@@ -6,6 +6,7 @@ class Reservation(models.Model):
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('refused', 'Refused'),
+        ('canceled', 'Canceled')
     ]
 
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)

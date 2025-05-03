@@ -7,10 +7,12 @@ class OrderStatus(models.TextChoices):
     PENDING = 'pending', 'Pending'
     PREPARING = 'preparing', 'Preparing'
     DONE = 'done', 'Done'
+    CANCELED ='canceled' 'Canceled'
 
 class OrderMode(models.TextChoices):
     SERVED = 'served', 'Served'
     DELIVERED = 'delivered', 'Delivered'
+    TAKEAWAY = 'take-away', 'Take-away'
 
 class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
