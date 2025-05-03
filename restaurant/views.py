@@ -41,15 +41,16 @@ def custom_login(request):
         
         if user is not None:
             login(request, user)
+            user.user_type = user.user_type.upper()  # Convert to uppercase
             request.session['display_username'] = user.get_full_name() or user.username
             if user.user_type == 'PDG':
                 return redirect('pdg_dashboard')
             elif user.user_type == 'MANAGER':
                 return redirect('manager_dashboard')
             elif user.user_type == 'CHEF':
-                return redirect('chef_dashboard')
+                return redirect('ordersListChef')
             elif user.user_type == 'SERVER':
-                return redirect('server_dashboard')
+                return redirect('takeOrder')
             elif user.user_type == 'DELIVERY':
                 return redirect('delivery_dashboard')
             elif user.user_type == 'CLIENT':

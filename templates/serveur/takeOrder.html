@@ -1,8 +1,9 @@
-{% include 'waiter/base.html' %}
+{% include 'serveur/base.html' %}
 {% load static %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'styles/waiter/order.css ' %}">
+<script src="{% static 'js/serveur/takeOrder.js' %}"></script>
 {% endblock %}
 
 {%  block content%}
@@ -25,39 +26,48 @@
     
     <!-- filter section -->
     <div class="d-flex flex-wrap justify-content-left gap-2 mb-4">
-      <button class="btn  filter" >All</button>
-      <button class="btn  filter" >Salads</button>
-      <button class="btn  filter" >Pasta</button>
-      <button class="btn  filter" >Pizza</button>
-      <button class="btn  filter" >Grilled</button>
-      <button class="btn  filter" >Drinks</button>
-      <button class="btn  filter" >Seafood</button>
-      <button class="btn  filter" >Desserts</button>
-      <div class="search-container ">
-        <i id="search-icon" class="bi bi-search "></i>
-        <input type="text" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search">
+        <button class="btn btn-outline-primary btn-sm filter " data-filter="all">All</button>
+        <button class="btn btn-outline-primary btn-sm filter" data-filter="salads">Salads</button>
+        <button class="btn btn-outline-primary btn-sm filter" data-filter="pasta">Pasta</button>
+        <button class="btn btn-outline-primary btn-sm filter" data-filter="pizza">Pizza</button>
+        <button class="btn btn-outline-primary btn-sm filter" data-filter="grilled">Grilled</button>
+        <button class="btn btn-outline-primary btn-sm filter" data-filter="drinks">Drinks</button>
+        <button class="btn btn-outline-primary btn-sm filter" data-filter="seafood">Seafood</button>
+        <button class="btn btn-outline-primary btn-sm filter" data-filter="desserts">Desserts</button>
         
-      </div>
+        <div class="ms-auto" style="min-width: 250px;">
+            <div class="input-group">
+            <span class="input-group-text">
+                <i class="bi bi-search"></i>
+            </span>
+            <input type="text" 
+                    class="form-control form-control-sm" 
+                    placeholder="Search..." 
+                    id="searchInput">
+            </div>
+        </div>
     </div>
     
+
+
       <div class="container-fluid">
         <div class="row  row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 ">
-          {% for dish in Dish %}
+          {% for dish in menu_entries %}
             <div class="col ">
                 <div class=" menu-card">
                     <img src="https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Cæesar Salad" class="menu-item-img">
                     <div class="menu-item-content">
-                        <div class="menu-item-name">Cæesar Salad {{dish.name}}</div>
-                        <div class="menu-item-desc">Romaine, parmesan, croutons, Caesar dressing {{dish.description}}</div>
+                        <div class="menu-item-name">{{dish.dish.name}}</div>
+                        <div class="menu-item-desc">{{dish.dish.description}}</div>
                         <div class="menu-item-footer">
-                            <span class="menu-item-price">10 $ {{dish.price}}</span>
-                            <button class="add-btn" data-id="1" data-name="Cæesar Salad" data-price="10">Add</button>
+                            <span class="menu-item-price">{{dish.dish.price}}</span>
+                            <button class="add-btn" data-id="{{ dish.dish.id }}" data-name="{{ dish.dish.name }}" data-price="{{ dish.dish.price }}">Add</button>
                         </div>
                     </div>
                 </div>
             </div>
             {% empty %}
-            <p>No reservations found.</p>
+            <p>menu found.</p>
            {% endfor%}
                 
             
@@ -66,11 +76,29 @@
   </div>
 
             <!-- Panier vertical à droite -->
-          <form method="post" action="{% url 'orders:place_order' %}" id="orderForm">
+          <form method="post" action="{% url 'place_order' %}" id="orderForm">
                {% csrf_token %}
+               {% if order %}
+                   <input type="hidden" name="order_id" value="{{ order.id }}">
+               {% endif %}
+                <div id="cart-fields">
+                    
+                    <input type="hidden" name="item_id"   value="">
+                    <input type="hidden" name="quantity"  value="">
+                    
+                </div>
                 <div class="col-4 order-summary " >
                     <div class="order-header">
                         <h5 class="m-0">Your Order</h5>
+                        <!-- ** New: Choose table ** -->
+                        <div class="mb-3 mt-3">
+                            
+                            <input type="number"name="table_number"id="tableInput" class="form-control"placeholder="Table.." min="1"required
+                                {% if order and order.table %}
+                                    value="{{ order.table_number }}"
+                                {% endif %}
+                            >
+                        </div>
                         <div class="order-count">0</div>
                     </div>
                     
@@ -97,8 +125,14 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
       document.addEventListener('DOMContentLoaded', function() {
+          
           // Gestion du panier
-          let cart = [];
+                
+            {% if order_items_json %}
+                let cart = {{ order_items_json|safe }};
+            {% else %}
+                let cart = [];
+            {% endif %}
           
           // Sélection des éléments du DOM
           const orderItemsEl = document.querySelector('.order-items');
@@ -111,6 +145,7 @@
           const orderForm  = document.getElementById('orderForm');
           const cartFields = document.getElementById('cart-fields');
 
+          
             orderForm.addEventListener('submit', function(e) {
             // 1️⃣ Clear old hidden inputs
             cartFields.innerHTML = '';
@@ -168,6 +203,7 @@
               // Ajout des écouteurs d'événements pour les boutons de contrôle
               document.querySelectorAll('.order-item-btn.minus').forEach(btn => {
                   btn.addEventListener('click', function() {
+                    
                       const itemId = parseInt(this.closest('.order-item').getAttribute('data-id'));
                       updateItemQuantity(itemId, -1);
                   });
@@ -175,6 +211,7 @@
               
               document.querySelectorAll('.order-item-btn.plus').forEach(btn => {
                   btn.addEventListener('click', function() {
+                    
                       const itemId = parseInt(this.closest('.order-item').getAttribute('data-id'));
                       updateItemQuantity(itemId, 1);
                   });
@@ -182,6 +219,7 @@
               
               document.querySelectorAll('.order-item-btn.remove').forEach(btn => {
                   btn.addEventListener('click', function() {
+                    
                       const itemId = parseInt(this.closest('.order-item').getAttribute('data-id'));
                       removeItemFromCart(itemId);
                   });
@@ -263,6 +301,7 @@
           // Écouteurs d'événements
           document.querySelectorAll('.add-btn').forEach(btn => {
               btn.addEventListener('click', function() {
+                  
                   const itemId = parseInt(this.getAttribute('data-id'));
                   const itemName = this.getAttribute('data-name');
                   const itemPrice = parseInt(this.getAttribute('data-price'));

@@ -83,3 +83,20 @@ background-color: white;
 .items{
     color: #FA4516;
 }
+#status_Form {
+    border-radius: 20px;
+    border: 1px solid #ff4500 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    width: 90px;
+    font-size: 0.8em;
+    margin-left: 90px;
+    padding: 2px 6px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+#status_Form:focus {
+    border-color: #cc3700;
+    box-shadow: 0 2px 8px rgba(255,69,0,0.2) !important;
+    outline: none;
+}

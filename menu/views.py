@@ -18,8 +18,14 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 
 
+@chef_required
+def recipes_list(request):
+    # Récupère tous les plats
+    dishes = Dish.objects.prefetch_related('dishingredient_set__ingredient').all()
 
-
+    return render(request, 'chef/recipie.html', {
+        'dishes': dishes,
+    })
 
 @pdg_required
 def menu_view(request):

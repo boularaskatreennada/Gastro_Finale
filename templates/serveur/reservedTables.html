@@ -1,4 +1,4 @@
-{% include 'waiter/base.html' %}
+{% include 'serveur/base.html' %}
 {% load static %}
 
 {% block extra_css %}
@@ -28,40 +28,41 @@
  
       <!-- === Filters bar === -->
       <div class="row g-2 align-items-center mb-3 mt-3">
-        <div class="col-12 col-md-1 d-grid">
-          <button id="clearFilters" class="btn btn-outline-secondary mt-4 shadow-sm ">All</button>
-        </div>
-        <div class="col-6 col-md-2">
-          <label class="form-label small" for="filterDate">Date</label>
-          <input type="date" id="filterDate" class="form-control shadow-sm filter">
-        </div>
-        <div class="col-6 col-md-2">
-          <label class="form-label small" for="filterTime">Time Slot</label>
-          <select id="filterTime" class="form-select shadow-sm filter">
-            <option value="">All</option>
-            <option value="Lunch">Lunch</option>
-            <option value="Dinner">Dinner</option>
-          </select>
-        </div>
-        <div class="col-6 col-md-2">
-          <label class="form-label small" for="filterStatus">Status</label>
-          <select id="filterStatus" class="form-select shadow-sm filter">
-            <option value="">All</option>
-            <option value="Pending">Pending</option>
-            <option value="Confirmed">Confirmed</option>
-            <option value="Seated">Seated</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-        </div>
-        <div class="col-6 col-md-2">
-          <label class="form-label small" for="filterTable">Table No.</label>
-          <input type="number" id="filterTable" class="form-control shadow-sm filter" placeholder="e.g. 12">
-        </div>
-        <div class="search-container mt-4">
-          <i id="search-icon" class="bi bi-search "></i>
-          <input type="text" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search">
-          
-        </div>
+        <form id="filterForm" method="get" class="row g-2 align-items-center mb-3 mt-3">
+          <div class="col-12 col-md-1 d-grid">
+            <button type="submit" name="clear" value="1" class="btn btn-outline-secondary mt-4 shadow-sm">All</button>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label small" for="filterDate">Date</label>
+            <input type="date" id="filterDate" name="filterDate" class="form-control shadow-sm filter" value="{{ request.GET.filterDate }}">
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label small" for="filterTime">Time Slot</label>
+            <select id="filterTime" name="filterTime" class="form-select shadow-sm filter">
+              <option value="" {% if not request.GET.filterTime %}selected{% endif %}>All</option>
+              <option value="Lunch" {% if request.GET.filterTime == "Lunch" %}selected{% endif %}>Lunch</option>
+              <option value="Dinner" {% if request.GET.filterTime == "Dinner" %}selected{% endif %}>Dinner</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label small" for="filterStatus">Status</label>
+            <select id="filterStatus" name="filterStatus" class="form-select shadow-sm filter">
+              <option value="" {% if not request.GET.filterStatus %}selected{% endif %}>All</option>
+              <option value="Pending" {% if request.GET.filterStatus == "Pending" %}selected{% endif %}>Pending</option>
+              <option value="Seated" {% if request.GET.filterStatus == "Seated" %}selected{% endif %}>Seated</option>
+              <option value="Cancelled" {% if request.GET.filterStatus == "Cancelled" %}selected{% endif %}>Cancelled</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label small" for="filterTable">Table No.</label>
+            <input type="number" id="filterTable" name="filterTable" class="form-control shadow-sm filter" placeholder="e.g. 12" value="{{ request.GET.filterTable }}">
+          </div>
+          <div class="search-container mt-4 col-12 col-md-3">
+            <i id="search-icon" class="bi bi-search"></i>
+            <input type="text" name="search" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search" value="{{ request.GET.search }}">
+          </div>
+        </form>
+        
       </div>
   <!-- Cards grid -->
   <div  class="row g-4" >
@@ -70,20 +71,42 @@
         <div id="cardContainer" class="card shadow-sm">
           <div id="card" class="card-body position-relative">
             
-            <span id="tables-num" class="badge  position-absolute top-0 start-0 m-2">{{ reservation.table.id }}</i></span>
+            <span id="tables-num" class="badge position-absolute top-0 start-0 m-2">
+              <input type="number"
+              name="table_number"
+              value="{{ reservation.table }}"
+              placeholder="Table #"
+              class="form-control form-control-sm"
+              style="width:70px; display:inline-block; font-size:0.8em; padding:2px 6px;" {% if reservation.status != 'accepted' %}readonly{% endif %}>
+            </span>
           
-            <span class="badge  position-absolute top-0 end-0 m-2 duration"><i class="bi bi-clock-fill"></i>{{ reservation.date_heure|time:"H:i" }}</span>
+            <span class="badge  position-absolute top-0 end-0 m-2 duration"><i class="bi bi-clock-fill"></i>{{ reservation.datetime|date:"H:i" }}</span>
             <p class="mt-4 mb-1"><i class="bi bi-clock"></i><strong>Reservation Time:</strong>{{ reservation.datetime }} </p>
-            <p class="mb-1"><i class="bi bi-person"></i><strong>Customer:</strong> {{ reservation.client.name }} </p>
-            <p class="mb-1"><i class="bi bi-telephone"></i><strong>Phone:</strong> {{ reservation.client.phone }} </p>
+            <p class="mb-1"><i class="bi bi-person"></i><strong>Customer:</strong> {{ reservation.client.user.get_full_name }}</p>
+            <p class="mb-1"><i class="bi bi-telephone"></i><strong>Phone:</strong> {{ reservation.phone }} </p>
             <p class="mb-1"><i class="bi bi-people"></i><strong>Guests:</strong>{{ reservation.number_of_people }} </p>
-            <p class="mb-3"><i class="mdi mdi-list-status mdi-24px" aria-hidden="true"></i><strong>Status:</strong>{{ reservation.status }} </p>
+            <div class="d-flex mb-3 position-relative">
+              <label class="form-label mb-0" for="Status"><i class="mdi mdi-list-status mdi-24px" aria-hidden="true"></i><strong>Status:</strong></label>
+              <form method="post" action="{% url 'update_reservation_status' reservation.pk %}" class="d-flex align-items-center gap-2 " style="position: absolute; top: 0; left: 0; width: 100%;">
+                {% csrf_token %}
+                
+                <select id="status_Form" name="status" class="form-select form-select-md mt-2" style="width:90px; font-size:0.8em ;margin-left: 90px; padding:2px 6px; " onchange="this.form.submit()">
+                  <option value="pending" {% if reservation.status == 'pending' %}selected{% endif %}>Pending</option>
+                  <option value="accepted" {% if reservation.status == 'accepted' %}selected{% endif %}>Accepted</option>
+                  <option value="refused" {% if reservation.status == 'refused' %}selected{% endif %}>Refused</option>
+                </select>
+              </form>
+            </div>
             
             <div class="d-flex justify-content-end">
-              <a href="{% url 'reservations:update_reservation' reservation.pk %}"  class="btn btn-sm btn-outline-danger me-2 items" ><i class="bi bi-pencil-fill"></i></a>
-              <form method="post" action="{% url 'reservations:delete_reservation' reservation.pk %}"  style="display:inline;">
+              <form method="post" action="{% url 'update_reservation' reservation.pk %}"  style="display:inline;">
                 {% csrf_token %}
-                <button class="btn btn-sm btn-outline-danger items"  onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');"><i class="bi bi-trash"></i></button>
+                <button class="btn btn-sm btn-outline-danger items mr-2"><i class="bi bi-pencil-fill"></i></button>
+              </form>
+              
+              <form method="post" action="{% url 'cancel_reservation' reservation.pk %}"  style="display:inline;">
+                {% csrf_token %}
+                <button class="btn btn-sm ms-2 btn-outline-danger items"  onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');"><i class="bi bi-trash"></i></button>
               </form>
             </div>
           </div>
@@ -97,4 +120,11 @@
     {% endfor %}
   </div>
 </div>
+<script>
+  document.querySelectorAll('.filter').forEach(el => {
+    el.addEventListener('change', () => {
+      document.getElementById('filterForm').submit();
+    });
+  });
+</script>
 {% endblock %}

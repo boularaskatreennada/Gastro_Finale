@@ -26,7 +26,7 @@ def chef_required(view_func):
     @wraps(view_func)
     @login_required
     def _wrapped_view(request, *args, **kwargs):
-        if request.user.user_type != 'CHEF':
+        if request.user.user_type.upper() != 'CHEF':
             return render(request, 'login.html')
         return view_func(request, *args, **kwargs)
     return _wrapped_view
@@ -35,7 +35,7 @@ def waiter_required(view_func):
     @wraps(view_func)
     @login_required
     def _wrapped_view(request, *args, **kwargs):
-        if request.user.user_type != 'WAITER':
+        if request.user.user_type.upper() != 'SERVER':
              return render(request, 'login.html')
         return view_func(request, *args, **kwargs)
     return _wrapped_view
