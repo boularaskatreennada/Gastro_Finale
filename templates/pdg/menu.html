@@ -1,0 +1,108 @@
+{% extends 'pdg/base.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="{% static 'styles/pdg/menu.css' %}">
+{% endblock %}
+{% block menu_active %}activate{% endblock %}
+
+{% block content %}
+<div class="main bg-white">
+  <nav class="navbar navbar-expand bg-basic d-flex justify-content-between">
+    <h6 class="fw-bold">Menu Management</h6>
+    <h6>{{ request.session.display_username }}</h6>
+  </nav>
+  <main class="content px-3 py-1">
+    <div class="container mt-2 mb-4">
+      <div class="d-flex justify-content-between mb-3">
+        <div>
+          <p class="fw-bold">Choose category</p>
+          <div class="dropdown d-flex align-items-center gap-2">
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                {% if selected_category_id == 'all' %}
+                  All Dishes
+                {% else %}
+                  {% for cat in categories %}
+                    {% if cat.id == selected_category_id|add:0 %}
+                      {{ cat.category }}
+                    {% endif %}
+                  {% endfor %}
+                  {% if not selected_category_id %}Choose category{% endif %}
+                {% endif %}
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="?category=all">All Dishes</a></li>
+                {% for cat in categories %}
+                  <li><a class="dropdown-item" href="?category={{ cat.id }}">{{ cat.category }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+            
+            <button class="btn btn-outline-primary btn-sm" type="button" onclick="document.getElementById('addCategoryForm').classList.toggle('d-none')">
+              Add +
+            </button>
+          </div>
+
+          <form id="addCategoryForm" method="POST" action="{% url 'menu' %}" class="d-none mt-2">
+            {% csrf_token %}
+            <div class="input-group">
+              <input type="text" name="category" class="form-control form-control-sm" placeholder="New category name" required>
+              <button type="submit" class="btn btn-primary btn-sm">Add</button>
+            </div>
+          </form>
+        </div>
+        <div class="d-flex">
+          <a href="{% url 'ingredients' %}" class="btn me-2" id="ingred">Ingredients</a>
+          <a href="{% url 'add_plate' %}" class="btn" id="add-plate">Add plate</a>
+        </div>
+      </div>
+
+      {% for dish in dishes %}
+      <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3">
+            <img src="{{ dish.image.url }}" class="rounded-circle" alt="Dish" style="width: 50px; height: 50px; object-fit: cover;">
+            <div>
+              <h5 class="mb-0">{{ dish.name }}</h5>
+              
+            </div>
+          </div>
+          <h5 class="fw-bold text-center">${{ dish.price }}</h5>
+          <div class="d-flex justify-content-between align-items-center">
+            <button class="btn btn-sm  mt-1" data-bs-toggle="collapse" data-bs-target="#recipe{{ dish.id }}">
+              Show Details
+            </button>
+            <a href="{% url 'edit_plate' dish.id %}" class="text-success me-2">Edit</a>
+            <form action="{% url 'delete_plate' dish.id %}"method="post" onsubmit="return confirm('Are you sure?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-link text-danger p-0 m-0">Delete</button>
+          </form>
+          </div>
+        </div>
+      
+        <div class="collapse" id="recipe{{ dish.id }}">
+          <div class="p-3 d-flex justify-content-around align-items-center">
+            <div>
+            <h6 class="fw-bold">Ingredients</h6>
+            <ul class="mb-2">
+              {% for item in dish.dishingredient_set.all %}
+                <li>{{ item.ingredient.name }} - {{ item.quantity }} {{ item.ingredient.unit }}</li>
+              {% endfor %}
+            </ul>
+            </div>
+            <div>
+            <h6 class="fw-bold">Recipe</h6>
+            <p>{{ dish.description }}</p>
+          </div>
+          </div>
+        </div>
+      </div>
+      
+      {% empty %}
+      <p>No dishes available.</p>
+      {% endfor %}
+    </div>
+  </main>
+</div>
+{% endblock %}

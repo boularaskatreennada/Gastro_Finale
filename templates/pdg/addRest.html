@@ -1,0 +1,68 @@
+{% extends 'pdg/baseform.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'styles/pdg/addMang.css' %}">
+{% endblock %}
+
+{% block titlee %}
+   <h4 class="form-title">{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Restaurant</h4>
+{% endblock %}
+
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+        <div class="row flex-column flex-md-row">
+            
+            <div class="col-md-7 mb-4">
+                <div class="icon-input mb-3">
+                    <i class="fa-solid fa-utensils"></i>
+                    {{ form.name }}
+                </div>
+                <div class="icon-input mb-3">
+                    <i class="fa-solid fa-envelope"></i>
+                    {{ form.email }}
+                </div>
+                <div class="icon-input mb-3">
+                    <i class="fa-solid fa-phone"></i>
+                    {{ form.phone }}
+                </div>
+                <div class="icon-input mb-3">
+                    <i class="fa-solid fa-location-pin"></i>
+                    {{ form.city }}
+                </div>
+                <div class="icon-input mb-3">
+                    {{ form.address }}
+                </div>
+                
+            </div>
+
+            <label for="id_photo" class="upload-area position-relative">
+                <img id="previewImage" class="w-100 h-100 rounded-circle" alt="Preview" style="display: none;">
+                <div class="d-flex flex-column align-items-center justify-content-center" id="uploadIcon">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <p>Upload Image</p>
+                </div>
+            </label>
+            
+            
+            {{ form.image }}
+            
+                <div class="buttons">
+                    <a href="{% url 'restaurants' %}" class="btn btn-outline btn1_color">Cancel</a>
+                    <button type="submit" class="btn btn2_color">Add</button>
+                </div>
+            </div>
+        </div>
+    </form>
+   
+{% endblock %}

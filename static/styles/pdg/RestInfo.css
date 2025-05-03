@@ -1,0 +1,22 @@
+:root{
+    --mainColor:#FA4516;
+    --secondColor:#F8E3A2;
+}
+
+.btn-css{
+    background-color: none;
+    color: black ;
+    border: none;
+    font-size: 20px;
+}
+.btn-css:hover{
+    color: var(--mainColor) ;
+}
+a.btn.btn-css.active{
+    color: var(--mainColor) ;
+    border-bottom: 1px solid var(--mainColor) ;
+    border-radius: 0px;
+}
+.search:hover{
+    color: var(--mainColor);
+}

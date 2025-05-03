@@ -1,0 +1,101 @@
+:root{
+    --mainColor:#FA4516;
+    --secondColor:#F8E3A2;
+}
+body {
+    height: 110vh;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    background: rgb(248,227,162);
+    background: linear-gradient(167deg, rgba(248,227,162,1) 1%, rgba(248,227,162,1) 40%, rgba(255,255,255,1) 66%, rgba(255,255,255,1) 100%);
+}
+@media screen and (max-width: 800px) {
+    body {
+      height: 170vh;
+    }
+    .form-container{
+        max-height: 800px;
+    }
+  }
+.form-container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    max-width: 700px;
+    width: 100%;
+    margin: .5rem;
+    height: auto;
+}
+.form-title {
+    text-align: left;
+    color: var(--mainColor);
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+.form-control,
+.form-select {
+    margin-bottom: 15px;
+    border-radius: 10px;
+    height: 2rem;
+}
+.text-area{
+    height:6rem;
+}
+.btn-cancel {
+    background-color: white;
+    color: var(--mainColor);
+    border: 1px solid var(--mainColor);
+}
+.btn-cancel:hover {
+    background-color: #f8d7da;
+}
+.btn-add {
+    background-color: var(--mainColor);
+    color: white;
+    border: none;
+}
+.btn-add:hover {
+    background-color: var(--mainColor);
+}
+.logo{
+    width: 60px;
+    height: 60px;
+}
+.btn1_color{
+     border: 1px solid var(--mainColor);
+     padding: .5rem 1rem;
+     color: var(--mainColor);
+}
+.btn2_color{
+    background-color: var(--mainColor);
+    padding: .5rem 1rem;
+    color: white;
+}
+.btn1_color:hover{
+    color: white;
+    background-color: var(--mainColor);
+}
+.btn2_color:hover{
+    border: 1px solid var(--mainColor);
+     color: var(--mainColor);
+}
+.left-form{
+    max-width: 50%;
+    width:90%;
+}
+.upload-area {
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    background-color: #f2f2f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+

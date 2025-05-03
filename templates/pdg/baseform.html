@@ -1,0 +1,30 @@
+<!-- templates/base_form.html -->
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GastroLink</title>
+  <link rel="icon" href="{% static 'images/GASTRO_LINK-.png' %}" type="image/x-icon"> 
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="{% static 'styles/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'styles/pdg/baseForm.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <div class="form-container d-flex flex-column justify-content-center align-items-start">
+
+      {% block titlee %}{% endblock %}
+      
+    
+    
+    {% block content %}
+    {% endblock %}
+  </div>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/pdg/baseForm.js' %}"></script>
+</body>
+</html>

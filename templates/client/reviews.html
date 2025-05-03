@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GastroLink</title>
+    <link rel="icon" href="{% static 'images/GASTRO_LINK-.png' %}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'styles/client/reviews.css' %}">
+   
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'landing_page' %}"><img src="{% static 'images/GASTRO_LINK-.png' %}" alt="GastroLink" class="logo"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'order' %}">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'client_offers' %}">Offers</a></li>
+                    <li class="nav-item"><a class="nav-link" id="active" href="{% url 'review_list' %}">Reviews</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'create_reservation' %}">Reservation</a></li>
+                </ul>
+                <a href="{% url 'login' %}" class="btn-signin">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="reviews-header">
+        <div class="container">
+            <h1>Customer Reviews</h1>
+            <p class="lead">See what our customers say about their GastroLink experience</p>
+
+            <a href="{% url 'add_review' %}" class="btn btn-success add-review-btn">Add Review</a>
+        </div>
+    </div>
+
+    <div class="reviews-container">
+        {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-text d-flex gap-2 ">
+                    <i class="fa-solid fa-user"></i>
+                    <p>{{ review.client }}</p>
+                   
+                </div>
+                <div class="review-author">
+                    <div class="author-info">
+                        {{ review.comment }}
+                        <div class="review-rating">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted">{{ review.date }}</small>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No reviews yet. Be the first to add one!</p>
+        {% endfor %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+{% extends 'pdg/baseform.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/pdg/addMang.css' %}">
+{% endblock %}
+
+{% block titlee %}
+<h4 class="form-title">{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Employee</h4>
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="w-100">
+    {% csrf_token %}
+    <div class="row">
+        <!-- Left side: inputs -->
+        <div class="col-md-7">
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-user"></i>
+                {{ form.first_name }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-user"></i>
+                {{ form.last_name }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-envelope"></i>
+                {{ form.email }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-phone"></i>
+                {{ form.phone }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-user-tie"></i>
+                {{ form.user_type }}
+            </div>
+            <div class="icon-input mb-3 supplier-only d-none">
+                <i class="fa-solid fa-location-pin"></i>
+                {{ form.address }}
+            </div>
+            <div class="icon-input mb-3 manager-only d-none">
+                <i class="fa-solid fa-utensils"></i>
+                {{ form.restaurant }}
+            </div>
+            <div class="icon-input mb-3 manager-only d-none">
+                <i class="fa-solid fa-lock"></i>
+                {{ form.password }}
+            </div>
+            <div class="icon-input mb-3 manager-only d-none">
+                <i class="fa-solid fa-lock"></i>
+                {{ form.status }}
+            </div>
+        </div>
+
+        <div class="buttons">
+            <a href="{% url 'employee_list' %}" class="btn btn-outline btn1_color">Cancel</a>
+            <button type="submit" class="btn btn2_color">Add</button>
+        </div>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const userTypeSelect = document.querySelector('[name="user_type"]');
+    const managerFields = document.querySelectorAll('.manager-only');
+    const supplierFields = document.querySelectorAll('.supplier-only');
+
+    function toggleFields() {
+        const role = userTypeSelect.value;
+        if (role === 'MANAGER') {
+            managerFields.forEach(el => el.classList.remove('d-none'));
+            supplierFields.forEach(el => el.classList.add('d-none'));
+        } else if (role === 'SUPPLIER') {
+            managerFields.forEach(el => el.classList.add('d-none'));
+            supplierFields.forEach(el => el.classList.remove('d-none'));
+        } else {
+            managerFields.forEach(el => el.classList.add('d-none'));
+            supplierFields.forEach(el => el.classList.add('d-none'));
+        }
+    }
+
+    toggleFields(); // On page load
+    userTypeSelect.addEventListener('change', toggleFields);
+});
+</script>
+{% endblock %}

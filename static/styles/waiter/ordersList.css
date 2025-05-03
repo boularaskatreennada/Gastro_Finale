@@ -1,0 +1,112 @@
+body{
+
+  background: linear-gradient(240deg, rgba(248, 227, 162, 0.427) 10%, rgba(255,255,255,1) 90%);
+}
+#main{
+    margin-left: 60px !important;
+}
+.navbar{
+  background-color: white;
+  box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
+  width: 100%;
+}
+.navbar-expand .navbar-collapse{
+  min-width: 200px;
+  
+}
+.avatar{
+  height: 40px;
+  width: 40px;
+}
+.search-container{
+    max-width: 300px; 
+    width: 100%;
+}
+#search-icon{
+    position: absolute;
+        
+       padding-left: 4px;
+       padding-top: 2px;
+        color: #aaa;    
+        font-size: 1.2rem;
+       
+  }
+  .search-input {
+    padding-left: 2.5rem; /* leave space for the icon */
+    
+  }
+  #clearFilters{
+    color:#FA4516 !important;
+    border: 1px solid #FA4516 !important;
+    margin-top: 30px !important;
+    
+  }
+  #clearFilters:hover{
+    background-color: #fa4416c6 !important;
+    color: white !important;
+  }
+  #clearFilters.active{
+    background-color: #fa4416c6 !important;
+    color: white !important;
+  }
+.filter{
+border: 1px solid #FA4516 !important;
+color: #FA4516 !important;
+background-color: white;
+
+}
+/* Order list styling */
+.order-row {
+    background-color: #fff;
+    border: 1px solid #f8e3a2d7;
+   
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .order-row:hover ,.order-row:active{
+    background-color:  #f8e3a294;
+    transform: translateY(-5px);      
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .order-status {
+    border-radius: 20px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.85rem;
+    width: 70px;
+    color: rgb(255, 255, 255) !important;
+  }
+  .price{
+    color: orangered !important;
+  }
+
+  #chevron{
+    color: orangered !important;
+  }
+  #btnCancel{
+    background-color: red !important;
+    color: #fff !important;
+    border-radius:10px;
+    transition: transform 0.2s ease;
+  }
+  #btnCancel:hover{
+    transform: scale(1.03);
+    background-color: #fff !important;
+    color: red !important;
+  }
+  #btnModify{
+    background-color: green !important;
+    color: #fff !important;
+    border-radius:10px;
+    transition: transform 0.2s ease;
+  }
+  #btnModify:hover{
+    transform: scale(1.03);
+    background-color: #fff !important;
+    color:green !important;
+  }

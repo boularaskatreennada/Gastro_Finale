@@ -1,0 +1,12 @@
+{% extends 'pdg/baseform.html' %}
+{% block titlee %}<h4 class="form-title"><h4 class="form-title">{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Ingredient</h4></h4>{% endblock %}
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <div class="mt-3 d-flex justify-content-between">
+    <a href="{% url 'ingredients' %}" class="btn btn-outline btn1_color">Cancel</a>
+    <button type="submit" class="btn btn2_color">Add</button>
+  </div>
+</form>
+{% endblock %}

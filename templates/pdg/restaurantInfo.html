@@ -1,0 +1,215 @@
+{% extends 'pdg/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="{% static 'styles/pdg/RestInfo.css'%}">
+{% endblock %}
+
+{% block restaurants_active %}activate{% endblock %}
+
+{% block content %}
+<div class="main">
+<div class="container mt-4">
+
+    <h2>{{ restaurant.name }}</h2>
+
+    <!-- Buttons -->
+    <div class="my-4 d-flex gap-3">
+        <a href="?view=daily_menu" class="btn btn-css {% if view_type == 'daily_menu' %}active{% endif %}">Daily Menu</a>
+        <a href="?view=expenses" class="btn btn-css {% if view_type == 'expenses' %}active{% endif %}">Expenses</a>
+        <a href="?view=orders" class="btn btn-css {% if view_type == 'orders' %}active{% endif %}">Client Orders</a>
+        <a href="?view=complaints" class="btn btn-css {% if view_type == 'complaints' %}active{% endif %}">Complaints</a>
+        <a href="?view=reservations" class="btn btn-css {% if view_type == 'reservations' %}active{% endif %}">Reservations</a>
+
+    </div>
+
+    <!-- Content based on selected view -->
+    {% if view_type == 'daily_menu' %}
+        <form method="get" class="d-flex align-items-center gap-2 mb-3">
+            <input type="hidden" name="view" value="daily_menu">
+            <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" class="form-control" style="width: 200px;">
+            <button type="submit" class="btn search"><i class="fa fa-search"></i></button>
+        </form>
+
+        {% if menus %}
+        <div class="list-group">
+            {% for menu in menus %}
+                {% for dish in menu.dailymenudish_set.all %}
+                    <div class="list-group-item d-flex gap-5 align-items-center">
+                        {% if dish.dish.image %}
+                            <img src="{{ dish.dish.image.url }}" alt="{{ dish.dish.name }}" 
+                                style="width: 70px; height: 70px; object-fit: cover; border-radius: 10px;">
+                        {% endif %}
+                        <h5>{{ dish.dish.name }}</h5>
+                        <h5 class="text-success">Initial Quantity: {{ dish.initial_quantity }}</h5>
+                        <h5 class="text-primary">Remaining Quantity: {{ dish.current_quantity }}</h5>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {% else %}
+            <p>No daily menu for this day.</p>
+        {% endif %}
+
+    {% elif view_type == 'expenses' %}
+        <form method="get" class="d-flex align-items-center gap-2 mb-3">
+            <input type="hidden" name="view" value="expenses">
+            <input type="number" name="month" min="1" max="12" placeholder="Month" class="form-control" style="width: 120px;">
+            <input type="number" name="year" placeholder="Year" class="form-control" style="width: 150px;">
+            <button type="submit" class="btn search"><i class="fa fa-search"></i></button>
+        </form>
+
+        {% if expenses %}
+        <table id="expenses-table" class="table table-striped border" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                        <tr>
+                            <td>{{ expense.expense_date }}</td>
+                            <td>{{ expense.get_category_display }}</td>
+                            <td>${{ expense.amount }}</td>
+                            <td>{{ expense.description }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No expenses for this month.</p>
+        {% endif %}
+
+    {% elif view_type == 'orders' %}
+        <form method="get" class="d-flex align-items-center gap-2 mb-3">
+            <input type="hidden" name="view" value="orders">
+            <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" class="form-control" style="width: 200px;">
+            <button type="submit" class="btn search"><i class="fa fa-search"></i></button>
+        </form>
+
+        <div class="table-responsive" id="restlist">
+            {% if orders %}
+            <table id="orders-table" class="table table-striped border" style="width:100%">
+                <thead>
+                    <tr>
+                        <th class="text-start">Order Date</th>
+                        <th>Client Name</th>
+                        <th>Status</th>
+                        <th>Mode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td class="text-start">{{ order.order_date|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            {% if order.client %}
+                                {{ order.client.user.username }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>{{ order.get_status_display }}</td>
+                        <td>{{ order.get_mode_display }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>No client orders for this day.</p>
+            {% endif %}
+        </div>
+
+    {% elif view_type == 'complaints' %}
+        <div class="table-responsive">
+            {% if complaints %}
+            <table id="complaints-table" class="table table-striped border" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>Email</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td>{{ complaint.client.user.username }}</td>
+                        <td>{{ complaint.client.user.email }}</td>
+                        <td>{{ complaint.message }}</td>
+                        <td>{{ complaint.get_status_display }}</td>
+                        <td>{{ complaint.date|date:"Y-m-d" }}</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>No complaints found for this restaurant.</p>
+            {% endif %}
+        </div>
+
+        {% elif view_type == 'reservations' %}
+    <form method="get" class="d-flex align-items-center gap-2 mb-3">
+        <input type="hidden" name="view" value="reservations">
+        <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" class="form-control" style="width: 200px;">
+        <button type="submit" class="btn search"><i class="fa fa-search"></i></button>
+    </form>
+
+    <div class="table-responsive">
+        {% if reservations %}
+        <table id="reservations-table" class="table table-striped border" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Client Name</th>
+                    <th>People</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                <tr>
+                    <td>{{ reservation.date }}</td>
+                    <td>{{ reservation.time|time:"H:i" }}</td>
+                    <td>
+                        {% if reservation.client %}
+                            {{ reservation.client.user.get_full_name }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ reservation.num_people }}</td>
+                    <td>{{ reservation.get_status_display }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>No reservations for this date.</p>
+        {% endif %}
+    </div>
+
+    {% endif %}
+</div>
+
+
+</div>
+ 
+</div>
+
+<script defer src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+<script src="{% static 'js/manager/expenses.js' %}"></script>
+{% endblock %}

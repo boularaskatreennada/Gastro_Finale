@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+{% load static%}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Document{% endblock %}</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{% static 'styles/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/chef/base.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link
+  href="https://cdn.materialdesignicons.com/6.5.95/css/materialdesignicons.min.css"
+  rel="stylesheet"
+/>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+
+    {% block extra_css %}
+    {% endblock %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  
+    <div class="wrapper ">
+        <aside id="sidebar" >
+            <div class="d-flex justify-content-between ">
+                <div class="sidebar-logo">
+                    <img src="{% static 'images/GASTRO_LINK-.png' %}" class="logo" alt="">
+                </div>
+                <button class="toggle-btn border-0" type="button">
+                    <i id="icon" class='bx bxs-chevrons-right'></i>
+                </button>
+            </div>
+            <ul class="sidebar-nav 
+                     flex-row flex-md-column   
+                     justify-content-around    
+                     w-100                    
+                     mb-3 mb-md-0    ">
+                <li class="sidebar-item" id="{% block dashboard_active %}{% endblock %}">
+                    <a href="{% url 'ordersListChef' %}" class="sidebar-link">
+                        <i class="las la-clipboard-list"></i>
+                    <span>Orders list</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item" id="{% block menu_active %}{% endblock %}">
+                    <a href="{% url 'recipie' %}" class="sidebar-link">
+                    
+                    <i class='bx bxs-book' style='color:#fc5012'  ></i>
+                    <span>Recipies</span>
+                </a></li>
+
+               
+            </ul>
+            <div class="sidebar-footer">
+                <ul class="sidebar-nav">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                          <i class='bx bx-log-out-circle'></i>
+                          <span>Log out</span>
+                        </a>
+                    </li>
+                </ul>
+                
+            </div>
+
+        </aside>
+     
+        {% block content %}
+        <div id="main" >
+        {% endblock %}
+
+    </div>
+    
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/pdg/base.js' %}"></script>
+</body>
+</html>

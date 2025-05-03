@@ -1,0 +1,264 @@
+/* General Reset and Font */
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    padding: 0;
+    margin: 0;
+}
+:root {
+    --primary: #FA4516;
+    --secondary: #f4a261;
+    --light: #f1faee;
+    --dark: #1d3557;
+    --accent: #457b9d;
+    --warning: #F8E3A2;
+}
+
+.navbar-toggler{
+    border: none;
+}
+
+
+/* Consistent navigation */
+.navbar {
+    height: 70px;
+    padding: 0 1.5rem;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    background-color: #f8e3a3;
+}
+.cart-toggle-btn i {
+    font-size: 22px;
+}
+.logo {
+    width: 70px;
+    height: auto;
+    margin: 0;
+}
+
+.nav-link {
+    padding: 0.5rem 1.2rem;
+    font-weight: 500;
+    color: var(--dark) !important;
+    position: relative;
+
+}
+
+.nav-link:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--primary);
+    transition: width 0.3s;
+}
+
+.nav-link:hover:after {
+    width: 100%;
+}
+
+.active{
+    color: var(--primary);
+}
+.btn-signin {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+
+.sidebar{
+    height: 100;
+    background-color: #f1f1f1;
+    padding-top: 10px;
+    margin-top: 0;
+   
+}
+/* Sidebar */
+.col-md-3 h6 {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.form-select, .list-group-item {
+    border-radius: 0.5rem;
+}
+
+.list-group-item {
+    transition: background-color 0.3s, color 0.3s;
+    margin-bottom: 5px;
+}
+
+.list-group-item:hover {
+    background-color: #f1f1f1;
+}
+
+.list-group-item.active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Dishes */
+.card {
+    border: none;
+    width: 200px;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+    height: 120px;
+    object-fit: cover;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+.card-title {
+    font-weight: 600;
+}
+
+.card-text {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.input-group .form-control {
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.input-group .btn {
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Buttons */
+.btn-success {
+    background-color: var(--primary);
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: var(--primary);
+}
+
+.btn-primary {
+    background-color: #dc3545;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #c82333;
+}
+
+/* Order Summary */
+#order-summary {
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background-color: white;
+}
+
+#order-summary li {
+    border: none;
+}
+
+#place-order-btn {
+    border-radius: 0.5rem;
+}
+
+/* Responsive tweaks */
+
+@media (max-width: 992px) {
+    .after-bg{
+        background-color: var(--light);
+        gap: 1;
+        position: absolute;
+        top: 70px;
+        right: 0;
+        z-index: 100000;
+    }
+}
+
+@media (max-width: 768px) {
+    
+    .navbar {
+        padding: 0 1rem;
+    }
+
+    #order-cart {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        height: 100%;
+        background-color: #fff;
+        z-index: 1050;
+        box-shadow: -2px 0 6px rgba(0,0,0,0.1);
+        transition: right 0.3s ease;
+        overflow-y: auto;
+    }
+
+    #order-cart.active {
+        right: 0;
+    }
+
+    .cart-toggle-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 55px;
+        height: 55px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        font-size: 24px;
+        z-index: 1060;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s;
+    }
+
+    .cart-toggle-btn:hover {
+        background-color: #c82333;
+    }
+
+    .logo{
+        width: 60px;
+        margin: 0;
+    }
+    nav{
+        padding: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar {
+        height: 70px;
+    }
+
+    .form-icon {
+        left: 10px;
+        font-size: 1rem;
+    }
+
+    .form-control, .form-select {
+        padding-left: 35px;
+    }
+}
+

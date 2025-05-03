@@ -1,0 +1,90 @@
+{% extends 'pdg/baseform.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/pdg/addMang.css' %}">
+{% endblock %}
+
+
+{% block titlee %}
+<h4 class="form-title">{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Offer</h4>
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="d-flex justify-content-between">
+    {% csrf_token %}
+    <div class="left-side" style="width: 60%;">
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="icon-input mb-3">
+            <i class="fa-solid fa-bullhorn"></i>
+            {{ form.title }}
+        </div>
+    
+        <div class="icon-input mb-3">
+            <i class="fa-solid fa-calendar-days"></i>
+            {{ form.start_date }}
+        </div>
+        <div class="icon-input mb-3">
+            <i class="fa-solid fa-star-of-life"></i>
+            {{ form.code }}
+        </div>
+           
+        <div class="icon-input mb-3">
+            <i class="fa-solid fa-calendar-days"></i>
+            {{ form.end_date }}
+        </div>
+        <div class="icon-input mb-3">
+            <i class="fa-solid fa-percent"></i>
+            {{ form.discount }}
+        </div>
+      
+    
+        <div class="icon-input mb-3">
+            {{ form.description }}
+        </div>
+    </div>
+
+    <div class="right-side">
+        <label for="id_photo" class="upload-area position-relative">
+            <img id="previewImage" class="w-100 h-100 rounded-circle" alt="Preview" style="display: none;">
+            <div class="d-flex flex-column align-items-center justify-content-center" id="uploadIcon">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <p>Upload Image</p>
+            </div>
+        </label>
+        
+        
+        {{ form.image }}
+        <div class="buttons">
+            <a href="{% url 'offers' %}" class="btn btn-outline btn1_color">Cancel</a>
+            <button type="submit" class="btn btn2_color">Add</button>
+        </div>
+    </div>
+    
+</form>
+<script>
+    document.getElementById('id_photo').addEventListener('change', function () {
+  const file = this.files[0];
+  const preview = document.getElementById('previewImage');
+  const icon = document.getElementById('uploadIcon');
+
+  if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          if (icon) icon.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+  }
+});
+</script>
+{% endblock %}

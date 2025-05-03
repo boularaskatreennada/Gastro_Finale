@@ -1,0 +1,84 @@
+:root{
+    --mainColor:#FA4516;
+    --secondColor:#F8E3A2;
+}
+
+.navbar{
+    background-color: white;
+    box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
+    padding: 0.3rem 1.5rem;
+}
+
+.navbar-expand .navbar-collapse{
+    min-width: 200px;
+}
+.avatar{
+    height: 40px;
+    width: 40px;
+}
+#btn {
+    padding: 0.5rem 1rem; 
+    background-color: var(--mainColor);
+    color: white;
+    border: none; 
+    border-radius: 0.25rem; 
+    font-size: 1rem; 
+    text-decoration: none;
+}
+#btn:hover {
+    background-color: #F8E3A2;
+    color: #FA4516;
+}
+
+
+td{
+    border: 0;
+}
+td a{
+    text-decoration: none;
+}
+div#restlist{
+    overflow-x:auto;
+    margin: 0rem;
+    
+}
+
+#example th, #example td {
+    text-align: left;
+}
+@media (max-width: 768px) {    
+.d-flex.flex-column.flex-md-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+}
+.expense-actions a, .expense-actions button {
+    font-size: 0.9rem;
+}
+.expense-amount {
+    font-weight: 500;
+    color: #d32f2f; /* Red for expenses */
+}
+.category-badge {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+#show-orders,
+#show-complaints{
+    color: black;
+}
+#show-orders.active,
+#show-complaints.active{
+    border: none;
+    border-radius:0;
+    color: var(--mainColor);
+    border-bottom:2px solid var(--mainColor) ;
+}
+.btn-primary.filter{
+    background-color: var(--secondColor);
+    color: var(--mainColor);
+    border: var(--secondColor);
+}

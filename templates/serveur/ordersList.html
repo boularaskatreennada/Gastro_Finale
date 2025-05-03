@@ -1,0 +1,171 @@
+{% include 'waiter/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/waiter/ordersList.css' %}">
+{% endblock %}
+
+{%  block content%}
+<div id="main" class=" ">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <nav class="navbar navbar-expand px-3 py-1 bg-basic">
+        <h2 class=" ">Orders</h2>
+
+        <div class="navbar-collapse collapse">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+                <a href="" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
+                    <img src="{% static 'images/téléchargement.jpg' %}" class="avatar  img-fluid rounded-circle border border-dark" alt="">
+                </a>
+            
+            </li>
+          </ul>
+        </div>
+      </nav>
+        
+      
+      
+      
+    </div>
+      <!-- === Filter Bar === -->
+      <div class="row g-2 align-items-center mb-3">
+        <!-- “All” button clears all filters -->
+        <div class="col-12 col-md-1 d-grid">
+          <button
+            id="clearFilters"
+            class="btn btn-outline-secondary mt-4 shadow-sm"
+            onclick="location.href='{{ request.path }}';"
+          >
+            All
+          </button>
+        </div>
+      
+        <!-- Order Status -->
+        <div class="col-6 col-md-2">
+          <label class="form-label small" for="filterStatus">Order Status</label>
+          <select
+            id="filterStatus"
+            name="filterStatus"
+            class="form-select filter"
+            onchange="location='?filterStatus='+this.value"
+          >
+            <option value="" >All</option>
+            <option value="pending"   >New</option>
+            <option value="preparing" >In Progress</option>
+            <option value="done"      >Ready</option>
+            <option value="served"    >Served</option>
+            <option value="cancelled" >Cancelled</option>
+          </select>
+        </div>
+      
+        <!-- Order Type -->
+        <div class="col-6 col-md-2">
+          <label class="form-label small" for="filterType">Order Type</label>
+          <select
+            id="filterType"
+            name="filterType"
+            class="form-select filter"
+            onchange="location='?filterType='+this.value"
+          >
+            <option value=""            >All</option>
+            <option value="served"      >Dine‑in</option>
+            <option value="takeaway"   >Takeaway</option>
+            <option value="delivered"  >Delivery</option>
+          </select>
+        </div>
+      
+        <!-- Table Number -->
+        <div class="col-6 col-md-2">
+          <label class="form-label small" for="filterTable">Table Number</label>
+          <input
+            type="number"
+            id="filterTable"
+            name="filterTable"
+            class="form-control filter"
+            placeholder="e.g. 5"
+            value="{{ request.GET.filterTable }}"
+            onchange="location='?filterTable='+this.value"
+          >
+        </div>
+      
+        <!-- Payment Status -->
+        <div class="col-6 col-md-2">
+          <label class="form-label small" for="filterPayment">Payment Status</label>
+          <select
+            id="filterPayment"
+            name="filterPayment"
+            class="form-select filter"
+            onchange="location='?filterPayment='+this.value"
+          >
+            <option value=""     >All</option>
+            <option value="paid"   >Paid</option>
+            <option value="unpaid" >Unpaid</option>
+          </select>
+        </div>
+      
+        <!-- Free‑text Search -->
+        <div class="col-12 col-md-2">
+          <div class="search-container">
+            <i id="search-icon" class="bi bi-search"></i>
+            <input type="text" name="search" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search">
+          </div>
+        </div>
+      </div>
+      
+
+  
+      <!-- Orders List -->
+      {% for order in orders %}
+      <div>
+        <!-- Order 1 -->
+        <div class="order-row  d-flex justify-content-between align-items-left">
+          <div>
+            <h6 class="mb-1"> {{ order.client.name }}</h6>
+            <small> #{{ order.pk }} • {{ order.items_count }} </small>
+            <h6 class="mb-0 text-primary price">{{ order.total_price }}</h6>
+          </div>
+
+          <div class="text-end">
+            <div class="d-flex">
+              <span class="order-status bg-warning text-dark ">{{ order.get_status_display }} </span>
+              <button class="btn btn-link p-0 ms-4" type="button" data-bs-toggle="collapse" data-bs-target="#items{{ order.pk }}" aria-expanded="false" aria-controls="items">
+                <i id="chevron" class="bi bi-chevron-down"></i>
+              </button>
+            </div>
+            <div class="d-flex justify-content-end">
+              <a href="{% url 'edit_order' order.pk %}" class="btn btn-sm  mt-3 " id="btnCancel"><strong>Cancel</strong></a>
+              <a href="{% url 'cancel_order' order.pk %}" class="btn  btn-sm ms-2 mt-3 " id="btnModify"><strong>Modify</strong></a>
+            </div>
+          </div>
+        </div>
+        <div class="collapse mt-2" id="items">
+          <table class="table items-table mb-3">
+            
+            <tbody>
+              {% for item in order.orderdish_set.all %}
+              <tr >
+                <td >{{ item.dish.name }} </td>
+                <td>{{ item.quantity }}</td>
+                <td  class="text-end "><i class="bi bi-currency-dollar"></i> {{ item.dish.price|floatformat:2 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+       
+
+        
+
+      </div>
+      
+     
+    </div>
+    
+    {% empty %}
+    <p>No orders found.</p>
+  {% endfor %}
+    
+    
+</div>  
+{% endblock %}

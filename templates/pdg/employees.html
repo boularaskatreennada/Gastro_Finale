@@ -1,0 +1,110 @@
+{% extends 'pdg/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="{% static 'styles/pdg/employee.css'%}">
+{% endblock %}
+
+{% block employees_active %}activate{% endblock %}
+
+{% block content %}
+<div class="main bg-white">
+  <nav class="navbar navbar-expand bg-basic d-flex justify-content-between">
+    <h6 class="fw-bold">Employees Management</h6>
+    <h6>{{ request.session.display_username }}</h6>
+  </nav>
+  <main class="content px-3 py-1">
+    <div class="container mt-2 mb-4">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div class="d-flex align-items-center" id="list-employee-manager">
+          <h6 class="me-3" id="managers-btn">Managers</h6>
+          <h6 class="me-3" id="suppliers-btn">Suppliers</h6>
+        </div>
+        <a href="{% url 'add_employee' %}" id="btn">Add<span>+</span></a>
+      </div>
+
+      <!-- Managers Table -->
+      <div class="table-responsive" id="manager">
+        <table id="managers-table" class="table table-striped border" style="width:100%">
+          <thead>
+              <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Restaurant</th>
+                  <th>Status</th>
+                  <th>Operations</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for manager in managers %}
+            <tr>
+              <td>{{ manager.user.get_full_name }}</td>
+              <td>{{ manager.user.phone }}</td>
+              <td>{{ manager.user.email }}</td>
+              <td>{{ manager.restaurant.name }}</td>
+              <td>{{ manager.get_status_display }}</td>
+              <td class="d-flex justify-content-evenly align-items-center">
+                <a href="{% url 'edit_employee' manager.user.pk %}" class="text-success">
+                  <i class="fa-solid fa-user-pen"></i> Edit
+                </a>
+                <form action="{% url 'delete_manager' manager.pk %}" method="post" onsubmit="return confirm('Are you sure you want to delete this manager?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-link text-danger p-0 m-0">
+                    <i class="fa-solid fa-trash"></i> Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Suppliers Table -->
+      <div class="table-responsive d-none" id="supplier">
+        <table id="suppliers-table" class="table table-striped border" style="width:100%">
+          <thead>
+              <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Address</th>
+                  <th>Operations</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for supplier in suppliers %}
+            <tr>  
+              <td>{{ supplier.user.get_full_name }}</td>
+              <td>{{ supplier.user.phone }}</td>
+              <td>{{ supplier.user.email }}</td>
+              <td>{{ supplier.address }}</td>
+              <td class="d-flex justify-content-evenly align-items-center">
+                <a href="{% url 'edit_employee' supplier.user.pk %}" class="text-success">
+                  <i class="fa-solid fa-user-pen"></i> Edit
+                </a>
+                <form action="{% url 'delete_supplier' supplier.pk %}" method="post" onsubmit="return confirm('Are you sure you want to delete this supplier?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-link text-danger p-0 m-0">
+                    <i class="fa-solid fa-trash"></i> Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script defer src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+<script defer src="{% static 'js/pdg/employee.js' %}"></script>
+{% endblock %}

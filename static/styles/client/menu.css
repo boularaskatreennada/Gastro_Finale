@@ -1,0 +1,242 @@
+:root {
+    --primary: #fa4516;
+    --secondary: #f4a261;
+    --light: #f1faee;
+    --dark: #1d3557;
+    --accent: #457b9d;
+    --warning: #ff9e00;
+  }
+  
+  body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    background-color: #eee;
+  }
+  
+  .navbar {
+    background-color: #f8e3a3;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .logo {
+    height: 60px;
+  }
+  
+  .nav-link {
+    font-weight: 500;
+    color: var(--dark) !important;
+    position: relative;
+  }
+  
+  .nav-link.active {
+    color: var(--primary) !important;
+    font-weight: 600;
+  }
+  
+  .btn-signin {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-signin:hover {
+    background-color: #c1121f;
+    transform: translateY(-1px);
+  }
+  
+  .main-container {
+    display: flex;
+    padding: 2rem 1rem;
+    gap: 2rem;
+  }
+  
+  .sidebar {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    width: 280px;
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .sidebar-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--dark);
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 0.5rem;
+  }
+  
+  .category-item {
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .category-item:hover,
+  .category-item.active {
+    background-color: var(--primary);
+    color: white;
+  }
+  
+  .menu-items {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .menu-card {
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  }
+  
+  .menu-item-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  
+  .menu-item-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+  
+  .menu-item-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+    color: var(--dark);
+  }
+  
+  .menu-item-desc {
+    font-size: 0.9rem;
+    color: #555;
+    flex-grow: 1;
+  }
+  
+  .menu-item-footer {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .menu-item-price {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--primary);
+  }
+  
+  .add-btn {
+    background-color: var(--primary);
+    border: none;
+    padding: 6px 12px;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.3s;
+  }
+  
+  .add-btn:hover {
+    background-color: #c1121f;
+  }
+  
+  .order-summary {
+    position: fixed;
+    top: 90px;
+    right: 30px;
+    width: 300px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .order-count {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+    padding: 5px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .order-items {
+    margin-bottom: 1rem;
+  }
+  
+  .empty-cart {
+    text-align: center;
+    font-style: italic;
+    color: #888;
+  }
+  
+  .order-note {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    resize: none;
+    min-height: 60px;
+    margin-bottom: 1rem;
+  }
+  
+  .order-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .submit-btn {
+    background: var(--primary);
+    color: white;
+    width: 100%;
+    border: none;
+    padding: 10px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: 0.3s;
+  }
+  
+  .submit-btn:disabled {
+    background-color: #ccc;
+  }
+  
+  .cart-toggle {
+    display: none;
+  }
+  

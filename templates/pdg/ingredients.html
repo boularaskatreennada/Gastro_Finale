@@ -1,0 +1,126 @@
+{% extends 'pdg/base.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="{% static 'styles/pdg/employee.css' %}">
+<link rel="stylesheet" href="{% static 'styles/pdg/ingredients.css' %}">
+{% endblock %}
+{% block menu_active %}activate{% endblock %}
+
+{% block content %}
+<div class="main bg-white">
+  <nav class="navbar navbar-expand bg-basic d-flex justify-content-between">
+    <h6 class="fw-bold">Ingredients Management</h6>
+    <h6>{{ request.session.display_username }}</h6>
+  </nav>
+
+  <main class="content px-3 py-1">
+    <div class="container mt-2 mb-4">
+      <!-- Ingredient Form -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h6 class="card-title">
+            {% if is_editing %}
+              Edit Ingredient: {{ current_ingredient.name }}
+            {% else %}
+              Add New Ingredient
+            {% endif %}
+          </h6>
+          <form method="post" class="row g-3 align-items-end">
+            {% csrf_token %}
+            <div class="col-md-3">
+              <label class="form-label">Name</label>
+              {{ form.name }}
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Category</label>
+              {{ form.category }}
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Unit</label>
+              {{ form.unit }}
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Price/Unit ($)</label>
+              {{ form.price_per_unit }}
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+              <button type="submit" class="btn btn1 flex-grow-1">
+                {% if is_editing %}Update{% else %}Add{% endif %}
+              </button>
+              {% if is_editing %}
+                <a href="{% url 'ingredients' %}" class="btn btn2 flex-grow-1">Cancel</a>
+              {% endif %}
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Category Filter -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h6 class="card-title">Filter by Category</h6>
+          <div class="d-flex flex-wrap gap-2">
+            <a href="?category=all" class="btn btn-sm btn-outline-primary">All</a>
+            {% for value, label in category_choices %}
+              <a href="?category={{ value }}" class="btn btn-sm btn-outline-primary">{{ label }}</a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Ingredients List -->
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-3">
+            <h6>All Ingredients</h6>
+          </div>
+          
+          <div class="table-responsive">
+            <table id="example" class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Unit</th>
+                  <th>Price/Unit</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ing in ingredients %}
+                <tr class="{% if is_editing and current_ingredient.id == ing.id %}table-active{% endif %}">
+                  <td>{{ ing.name }}</td>
+                  <td>{{ ing.get_category_display }}</td>
+                  <td>{{ ing.get_unit_display }}</td>
+                  <td>${{ ing.price_per_unit }}</td>
+                  <td>
+                    <a href="{% url 'ingredients' ing.id %}" class="btn btn-sm btn-outline-success">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'delete_ingredient' ing.id %}" class="btn btn-sm btn-outline-danger">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center">No ingredients found</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script defer src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+<script defer src="{% static 'js/pdg/rest.js' %}"></script>
+{% endblock %}

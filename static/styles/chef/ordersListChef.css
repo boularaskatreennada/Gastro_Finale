@@ -1,0 +1,121 @@
+body{
+
+  background: linear-gradient(240deg, rgba(248, 227, 162, 0.427) 10%, rgba(255,255,255,1) 90%) !important;
+}
+.navbar{
+  background-color: white;
+  box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
+  width: 100%;
+}
+.navbar-expand .navbar-collapse{
+  min-width: 200px;
+  
+}
+.avatar{
+  height: 40px;
+  width: 40px;
+}
+.top-nav {
+  
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  /* Ensure the nav occupies full width with evenly spaced items */
+  .filter-bar .nav {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Style each filter link */
+  .filter-link {
+    display: block;
+    position: relative;
+    padding: 0.75rem 1rem; /* Adjust for your desired button height */
+    color: #6c757d;       /* Default text color (gray) */
+    transition: color 0.3s ease, background-color 0.3s ease;
+    border: none;
+  }
+  
+  /* Hover effect for filter links */
+  .filter-link:hover {
+    color: orangered;
+  }
+  
+  /* Active state: blue text/background and a colored underline */
+  .filter-link.active {
+    color: orangered !important;
+    background-color: transparent !important;
+    /* Optionally, you could change the background if desired:
+       background-color: #e7f1ff; */
+  }
+  
+  .filter-link.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 4px;  /* Thickness of the underline */
+    background-color: orangered; /* Underline color */
+    border-radius: 2px;
+  }
+  
+  
+  
+.search-container{
+  margin-top: 10px !important;
+  margin-bottom: 20px;
+ 
+}
+#search-icon{
+  position: absolute;
+      
+     padding-left: 4px;
+     padding-top: 2px;
+      color: #aaa;    
+      font-size: 1.2rem;
+     
+}
+.search-input {
+  padding-left: 2.5rem; /* leave space for the icon */
+}
+  /* Order list styling */
+  .order-row {
+    background-color: #fff;
+    border: 1px solid #f8e3a2d7;
+   
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+  .order-row:hover{
+    background-color:  #f8e3a294;
+    transform: translateY(-5px);      
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .order-status {
+    border-radius: 20px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.85rem;
+    width: 70px;
+    color: rgb(255, 255, 255) !important;
+  }
+  .price{
+    color: orangered !important;
+  }
+  #icons{
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    color: orangered !important;
+  }
+  #chevron{
+    color: orangered !important;
+  }
+.items-table tbody tr {
+    background-color: #d4d7d9 !important; /* !important ensures it overrides Bootstrap defaults */
+  }

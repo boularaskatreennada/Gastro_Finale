@@ -1,0 +1,88 @@
+.main{
+    margin-left: 60px;
+}
+.navbar{
+    background-color: white;
+    box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
+    width: 95%;
+  }
+  .navbar-expand .navbar-collapse{
+    min-width: 200px;
+    
+  }
+  .avatar{
+    height: 40px;
+    width: 40px;
+  }
+.filter-bar .nav {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Style each filter link */
+  .filter-link {
+    display: block;
+    position: relative;
+    padding: 0.75rem 1rem; /* Adjust for your desired button height */
+    color: #6c757d !important;       /* Default text color (gray) */
+    transition: color 0.3s ease, background-color 0.3s ease;
+    border: none;
+  }
+  
+  /* Hover effect for filter links */
+  .filter-link:hover{
+    color: orangered !important;
+  }
+  
+  /* Active state: blue text/background and a colored underline */
+  .filter-link.active {
+    color: orangered !important;
+    background-color: transparent !important;
+    /* Optionally, you could change the background if desired:
+       background-color: #e7f1ff; */
+  }
+  
+  .filter-link.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 4px;  /* Thickness of the underline */
+    background-color: orangered; /* Underline color */
+    border-radius: 2px;
+  }
+  /* Cards */
+  .card {
+    border-radius: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card:hover{
+    transform: scale(1.03);    
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .card-title {
+    font-weight: 600;
+    color: #d35400;
+  }
+  .btn-outline-primary {
+    color: #d35400;
+    border-color: #d35400;
+  }
+  .btn-outline-primary:hover{
+    color: #fff;
+    background-color: #d35400ce;
+    border-color: #d35400;
+  }
+  #Status{
+    background-color: rgba(0, 128, 0, 0.799) !important;
+    border-radius: 10px;
+    color: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  #Status:hover{
+    background-color: rgba(0, 128, 0, 0.95) !important;
+    transform: scale(1.05);    
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }

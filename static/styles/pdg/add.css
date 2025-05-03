@@ -1,0 +1,38 @@
+/* styles.css */
+.card {
+    border-radius: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 0.25rem;
+    
+}
+#desc{
+    height: 3rem;
+}
+.btn {
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.was-validated .form-control:invalid, 
+.was-validated .form-select:invalid, 
+.form-control.is-invalid, 
+.form-select.is-invalid {
+    border-color: #dc3545;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback, 
+.was-validated .form-select:invalid ~ .invalid-feedback, 
+.form-control.is-invalid ~ .invalid-feedback, 
+.form-select.is-invalid ~ .invalid-feedback {
+    display: block;
+}

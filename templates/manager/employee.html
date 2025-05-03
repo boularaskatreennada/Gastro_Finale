@@ -1,0 +1,148 @@
+{% extends 'manager/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="{% static 'styles/pdg/employee.css'%}">
+{% endblock %}
+
+{% block employees_active %}activate{% endblock %}
+
+{% block content %}
+<div class="main bg-white" >
+  <nav class="navbar navbar-expand  bg-basic d-flex justify-content-between">
+      <h6 class="fw-bold">
+          Employees management
+      </h6>
+      <h6>{{ request.session.display_username }}</h6>
+  </nav>
+
+  <main class="content px-3 py-1">
+    <div class="container mt-2 mb-4">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div class="d-flex align-items-center" id="list-employee-manager">
+          <h6 class="me-3" id="servers-btn">Waiters</h6>
+          <h6 class="me-3" id="chefs-btn">Chefs</h6>
+          <h6 class="me-3" id="delivery-btn">Delivery Man</h6>
+        </div>
+        <a href="{% url 'add_staff' %}" id="btn">Add<span>+</span></a>
+      </div>
+
+      <!-- Add table-responsive wrapper to make the table responsive -->
+      <div class="table-responsive " id="server">
+        <table id="servers-table" class="table table-striped border" style="width:100%">
+          <thead>
+              <tr>
+                  <th>name</th>
+                  <th style="text-align: left;">phone</th>
+                  <th>email</th>
+                  <th>Status</th>
+                  <th>Added on</th>
+                  <th>operations</th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {% for waiter in waiters %}
+              <td>{{ waiter.user.get_full_name }}</td>
+              <td>{{ waiter.user.phone }}</td>
+              <td>{{ waiter.user.email }}</td>
+              <td>{{ waiter.status }}</td>
+              <td>{{ waiter.created_at }}</td>
+              
+              <td class="d-flex justify-content-evenly align-items-center">
+                <a href="{% url 'edit_staff' role='server' pk=waiter.pk %}" class="text-success">edit <i class="fa-solid fa-user-pen"></i></a>
+                <form action="{% url 'delete_staff' role='server' pk=waiter.pk %}" method="post" onsubmit="return confirm('Are you sure?');">
+                
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-link text-danger p-0 m-0">Delete</button>
+                </form>
+              </td>
+            </tr>
+            
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-responsive  d-none " id="chef">
+        <table id="chefs-table" class="table table-striped border" style="width:100%">
+          <thead>
+            <tr>
+                <th>name</th>
+                <th style="text-align: left;">phone</th>
+                <th>email</th>
+                <th>Status</th>
+                <th>Added on</th>
+                <th>operations</th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {% for chef in chefs %}
+            <td>{{ chef.user.get_full_name }}</td>
+            <td>{{ chef.user.phone }}</td>
+            <td>{{ chef.user.email }}</td>
+            <td>{{ chef.status }}</td>
+            <td>{{ chef.created_at }}</td>
+            
+            <td class="d-flex justify-content-evenly align-items-center">
+              <a href="{% url 'edit_staff' role='chef' pk=chef.user.pk %}" class="text-success">edit <i class="fa-solid fa-user-pen"></i></a>
+              <form action="{% url 'delete_staff' role='chef' pk=chef.user.pk %}" method="post" onsubmit="return confirm('Are you sure?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link text-danger p-0 m-0">Delete</button>
+              </form>
+            </td>
+          </tr>
+          
+          {% endfor %}
+        </tbody>
+        </table>
+      </div>
+
+      <div class="table-responsive  d-none " id="delivery">
+        <table id="delivery-table" class="table table-striped border" style="width:100%">
+          <thead>
+            <tr>
+                <th>name</th>
+                <th style="text-align: left;">phone</th>
+                <th>email</th>
+                <th>Status</th>
+                <th>Added on</th>
+                <th>operations</th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {% for DeliveryPerson in DeliveryPersons %}
+            <td>{{ DeliveryPerson.user.get_full_name }}</td>
+            <td>{{ DeliveryPerson.user.phone }}</td>
+            <td>{{ DeliveryPerson.user.email }}</td>
+            <td>{{ DeliveryPerson.status }}</td>
+            <td>{{ DeliveryPerson.created_at }}</td>
+            
+            <td class="d-flex justify-content-evenly align-items-center">
+              <a href="{% url 'edit_staff' role='delivery' pk=DeliveryPerson.user.pk %}" class="text-success">edit <i class="fa-solid fa-user-pen"></i></a>
+              <form action="{% url 'delete_staff' role='delivery' pk=DeliveryPerson.user.pk %}" method="post" onsubmit="return confirm('Are you sure?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link text-danger p-0 m-0">Delete</button>
+              </form>
+            </td>
+          </tr>
+          
+          {% endfor %}
+        </tbody>
+          
+        </table>
+      </div>
+  </main>
+</div>
+ 
+<script defer src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+<script defer src="{% static 'js/manager/employee.js' %}"></script>
+{% endblock %}

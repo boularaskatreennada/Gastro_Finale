@@ -1,0 +1,159 @@
+{% extends 'manager/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/manager/menu.css' %}">
+
+{% endblock %}
+
+{% block menu_active %}activate{% endblock %}
+
+{% block content %}
+<div class=" main container-fluid">
+    <nav class="navbar navbar-expand  bg-basic d-flex justify-content-between">
+        <h6 class="fw-bold">
+            Employees management
+        </h6>
+        <h6>{{ request.session.display_username }}</h6>
+    </nav>
+    <div class="row">
+        
+      
+        <div class="col-md-8">
+            <h2>Menu of the day</h2>
+
+            <div class="mb-3">
+                <label for="categorySelect" class="form-label">Choose category</label>
+                <select id="categorySelect" class="form-select">
+                    <option value="">select</option>
+                    {% for menu in main_menus %}
+                        <option value="{{ menu.id }}">{{ menu.category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Liste des plats -->
+            <div id="dishesContainer" class="row"></div>
+        </div>
+
+        <!-- Sidebar Menu du jour -->
+        <div class="col-md-4 order-box-overlay">
+            <h4>Menu du Jour</h4>
+            <div id="dailyMenuSidebar" class="order-box">
+                <!-- Liste dynamique des plats ajoutés ici -->
+            </div>
+            
+        </div>
+
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    
+$(document).ready(function() {
+    // Quand je choisis une catégorie
+    $('#categorySelect').change(function() {
+        const categoryId = $(this).val();
+        console.log("Selected category ID:", categoryId);
+        if (categoryId) {
+            console.log("before sending url");
+            $.ajax({
+                url: "/menu/get-dishes/",
+                data: { 'category_id': categoryId },
+                success: function(data) {
+                    $('#dishesContainer').html('');
+                    data.dishes.forEach(function(dish) {
+                        $('#dishesContainer').append(`
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <img src="${dish.image_url}" class="menu-img" alt="${dish.name}">
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title">${dish.name}</h5>
+                                        <p class="card-text">${dish.price} €</p>
+                                        <input type="number" min="1" value="1" class="form-control mb-2 quantityInput" id="quantity_${dish.id}">
+                                        <button class="btn add-btn addDishBtn" data-dish-id="${dish.id}">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    });
+                }
+            });
+            console.log("after sending url");
+        } else {
+            $('#dishesContainer').html('');
+        }
+    });
+
+    // Ajouter plat au menu
+    $(document).on('click', '.addDishBtn', function() {
+        const dishId = $(this).data('dish-id');
+        const quantity = $(`#quantity_${dishId}`).val();
+        
+        $.ajax({
+            url: "{% url 'add_dish_to_daily_menu' %}",
+            method: 'POST',
+            data: {
+                'dish_id': dishId,
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                loadDailyMenu();
+            }
+        });
+    });
+
+    // Supprimer un plat du menu
+    $(document).on('click', '.removeDishBtn', function() {
+        const dailyMenuDishId = $(this).data('daily-menu-dish-id');
+        
+        $.ajax({
+            url: "{% url 'remove_dish_from_daily_menu' 0 %}".replace('0', dailyMenuDishId),
+
+            method: 'POST',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function() {
+                loadDailyMenu();
+            }
+        });
+    });
+
+    // Charger le menu du jour
+    function loadDailyMenu() {
+        $.ajax({
+            url: "{% url 'get_daily_menu' %}",
+            success: function(data) {
+                $('#dailyMenuSidebar').html('');
+                if (data.menu_dishes.length === 0) {
+                    $('#dailyMenuSidebar').append('<p>Aucun plat ajouté pour le moment</p>');
+                } else {
+                    data.menu_dishes.forEach(function(dish) {
+                        $('#dailyMenuSidebar').append(`
+                            <div class="d-flex justify-content-between align-items-center mb-2 p-2">
+                                <div>
+                                    <strong>${dish.name}</strong><br>
+                                    <small>Initiale: ${dish.initial_quantity} / Disponible: ${dish.current_quantity}</small>
+                                </div>
+                                <button class="remove-btn removeDishBtn" data-daily-menu-dish-id="${dish.id}">
+                                    remove
+                                </button>
+                            </div>
+                        `);
+                    });
+                }
+            }
+        });
+    }
+
+    
+
+    // Initial load
+    loadDailyMenu();
+});
+
+</script>
+{% endblock %}

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GastroLink</title>
+    <link rel="icon" href="{% static 'images/GASTRO_LINK-.png' %}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'styles/client/profil.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'landing_page' %}"><img src="{% static 'images/GASTRO_LINK-.png'  %}" alt="GastroLink" class="logo"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'order' %}">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'client_offers' %}">Offers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'review_list' %}">Reviews</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'create_reservation' %}">Reservation</a></li>
+                </ul>
+                <a href="{% url 'login' %}" class="btn-signin">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="sidebar-avatar">
+                <div class="sidebar-name-email">
+                    <div class="sidebar-name">Djoulinar Koutchoukali</div>
+                    <div class="sidebar-email">Djoulinar@gmail.com</div>
+                </div>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#" class="active" onclick="showSection('history')">
+                        <i class="fas fa-history"></i> History
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('personal-info')">
+                        <i class="fas fa-user-circle"></i> Personal Info
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('notifications')">
+                        <i class="fas fa-bell"></i> Notifications
+                        <span class="badge-notification">3</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="profile-card">
+                <!-- History Section -->
+                <div class="history-section" id="history-section">
+                    <h2 class="section-title">Order History</h2>
+                    
+                    <div class="history-tabs">
+                        <div class="history-tab active" onclick="showHistoryTab('orders')">Orders</div>
+                        <div class="history-tab" onclick="showHistoryTab('reservations')">Reservations</div>
+                    </div>
+
+                    <div class="history-content">
+                        <!-- Orders list -->
+                        <div class="orders-list" id="orders-list">
+                            <div class="order-item">
+                                <div class="order-date">03/01/2025</div>
+                                <div class="order-details">2 cheeseburgers, 1 pizza, 2 sodas</div>
+                                <div class="order-price">$60</div>
+                            </div>
+                            
+                            <div class="order-item">
+                                <div class="order-date">02/25/2025</div>
+                                <div class="order-details">1 paella, 1 Caesar salad, 3 sodas</div>
+                                <div class="order-price">$100</div>
+                            </div>
+                            
+                            <div class="order-item">
+                                <div class="order-date">03/01/2025</div>
+                                <div class="order-details">4 pizzas, 4 sodas</div>
+                                <div class="order-price">$75</div>
+                            </div>
+
+                            <div class="order-item">
+                                <div class="order-date">02/28/2025</div>
+                                <div class="order-details">1 steak frites, 1 bottle of watter</div>
+                                <div class="order-price">$85</div>
+                            </div>
+                            
+                            <div class="order-item">
+                                <div class="order-date">02/20/2025</div>
+                                <div class="order-details">2 pasta carbonara, 2 tiramisu</div>
+                                <div class="order-price">$65</div>
+                            </div>
+                        </div>
+
+                        <!-- Reservations list -->
+                        <div class="reservations-list" id="reservations-list">
+                            <div class="reservation-item">
+                                <div class="reservation-date">03/15/2025<br>7:30 PM</div>
+                                <div class="reservation-info">
+                                    <div class="reservation-restaurant">Ali Mendjeli</div>
+                                    <div class="reservation-details">Table 5 • 4 people • 2 hours</div>
+                                </div>
+                                <div class="reservation-status status-confirmed">Confirmed</div>
+                            </div>
+                            
+                            <div class="reservation-item">
+                                <div class="reservation-date">03/10/2025<br>8:00 PM</div>
+                                <div class="reservation-info">
+                                    <div class="reservation-restaurant">Downtown</div>
+                                    <div class="reservation-details">VIP Table 2 • 2 people • 1.5 hours</div>
+                                </div>
+                                <div class="reservation-status status-confirmed">Confirmed</div>
+                            </div>
+                            
+                            <div class="reservation-item">
+                                <div class="reservation-date">03/05/2025<br>12:30 PM</div>
+                                <div class="reservation-info">
+                                    <div class="reservation-restaurant">El Khroub</div>
+                                    <div class="reservation-details">Table B • 6 people • 3 hours</div>
+                                </div>
+                                <div class="reservation-status status-cancelled">Cancelled</div>
+                            </div>
+                            
+                            <div class="reservation-item">
+                                <div class="reservation-date">02/28/2025<br>9:00 PM</div>
+                                <div class="reservation-info">
+                                    <div class="reservation-restaurant">Mohamed Boudiaf Airport</div>
+                                    <div class="reservation-details">Lounge Table 1 • 2 people • 1 hour</div>
+                                </div>
+                                <div class="reservation-status status-confirmed">Confirmed</div>
+                            </div>
+                            
+                            <div class="reservation-item">
+                                <div class="reservation-date">02/22/2025<br>8:30 PM</div>
+                                <div class="reservation-info">
+                                    <div class="reservation-restaurant">Ali Mendjeli</div>
+                                    <div class="reservation-details">Table 3 • 3 people • 2 hours</div>
+                                </div>
+                                <div class="reservation-status status-pending">Pending</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Info Section -->
+                <div class="personal-info-section" id="personal-info-section">
+                    <h2 class="section-title">Personal Information</h2>
+                    
+                    <form class="info-form">
+                        <div class="form-group">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" value="Sophia Martinez">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" value="sophia.martinez@gmail.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" value="0674983266">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="address" value="123 Olive Street, Constantine">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="••••••••">
+                        </div>
+                        
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Notifications Section -->
+                <div class="notifications-section" id="notifications-section">
+                    <h2 class="section-title">Notifications</h2>
+                    
+                    <div class="notification-item unread">
+                        <div class="notification-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">Reservation Confirmed</div>
+                            <div class="notification-message">Your reservation for 03/15/2025 at 7:30 PM has been confirmed</div>
+                            <div class="notification-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item unread">
+                        <div class="notification-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">New Special Offer</div>
+                            <div class="notification-message">Enjoy 20% off all pizzas this weekend</div>
+                            <div class="notification-time">Yesterday, 2:30 PM</div>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div class="notification-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">Order Being Prepared</div>
+                            <div class="notification-message">Your order #4582 is being prepared</div>
+                            <div class="notification-time">Feb 28, 2025</div>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div class="notification-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">Feedback Request</div>
+                            <div class="notification-message">Share your feedback about your last visit</div>
+                            <div class="notification-time">Feb 25, 2025</div>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div class="notification-icon">
+                            <i class="fas fa-birthday-cake"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">Birthday Gift</div>
+                            <div class="notification-message">Enjoy a free dessert for your birthday</div>
+                            <div class="notification-time">Feb 20, 2025</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/client/profil.js' %}"></script>
+</body>
+</html>

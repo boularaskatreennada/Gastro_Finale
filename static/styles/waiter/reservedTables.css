@@ -1,0 +1,85 @@
+#main{
+    margin-left: 60px;
+}
+.navbar{
+    background-color: white;
+    box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
+    width: 100%;
+}
+.navbar-expand .navbar-collapse{
+    min-width: 200px;
+    
+}
+.avatar{
+    height: 40px;
+    width: 40px;
+}
+.search-container{
+    max-width: 300px; 
+    width: 100%;
+    border-radius: 20px !important;
+}
+#search-icon{
+    position: absolute;
+        
+       padding-left: 4px;
+       padding-top: 2px;
+        color: #aaa;    
+        font-size: 1.2rem;
+       
+  }
+  .search-input {
+    padding-left: 2.5rem; /* leave space for the icon */
+  }
+  #clearFilters{
+    color:#FA4516 !important;
+    border: 1px solid #FA4516 !important;
+    margin-top: 32px !important;
+
+  }
+  #clearFilters:hover{
+    background-color: #fa4416c6 !important;
+    color: white !important;
+  }
+  #clearFilters.active{
+    background-color: #fa4416c6 !important;
+    color: white !important;
+  }
+.filter{
+border: 1px solid #FA4516 !important;
+color: #FA4516 !important;
+background-color: white;
+
+}
+
+
+
+#cardContainer{
+    background-color:#f8e3a24d ;
+    border-radius: 30px !important;
+    border-color: bisque;
+    transition: transform 0.2s ease;
+   
+}
+#cardContainer:hover{
+    transform: scale(1.05);
+}
+.duration{
+    border-radius: 30px !important;
+    background-color: #fdcb4b !important;
+    
+}
+#btnGroup{
+    align-items: center !important;
+    background-color: aliceblue
+    
+}
+#Durée{
+    border-radius: 30px;
+}
+#tables-num{
+    background-color: #FA4516;
+}
+.items{
+    color: #FA4516;
+}

@@ -1,0 +1,299 @@
+{% include 'waiter/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/waiter/order.css ' %}">
+{% endblock %}
+
+{%  block content%}
+<div class="wrapper">
+  <div class="main">
+        <nav class="navbar navbar-expand px-3 py-1 bg-basic mb-2">
+          <h2 class="ms-4 mb-2">Order now </h2>
+
+          <div class="navbar-collapse collapse">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item dropdown">
+                  <a href="" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
+                      <img src="{% static 'images/téléchargement.jpg' %}" class="avatar  img-fluid rounded-circle border border-dark" alt="">
+                  </a>
+              
+              </li>
+            </ul>
+         </div>
+        </nav>
+    
+    <!-- filter section -->
+    <div class="d-flex flex-wrap justify-content-left gap-2 mb-4">
+      <button class="btn  filter" >All</button>
+      <button class="btn  filter" >Salads</button>
+      <button class="btn  filter" >Pasta</button>
+      <button class="btn  filter" >Pizza</button>
+      <button class="btn  filter" >Grilled</button>
+      <button class="btn  filter" >Drinks</button>
+      <button class="btn  filter" >Seafood</button>
+      <button class="btn  filter" >Desserts</button>
+      <div class="search-container ">
+        <i id="search-icon" class="bi bi-search "></i>
+        <input type="text" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search">
+        
+      </div>
+    </div>
+    
+      <div class="container-fluid">
+        <div class="row  row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 ">
+          {% for dish in Dish %}
+            <div class="col ">
+                <div class=" menu-card">
+                    <img src="https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Cæesar Salad" class="menu-item-img">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Cæesar Salad {{dish.name}}</div>
+                        <div class="menu-item-desc">Romaine, parmesan, croutons, Caesar dressing {{dish.description}}</div>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">10 $ {{dish.price}}</span>
+                            <button class="add-btn" data-id="1" data-name="Cæesar Salad" data-price="10">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No reservations found.</p>
+           {% endfor%}
+                
+            
+        </div>
+          
+  </div>
+
+            <!-- Panier vertical à droite -->
+          <form method="post" action="{% url 'orders:place_order' %}" id="orderForm">
+               {% csrf_token %}
+                <div class="col-4 order-summary " >
+                    <div class="order-header">
+                        <h5 class="m-0">Your Order</h5>
+                        <div class="order-count">0</div>
+                    </div>
+                    
+                    <div class="order-items">
+                        <div class="empty-cart">Your cart is empty</div>
+                    </div>
+                    
+                    <textarea class="order-note" placeholder="Any special instructions?"></textarea>
+                    
+                    <div class="order-total">
+                        <span>Total:</span>
+                        <span>0 $</span>
+                    </div>
+                    
+                    <button class="submit-btn" disabled>Place Order</button>
+                </div>
+            </form>
+        <!-- Bouton toggle pour mobile -->
+        <button class="cart-toggle">
+            🛒
+            <span class="cart-badge">0</span>
+        </button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          // Gestion du panier
+          let cart = [];
+          
+          // Sélection des éléments du DOM
+          const orderItemsEl = document.querySelector('.order-items');
+          const orderCountEl = document.querySelector('.order-count');
+          const orderTotalEl = document.querySelector('.order-total span:last-child');
+          const submitBtn = document.querySelector('.submit-btn');
+          const orderSummary = document.querySelector('.order-summary');
+          const cartToggle = document.querySelector('.cart-toggle');
+          const cartBadge = document.querySelector('.cart-badge');
+          const orderForm  = document.getElementById('orderForm');
+          const cartFields = document.getElementById('cart-fields');
+
+            orderForm.addEventListener('submit', function(e) {
+            // 1️⃣ Clear old hidden inputs
+            cartFields.innerHTML = '';
+
+            // 2️⃣ For each item in `cart`, append
+            //    <input type="hidden" name="item_id" value="…">
+            //    <input type="hidden" name="quantity" value="…">
+            cart.forEach(item => {
+                cartFields.innerHTML += `
+                <input type="hidden" name="item_id"   value="${item.id}">
+                <input type="hidden" name="quantity" value="${item.quantity}">
+                `;
+            });
+
+            
+            });
+
+          // Fonction pour mettre à jour l'affichage du panier
+          function updateCartDisplay() {
+              if (cart.length === 0) {
+                  orderItemsEl.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
+                  orderCountEl.textContent = '0';
+                  cartBadge.textContent = '0';
+                  orderTotalEl.textContent = '0 $';
+                  submitBtn.disabled = true;
+                  return;
+              }
+              
+              let itemsHtml = '';
+              let total = 0;
+              let totalItems = 0;
+              
+              cart.forEach(item => {
+                  itemsHtml += `
+                      <div class="order-item" data-id="${item.id}">
+                          <span>${item.name}</span>
+                          <div class="order-item-controls">
+                              <span>${item.quantity} x ${item.price} $</span>
+                              <button class="order-item-btn minus">-</button>
+                              <button class="order-item-btn plus">+</button>
+                              <button class="order-item-btn remove">×</button>
+                          </div>
+                      </div>
+                  `;
+                  total += item.quantity * item.price;
+                  totalItems += item.quantity;
+              });
+              
+              orderItemsEl.innerHTML = itemsHtml;
+              orderCountEl.textContent = totalItems;
+              cartBadge.textContent = totalItems;
+              orderTotalEl.textContent = `${total} $`;
+              submitBtn.disabled = false;
+              
+              // Ajout des écouteurs d'événements pour les boutons de contrôle
+              document.querySelectorAll('.order-item-btn.minus').forEach(btn => {
+                  btn.addEventListener('click', function() {
+                      const itemId = parseInt(this.closest('.order-item').getAttribute('data-id'));
+                      updateItemQuantity(itemId, -1);
+                  });
+              });
+              
+              document.querySelectorAll('.order-item-btn.plus').forEach(btn => {
+                  btn.addEventListener('click', function() {
+                      const itemId = parseInt(this.closest('.order-item').getAttribute('data-id'));
+                      updateItemQuantity(itemId, 1);
+                  });
+              });
+              
+              document.querySelectorAll('.order-item-btn.remove').forEach(btn => {
+                  btn.addEventListener('click', function() {
+                      const itemId = parseInt(this.closest('.order-item').getAttribute('data-id'));
+                      removeItemFromCart(itemId);
+                  });
+              });
+          }
+          
+          // Fonction pour ajouter un article au panier
+          function addToCart(itemId, itemName, itemPrice) {
+              const existingItem = cart.find(item => item.id === itemId);
+              
+              if (existingItem) {
+                  existingItem.quantity += 1;
+              } else {
+                  cart.push({
+                      id: itemId,
+                      name: itemName,
+                      price: itemPrice,
+                      quantity: 1
+                  });
+              }
+              
+              updateCartDisplay();
+              
+              // Sur mobile, ouvrir le panier quand on ajoute un article
+              if (window.innerWidth <= 992) {
+                  orderSummary.classList.add('open');
+              }
+          }
+          
+          // Fonction pour mettre à jour la quantité d'un article
+          function updateItemQuantity(itemId, change) {
+              const item = cart.find(item => item.id === itemId);
+              
+              if (item) {
+                  item.quantity += change;
+                  
+                  if (item.quantity <= 0) {
+                      removeItemFromCart(itemId);
+                  } else {
+                      updateCartDisplay();
+                  }
+              }
+          }
+          
+          // Fonction pour supprimer un article du panier
+          function removeItemFromCart(itemId) {
+              cart = cart.filter(item => item.id !== itemId);
+              updateCartDisplay();
+          }
+          
+          // Fonction pour passer la commande
+          function submitOrder() {
+              const note = document.querySelector('.order-note').value;
+              
+              // Ici, vous enverriez normalement les données au serveur
+              console.log('Order submitted:', {
+                  items: cart,
+                  note: note,
+                  total: cart.reduce((sum, item) => sum + (item.quantity * item.price), 0)
+              });
+              
+              // Réinitialiser le panier après la commande
+              cart = [];
+              updateCartDisplay();
+              document.querySelector('.order-note').value = '';
+              
+              // Afficher un message de confirmation
+              alert('Your order has been placed successfully!');
+              
+              //  fermer le panier après la commande
+              
+                  orderSummary.classList.remove('open');
+              
+          }
+          //open summery when click 
+          cartToggle.addEventListener('click', () => {
+                orderSummary.classList.toggle('open');
+              });
+          // Écouteurs d'événements
+          document.querySelectorAll('.add-btn').forEach(btn => {
+              btn.addEventListener('click', function() {
+                  const itemId = parseInt(this.getAttribute('data-id'));
+                  const itemName = this.getAttribute('data-name');
+                  const itemPrice = parseInt(this.getAttribute('data-price'));
+                  addToCart(itemId, itemName, itemPrice);
+              });
+          });
+          
+          //submitBtn.addEventListener('click', submitOrder);
+          
+          
+          // Fermer le panier quand on clique à l'extérieur (sur mobile)
+          document.addEventListener('click', function(e) {
+              if (
+                  !orderSummary.contains(e.target) && 
+                  !cartToggle.contains(e.target) &&
+                  orderSummary.classList.contains('open')) {
+                  orderSummary.classList.remove('open');
+              }
+          });
+          
+          
+
+          
+          // Initialiser l'affichage du panier
+          updateCartDisplay();
+          
+          updateChart();
+      });
+  </script>
+        </div>
+      </div> 
+</div>
+ 
+{%endblock%}

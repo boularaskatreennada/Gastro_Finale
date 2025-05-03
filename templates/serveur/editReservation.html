@@ -1,0 +1,326 @@
+{% extends 'waiter/base.html' %}
+{% block extra_css %}
+<style>
+:root {
+    --primary: #e63946;
+    --secondary: #f4a261;
+    --light: #f1faee;
+    --dark: #1d3557;
+    --accent: #457b9d;
+    --warning: #ff9e00;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(
+        135deg,
+        #f8e3a3 0%,  /* Beige */
+        #f8e3a3 60%, 
+        #ffffff 60%,  /* White */
+        #ffffff 100%
+    );
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Consistent navigation */
+.navbar {
+    height: 80px;
+    padding: 0 2rem;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    background-color: #f8e3a3;
+}
+
+.logo { 
+    width: 100px;
+    height: auto;
+}
+
+.nav-link {
+    padding: 0.5rem 1.2rem;
+    font-weight: 500;
+    color: var(--dark) !important;
+    position: relative;
+}
+
+.nav-link:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--primary);
+    transition: width 0.3s;
+}
+
+.nav-link:hover:after {
+    width: 100%;
+}
+
+.nav-item:nth-child(2) .nav-link {
+    color: var(--warning) !important;
+    font-weight: 600;
+}
+
+.nav-item:nth-child(2) .nav-link:after {
+    background-color: var(--warning);
+}
+
+.btn-signin {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* New layout */
+.reservation-layout {
+    display: flex;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    gap: 2rem;
+}
+
+.restaurants-section {
+    flex: 1;
+}
+
+.reservation-form-section {
+    flex: 1;
+}
+
+/* Restaurant cards */
+.restaurant-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.restaurant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.restaurant-card.active {
+    border-color: var(--warning);
+}
+
+.restaurant-card h3 {
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+}
+
+.restaurant-card p {
+    color: #666;
+    margin-bottom: 0;
+}
+
+/* Table plans */
+.tables-preview {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.tables-preview img {
+    max-width: 100%;
+    border-radius: 8px;
+    display: none;
+}
+
+.tables-preview img.active {
+    display: block;
+}
+
+.tables-preview p {
+    color: #666;
+    text-align: center;
+}
+
+/* Form with icons */
+.reservation-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--warning);
+    font-size: 1.1rem;
+    margin-top: 15px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    padding-left: 30px;
+}
+
+.form-control, .form-select {
+    padding: 0.8rem 1rem 0.8rem 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.25rem rgba(69, 123, 157, 0.25);
+}
+
+.submit-reservation {
+    background-color: #ff9e00;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    width: 100%;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.submit-reservation:hover {
+    background-color: #c1121f;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .reservation-layout {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 1rem;
+    }
+    
+    .reservation-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar {
+        height: 70px;
+    }
+    
+    .form-icon {
+        left: 10px;
+        font-size: 1rem;
+    }
+    
+    .form-control, .form-select {
+        padding-left: 35px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reservation-layout">
+  <div class="reservation-form-section">
+    <div class="reservation-card">
+      <form method="post">
+        {% csrf_token %}
+        <h3 class="mb-4" style="color: var(--dark);">
+          Modifier la réservation #{{ reservation.pk }}
+        </h3>
+
+        <!-- Restaurant (read-only) -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-store form-icon"></i> Restaurant
+          </label>
+          <input type="text" class="form-control" 
+                 value="{{ restaurant.name }}" readonly>
+        </div>
+
+        <!-- Client (read-only) -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-user form-icon"></i> Client
+          </label>
+          <input type="text" class="form-control"
+                 value="{{ reservation.client.get_full_name }}" readonly>
+        </div>
+
+        <!-- Table Number -->
+        <div class="form-group">
+          {{ form.table.label_tag }}
+          {{ form.table }}
+        </div>
+
+        <!-- Date & Time -->
+        <div class="row">
+          <div class="col-md-6 form-group">
+            {{ form.datetime.label_tag }}
+            {{ form.datetime }}
+          </div>
+          <div class="col-md-6 form-group">
+            {{ form.number_of_people.label_tag }}
+            {{ form.number_of_people }}
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="form-group">
+          {{ form.status.label_tag }}
+          {{ form.status }}
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="submit-reservation">
+          <i class="fas fa-check-circle"></i> Enregistrer
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

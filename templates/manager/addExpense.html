@@ -1,0 +1,25 @@
+{% extends 'pdg/baseform.html' %}
+{% load static%}
+
+{% block extra_css %}
+
+{% endblock %}
+
+</style>
+{% block content %}
+<div class="main bg-white">
+  <nav class="navbar navbar-expand bg-basic">
+      <h4 class="fw-bold">{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Expense</h4>
+  </nav>
+
+  <main class="content px-4 py-3">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="buttons">
+        <a href="{% url 'restaurants' %}" class="btn btn-outline btn1_color">Cancel</a>
+        <button type="submit" class="btn btn2_color">Save</button>
+    </div>
+    </form>
+  </main>
+{% endblock %}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+{% load static%}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GastroLink</title>
+    <link rel="icon" href="{% static 'images/GASTRO_LINK-.png' %}" type="image/x-icon"> 
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{% static 'styles/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/pdg/base.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    {% block extra_css %}
+    {% endblock %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="wrapper">
+        <aside id="sidebar">
+            <div class="d-flex justify-content-between ">
+                <div class="sidebar-logo">
+                    <img src="{% static 'images/GASTRO_LINK-.png' %}" class="logo" alt="">
+                </div>
+                <button class="toggle-btn border-0" type="button">
+                    <i id="icon" class='bx bxs-chevrons-right'></i>
+                </button>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item" id="{% block dashboard_active %}{% endblock %}">
+                    <a href="{% url 'manager_dashboard' %}" class="sidebar-link">
+                    <i class='bx bxs-home'></i>
+                    <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item" id="{% block menu_active %}{% endblock %}">
+                    <a href="{% url 'manager_daily_menu' %}" class="sidebar-link">
+                    <i class='fa fa-utensils'></i>
+                    <span>Menu</span>
+                </a></li>
+
+                <li class="sidebar-item" id="{% block clients_orders_active %}{% endblock %}">
+                    <a href="{% url 'clients_orders_list' %}" class="sidebar-link">
+                    <i class="fa-solid fa-arrow-up-wide-short"></i>
+                    <span>Orders</span>
+                </a></li>
+
+
+                <li class="sidebar-item" id="{% block orders_active %}{% endblock %}">
+                    <a href="{% url 'generate_shopping_list' %}" class="sidebar-link">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Shopping List</span>
+                </a></li>
+
+
+                <li class="sidebar-item " id="{% block employees_active %}{% endblock %}">
+                    <a href="{% url 'employee_manager_list' %}" class="sidebar-link">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Employees</span>
+                </a></li>
+                
+                <li class="sidebar-item " id="{% block expenses_active %}{% endblock %}">
+                    <a href="{% url 'expense_list' %}" class="sidebar-link">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>Expenses</span>
+                </a></li>
+
+                                
+            </ul>
+
+            <div class="sidebar-footer">
+                <ul class="sidebar-nav">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                          <i class='bx bx-log-out-circle'></i>
+                          <span>Log out</span>
+                        </a>
+                    </li>
+                </ul>
+                
+            </div>
+
+        </aside>
+     
+        {% block content %}
+            
+        {% endblock %}
+
+    </div>
+    
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/pdg/base.js' %}"></script>
+</body>
+</html>

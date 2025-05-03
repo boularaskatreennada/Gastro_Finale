@@ -1,0 +1,86 @@
+:root{
+    --mainColor:#FA4516;
+    --secondColor:#F8E3A2;
+}
+
+.navbar{
+    background-color: white;
+    box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
+    padding: 0.3rem 1.5rem;
+}
+.navbar-expand .navbar-collapse{
+    min-width: 200px;
+    padding: 0 2rem;
+}
+.avatar{
+    height: 40px;
+    width: 40px;
+}
+#btn {
+    padding: 0.5rem 1rem; 
+    background-color: var(--mainColor);
+    color: white;
+    border: none; 
+    border-radius: 0.25rem; 
+    font-size: 1rem; 
+    text-decoration: none;
+}
+#btn:hover {
+    background-color: #F8E3A2;
+    color: #FA4516;
+}
+
+
+td{
+    border: 0;
+}
+td a{
+    text-decoration: none;
+}
+div#manager,
+div#supplier{
+    overflow-x:auto;
+    margin: 0rem;
+}
+  
+h6 {
+    transition: color 0.3s;
+    cursor: pointer;
+}  
+  
+h6:hover {
+    color: var(--mainColor);
+}
+  
+  /* Transition for tables */
+.table-wrapper {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+  
+.table-wrapper.active {
+    opacity: 1;
+    visibility: visible;
+}
+.me-3{
+    padding: .5rem;
+}  
+#plats-table td:nth-child(2), 
+#plats-table td:nth-child(3),
+#plats-table th:nth-child(2), 
+#plats-table th:nth-child(3), 
+#ingredients-table td:nth-child(2), 
+#ingredients-table td:nth-child(3),
+#ingredients-table th:nth-child(2), 
+#ingredients-table th:nth-child(3)  { 
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+      div.d-flex.align-items-center#list-employee-manager{
+          flex-direction: column !important;
+          align-items: start !important;
+      }
+      
+}

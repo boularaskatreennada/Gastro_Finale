@@ -1,0 +1,125 @@
+{% include 'chef/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/chef/ordersListChef.css' %}">
+{% endblock %}
+
+{%  block content%}
+<div id="main" class="ms-2">
+    <div class="row ">
+      <nav class="navbar navbar-expand px-3 py-1 bg-basic mb-3">
+        <h1 class="">Orders list</h1>
+        <div class="navbar-collapse collapse">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+                <a href="" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
+                    <img src="{% static 'images/téléchargement.jpg' %}" class="avatar  img-fluid rounded-circle border border-dark" alt="">
+                </a>
+            
+            </li>
+           </ul>
+        </div>
+     </nav>
+  
+       
+        <!-- Top Nav: Categories + Search -->
+        <div class="container-fluid my-3">
+          <div class="filter-bar">
+            <ul class="nav nav-pills justify-content-between flex-wrap">
+              <li class="nav-item flex-fill text-center">
+                <a href=""
+                   class="nav-link filter-link {% if not filter_type %}active{% endif %}">
+                  All
+                </a>
+              </li>
+              <li class="nav-item flex-fill text-center">
+                <a href=""
+                   class="nav-link filter-link {% if filter_type == 'Dine-in' %}active{% endif %}">
+                  Dine In
+                </a>
+              </li>
+              <li class="nav-item flex-fill text-center">
+                <a href=""
+                   class="nav-link filter-link {% if filter_type == 'Takeaway' %}active{% endif %}">
+                  Takeaway
+                </a>
+              </li>
+              <li class="nav-item flex-fill text-center">
+                <a href=""
+                   class="nav-link filter-link {% if filter_type == 'Delivery' %}active{% endif %}">
+                  Delivery
+                </a>
+              </li>
+            </ul>
+            
+          </div>
+        </div>
+        
+  
+        <!-- Search Bar -->
+         
+          
+        <div class="search-container">
+          <i id="search-icon" class="bi bi-search "></i>
+          <input type="text" class="form-control search-input" placeholder="Search..." aria-label="Search">
+          
+        </div>
+         
+        
+        <!-- Orders List -->
+        {% for order in order %}
+        <div>
+          <!-- Order 1 -->
+          <div class="order-row d-flex justify-content-between align-items-left " >
+            <div>
+              <h6 class="mb-1">Brandon O'Neal {{ order.client.get_full_name }}</h6>
+              <small>Order #1234 #{{ order.pk }} • {{ order.items_count }} 2 items</small>
+              <h6 class="mb-0 text-primary price">$15.00 {{ order.total_price }}</h6>
+            </div>
+
+            <div class="text-end">
+              <div class="d-flex">
+                <span class="order-status bg-warning text-dark ">Pending</span>
+                <button class="btn btn-link p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#items" aria-expanded="false" aria-controls="items">
+                  <i id="chevron" class="bi bi-chevron-down"></i>
+                </button>
+              </div>
+              <div class="d-flex">
+                <i id="icons" class="mdi mdi-motorbike mdi-20px" aria-hidden="true"></i>
+                <span class="icon-separator">  </span>
+                <i id="icons" class="bi bi-person meal-icon"></i>
+              </div>
+            </div>
+          </div>
+          <div class="collapse mt-2" id="items">
+            <div class="table-responsive">
+              <table class="table items-table mb-3">
+              
+                <tbody>
+                  {% for item in order.orderdish_set.all %}
+                  <tr >
+                    <td >Veg Hawaiian Pizza {{ item.dish.name }} </td>
+                    <td>Large {{ item.quantity }}</td>
+                    <td  class="text-end "><i class="bi bi-currency-dollar"></i> $15.00 {{ item.dish.price|floatformat:2 }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+             
+          </div>
+         
+  
+          
+  
+        </div>
+        {% empty %}
+        <p>No orders found.</p>
+      {% endfor %}
+      </div>
+      <!-- End Main Content -->
+  
+    </div>
+  </div>
+{% endblock %}

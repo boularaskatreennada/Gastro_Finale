@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>GastroLink</title>
+    <link rel="icon" href="{% static 'images/GASTRO_LINK-.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'styles/client/landingPage.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'landing_page' %}">
+                <img src="{% static 'images/GASTRO_LINK-.png' %}" alt="GastroLink" class="logo"> 
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'order' %}">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'client_offers' %}">Offers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'review_list' %}">Reviews</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'create_reservation' %}">Reservation</a></li>
+                </ul>
+                <a href="{% url 'login' %}" class="btn-signin">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="text-center py-5 bg-white">
+        <div class="container">
+            <h1 class="display-5 fw-bold text-dark">The Art of Gastronomy at Your Fingertips!</h1>
+            <p class="lead text-muted mx-auto" style="max-width: 600px;">
+                Discover the best dining experience with GastroLink — order, reserve, and enjoy exceptional flavors effortlessly!
+            </p>
+            <div class="mt-4 d-flex flex-column flex-sm-row justify-content-center gap-3">
+                <a href="#" class="btn btn-danger"><i class="fas fa-utensils me-2"></i> Order Now</a>
+                <a href="{% url 'create_reservation' %}" class="btn btn-warning"><i class="fas fa-chair me-2"></i> Reserve Now</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Popular Dishes -->
+    <section class="container my-5">
+        <h2 class="text-center">Our Popular Dishes</h2>
+        <div class="row text-center">
+            <!-- Plat 1 -->
+            <div class="col-md-3">
+                <div class="dish-container">
+                    <img src="assets/paella.PNG" class="dish-img" alt="Paella Marisco">
+                    <p class="dish-name">Paella Marisco - <strong>10$</strong></p>
+                </div>
+            </div>
+            
+            <!-- Plat 2 -->
+            <div class="col-md-3">
+                <div class="dish-container">
+                    <img src="assets/shrimp.PNG" class="dish-img" alt="Shrimp Scampi">
+                    <p class="dish-name">Shrimp Scampi - <strong>10$</strong></p>
+                </div>
+            </div>
+            
+            <!-- Plat 3 -->
+            <div class="col-md-3">
+                <div class="dish-container">
+                    <img src="assets/carbonara.PNG" class="dish-img" alt="Spaghetti Carbonara">
+                    <p class="dish-name">Spaghetti Carbonara - <strong>10$</strong></p>
+                </div>
+            </div>
+            
+            <!-- Plat 4 -->
+            <div class="col-md-3">
+                <div class="dish-container">
+                    <img src="assets/penne.PNG" class="dish-img" alt="Penne Arrabiata">
+                    <p class="dish-name">Penne Arrabiata - <strong>10$</strong></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Discover Our App -->
+    <section class="app bg-light py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Colonne pour le texte et les boutons -->
+                <div class="col-md-6 order-md-1">
+                    <h2>Discover Our App: <span class="text-danger">Gastro</span></h2>
+                    <p>Download The Gastro App to easily reserve a table and order your food online.</p>
+                    <div class="d-flex gap-3 mt-4">
+                        <img src="assets/app_store-removebg-preview.png" alt="App Store" class="store-button">
+                        <img src="assets/play_store-removebg-preview.png" alt="Google Play" class="store-button">
+                    </div>
+                </div>
+                <!-- Colonne pour l'image -->
+                <div class="col-md-6 order-md-2 text-center">
+                    <div class="app-image-container" id="appImage">
+                        <img src="assets/app mob.PNG" alt="App Preview" class="app-image img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Client Reviews -->
+    <section class="container my-5">
+        <h2 class="text-center">What Our Clients Say</h2>
+        <div class="row">
+            <div class="col-md-4"> <div class="p-3 border rounded">Amazing service! - <strong>Oliver</strong></div> </div>
+            <div class="col-md-4"> <div class="p-3 border rounded">Food always fresh! - <strong>Sophia</strong></div> </div>
+            <div class="col-md-4"> <div class="p-3 border rounded">Seamless experience! - <strong>Liam</strong></div> </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-center py-3">
+        <p>Address: Constantine, Algeria | Phone: 0543128970 | Email: GastroLink@gmail.com</p>
+        <p>Copyright 2025</p>
+    </footer>
+    
+</body>
+</html>

@@ -1,0 +1,44 @@
+.navbar{
+    background-color: white;
+    box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
+    padding: 0.3rem 1.5rem;
+
+}
+.navbar-expand .navbar-collapse{
+    min-width: 200px;
+}
+.avatar{
+    height: 40px;
+    width: 40px;
+}
+
+.card {
+    margin: 1rem;
+    background-color: #f8f9fa; 
+    padding: 0rem;
+}
+
+.card-body {
+    padding: 1rem;
+    border-radius: 0.75rem; 
+}
+
+.shadow-sm {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); 
+}
+
+i.bxs-group ,
+i.fa-comments{
+    font-size: 2rem; 
+    color: #050506;
+}
+i.fa-star{
+    color: rgb(209, 209, 8);
+}
+h6, p {
+    margin: 0 1rem;
+}
+#average{
+    display: inline;
+}
+

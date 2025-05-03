@@ -1,0 +1,192 @@
+{% extends 'pdg/baseform.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/pdg/addMang.css' %}">
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" id="dish-form">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-7">
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-utensils"></i>
+                {{ form.name }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-utensils"></i>
+                {{ form.category }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-utensils"></i>
+                {{ form.price }}
+            </div>
+
+            <div class="ingredients-box">
+                <label class="section-title">Ingredients</label>
+
+                <!-- Category selector -->
+                <div class="ingredient-filter mb-3">
+                    <select class="form-select btn-category" name="ingredient_category" id="ingredient_category">
+                        {% for cat_value, cat_name in ingredient_categories %}
+                            <option value="{{ cat_value }}">{{ cat_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Ingredients grouped by category -->
+                <div id="ingredient-list">
+                    {% for cat_value, cat_name in ingredient_categories %}
+                        <div class="ingredient-category" data-category="{{ cat_value }}" style="display: none;">
+                            {% for ingredient in ingredients_by_category|get_item:cat_value %}
+                                <div class="ingredient-item d-flex align-items-center mb-2">
+                                    <input type="checkbox" 
+                                           class="ingredient-checkbox me-2" 
+                                           data-id="{{ ingredient.id }}" 
+                                           id="ingredient_{{ ingredient.id }}" 
+                                           {% if ingredient.id in selected_ingredients %}checked{% endif %}>
+                                    <label for="ingredient_{{ ingredient.id }}" class="me-3 flex-grow-1">
+                                        {{ ingredient.name }}
+                                    </label>
+                                    <input type="number" 
+                                           class="ingredient-qty form-control me-2" 
+                                           min="0" 
+                                           step="0.01" 
+                                           value="{% if ingredient.id in selected_ingredients %}{{ selected_ingredients|get_item:ingredient.id|get_item:'quantity' }}{% else %}0{% endif %}" 
+                                           {% if ingredient.id not in selected_ingredients %}disabled{% endif %} 
+                                           style="width: 80px;" 
+                                           placeholder="Qty">
+                                    <select class="ingredient-unit form-select" 
+                                            style="width: 100px;"
+                                            {% if ingredient.id not in selected_ingredients %}disabled{% endif %}>
+                                        {% for unit_value, unit_name in ingredient.UNIT_CHOICES %}
+                                            <option value="{{ unit_value }}" 
+                                                    {% if ingredient.id in selected_ingredients and selected_ingredients|get_item:ingredient.id|get_item:'unit' == unit_value %}selected{% elif not ingredient.id in selected_ingredients and unit_value == ingredient.unit %}selected{% endif %}>
+                                                {{ unit_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% empty %}
+                                <p>No ingredients in this category.</p>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Hidden input to hold ingredients JSON data -->
+            <input type="hidden" name="ingredients_data" id="ingredients_data">
+        </div>
+
+        <div class="col-md-5 d-flex flex-column align-items-center justify-content-between">
+            <label for="id_photo" class="upload-area position-relative">
+                {% if dish.image %}
+                    <img id="previewImage" src="{{ dish.image.url }}" class="w-80 h-80 rounded-circle" alt="Preview">
+                {% else %}
+                    <img id="previewImage" class="w-80 h-80 rounded-circle" alt="Preview">
+                {% endif %}
+                <div class="d-flex flex-column align-items-center justify-content-center">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <p>upload image</p>
+                </div>
+            </label>
+            {{ form.image }}
+            <div class="icon-input mb-1">
+                {{ form.description }}
+            </div>
+            <div class="buttons">
+                <a href="{% url 'menu' %}" class="btn btn-outline btn1_color">Cancel</a>
+                <button type="submit" class="btn btn2_color">Update</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Category selection
+    const categorySelect = document.getElementById('ingredient_category');
+    const ingredientLists = document.querySelectorAll('.ingredient-category');
+    
+    function showCategory(category) {
+        ingredientLists.forEach(div => {
+            div.style.display = (div.dataset.category === category) ? 'block' : 'none';
+        });
+    }
+
+    // Show the selected category
+    if (categorySelect.value) {
+        showCategory(categorySelect.value);
+    }
+
+    categorySelect.addEventListener('change', function() {
+        showCategory(this.value);
+    });
+
+    // Enable/disable quantity and unit inputs based on checkbox state
+    document.querySelectorAll('.ingredient-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const parent = this.closest('.ingredient-item');
+            const qtyInput = parent.querySelector('.ingredient-qty');
+            const unitSelect = parent.querySelector('.ingredient-unit');
+            
+            if (this.checked) {
+                qtyInput.disabled = false;
+                unitSelect.disabled = false;
+                if (parseFloat(qtyInput.value) <= 0) {
+                    qtyInput.value = '1'; // Set default quantity if empty or zero
+                }
+            } else {
+                qtyInput.disabled = true;
+                unitSelect.disabled = true;
+                qtyInput.value = '0';
+            }
+        });
+    });
+
+    // Form submission handler
+    const form = document.getElementById('dish-form');
+    form.addEventListener('submit', function(e) {
+        const selectedIngredients = [];
+        
+        document.querySelectorAll('.ingredient-checkbox:checked').forEach(checkbox => {
+            const parent = checkbox.closest('.ingredient-item');
+            const id = checkbox.dataset.id;
+            const quantity = parseFloat(parent.querySelector('.ingredient-qty').value);
+            const unit = parent.querySelector('.ingredient-unit').value;
+
+            if (quantity > 0) {
+                selectedIngredients.push({
+                    id: id,
+                    quantity: quantity,
+                    unit: unit
+                });
+            }
+        });
+        
+        document.getElementById('ingredients_data').value = JSON.stringify(selectedIngredients);
+    });
+
+    // Image preview
+    const imageInput = document.querySelector('#id_image');
+    const previewImage = document.querySelector('#previewImage');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

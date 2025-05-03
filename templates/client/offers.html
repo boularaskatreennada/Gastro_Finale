@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GastroLink</title>
+    <link rel="icon" href="{% static 'images/GASTRO_LINK-.png' %}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/client/offers.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'landing_page' %}"><img src="{% static 'images/GASTRO_LINK-.png'  %}" alt="GastroLink" class="logo"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'order' %}">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'client_offers' %}">Offers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'review_list' %}">Reviews</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'create_reservation' %}">Reservation</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="offers-container">
+        <div class="offers-filter">
+            <div class="filter-tab active">Offers you may like</div>
+            <div class="filter-tab">Personalized offers</div>
+        </div>
+
+        {% if active_offers %}
+            {% for offer in active_offers %}
+            <div class="offer-card">
+                <img src="{% static 'images/default-offer.jpg' %}" alt="{{ offer.title }}" class="offer-image">
+                <div class="offer-content">
+                    <div class="offer-title">{{ offer.title }}</div>
+                    <div class="offer-description">{{ offer.description }}</div>
+                    <div class="offer-details">
+                        <div class="offer-period">
+                            {{ offer.start_date|date:"d/m/Y" }} - {{ offer.end_date|date:"d/m/Y" }}
+                        </div>
+                        <div class="promo-code">Promo Code: {{ offer.code }}</div>
+                    </div>
+                    <button class="use-now-btn">Use now</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center mt-4">No active offers at the moment. Please check back later!</p>
+        {% endif %}
+
+        <div class="see-more">
+            <a href="#" class="see-more-btn">See more offers →</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelector('.filter-tab.active').classList.remove('active');
+                tab.classList.add('active');
+                // Vous pouvez ajouter ici la logique pour filtrer les offres
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+{% include 'livreur/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/livreur/DeliveryOrders.css' %}">
+{% endblock %}
+
+{%  block content%}
+<div class="flex-fill mb-3 d-flex flex-column main bg-basic">
+    <nav class="navbar navbar-expand px-3 py-1 bg-basic">
+        <h3>Delivery Orders</h3>
+
+        <div class="navbar-collapse collapse">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+                <a href="" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
+                    <img src="{% static 'images/téléchargement.jpg' %}" class="avatar  img-fluid rounded-circle border border-dark" alt="">
+                </a>
+            
+            </li>
+          </ul>
+        </div>
+    </nav>
+        
+      
+   
+
+    <!-- Tabs for status filter -->
+    <div class="container-fluid my-3">
+        <div class="filter-bar">
+          <ul class="nav nav-pills justify-content-between">
+            <li class="nav-item flex-fill text-center">
+                            <a class="nav-link filter-link active" href="?status=">All</a>
+            </li>
+                          <li class="nav-item flex-fill text-center">
+                            <a
+                              class="nav-link filter-link"
+                              href="?status=pending"
+                            >Pending</a>
+                          </li>
+                          <li class="nav-item flex-fill text-center">
+                            <a
+                              class="nav-link filter-link "
+                              href="?status=in_progress"
+                            >In Progress</a>
+                          </li>
+                          <li class="nav-item flex-fill text-center">
+                           <a
+                             class="nav-link filter-link "
+                              href="?status=delivered"
+              
+                               >Delivered</a>
+                          </li>
+            
+          </ul>
+        </div>
+      </div>
+
+     
+    
+
+    <!-- Cards container -->
+    <div class="row g-4 flex-fill" id="cardsContainer">
+      {% for delivery in deliveries %}
+      <!-- example card; duplicate/adapt for each order -->
+      <div class="col-12 col-md-3" data-status="Pending">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title text-danger"><i class="bi bi-box-seam-fill"></i> {{ delivery.order.pk }}</h5>
+            <p class="mb-1"><i class="bi bi-person-fill"></i> {{ delivery.order.client.name }}</p>
+            <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ delivery.order.client.address }}</p>
+            <p class="mb-1"><i class="bi bi-telephone-fill"></i>  {{ delivery.order.client.phone }}</p>
+            <p class="mb-1"><i class="bi bi-currency-dollar"></i> Total: <strong>${{ delivery.order.total_price }}</strong></p>
+            <p class="mb-1"><i class="bi bi-list-ul"></i> Items: {{ delivery.order.orderdish_set.count }}</p>
+            <div class="mb-3">
+              <label class="form-label mb-0" for="Status"><i class="bi bi-clock-fill"></i> Status:</label>
+              <form method="post" action="{% url 'livreur:update_delivery_status' delivery.pk %}">
+                {% csrf_token %}
+              <select id="Status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                {% for label in delivery_status_choices %}
+                <option>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button class="btn btn-outline-primary direction"><i class="bi bi-geo-alt"></i> Get Directions</button>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p>Aucune livraison trouvée.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

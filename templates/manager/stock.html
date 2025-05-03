@@ -1,0 +1,59 @@
+{% extends 'manager/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="{% static 'styles/pdg/employee.css'%}">
+{% endblock %}
+
+{% block stock_active %}activate{% endblock %}
+
+{% block content %}
+<div class="main bg-white">
+  <nav class="navbar navbar-expand bg-basic d-flex justify-content-between">
+      <h6 class="fw-bold">
+          Dish Stock Management
+      </h6>
+      <h6>{{ request.session.display_username }}</h6>
+  </nav>
+
+  <main class="content px-3 py-1">
+    <div class="container mt-2 mb-4">
+      <!-- Only show dishes table -->
+      <div class="table-responsive">
+        <table id="dishes-table" class="table table-striped border" style="width:100%">
+          <thead>
+              <tr>
+                  <th>Dish Name</th>
+                  <th>Allocated Quantity</th>
+                  <th>Remaining Quantity</th>
+                  <th>Status</th>
+                  
+              </tr>
+          </thead>
+          <tbody>
+            {% for menu_dish in menu_dishes %}
+            <tr>
+              <td>{{ menu_dish.dish.name }}</td>
+              <td>{{ menu_dish.available_quantity }}</td>
+              <td>{{ menu_dish.available_quantity }} </td>
+              <td class="{% if menu_dish.available_quantity > 0 %}text-success{% else %}text-danger{% endif %}">
+                {% if menu_dish.available_quantity > 0 %}Available{% else %}Unavailable{% endif %}
+              </td>
+              
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script defer src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+<script defer src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+<script defer src="{% static 'js/manager/stock.js' %}"></script>
+{% endblock %}

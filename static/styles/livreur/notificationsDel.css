@@ -1,0 +1,35 @@
+/* styles-notification.css */
+.main{
+    margin-left: 60px;
+}
+.navbar{
+    background-color: white;
+    box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
+    width: 95%;
+  }
+  .navbar-expand .navbar-collapse{
+    min-width: 200px;
+    
+  }
+  .avatar{
+    height: 40px;
+    width: 40px;
+  }
+.list-group-item {
+    border: none;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .list-group-item:hover{
+    background-color:  #b2b2b194;
+    transform: translateY(-5px);      
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .badge {
+    font-size: 1rem;
+    padding: 0.5em;
+  }
+  

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+{% load static%}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Document{% endblock %}</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link href="https://cdn.materialdesignicons.com/6.5.95/css/materialdesignicons.min.css"rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'styles/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/pdg/base.css' %}">
+    {% block extra_css %}
+    {% endblock %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  
+    <div class=" wrapper">
+        <aside id="sidebar">
+            <div class="d-flex justify-content-between ">
+                <div class="sidebar-logo">
+                    <img src="{% static 'images/GASTRO_LINK-.png' %}" class="logo" alt="">
+                </div>
+                <button class="toggle-btn border-0" type="button">
+                    <i id="icon" class='bx bxs-chevrons-right'></i>
+                </button>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item" id="{% block dashboard_active %}{% endblock %}">
+                    <a href="{% url 'takeOrder' %}" class="sidebar-link">
+                    <i class='bx bxs-home'></i>
+                    <span>Menu</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item" id="{% block menu_active %}{% endblock %}">
+                    <a href="{% url 'ordersList' %}" class="sidebar-link">
+                    <i class='bx bxs-food-menu'></i>
+                    <span>Orders list</span>
+                </a></li>
+
+                <li class="sidebar-item " id="{% block offers_active %}{% endblock %}">
+                    <a href="{% url 'reserved_tables' %}" class="sidebar-link">
+                        <i class="mdi mdi-table-chair " aria-hidden="true"></i>
+                    <span>Reserved tables</span>
+                </a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <ul class="sidebar-nav">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">
+                          <i class='bx bx-log-out-circle'></i>
+                          <span>Log out</span>
+                        </a>
+                    </li>
+                </ul>
+                
+            </div>
+
+        </aside>
+     
+        {% block content %}
+        
+        {% endblock %}
+
+    </div>
+    
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/pdg/base.js' %}"></script>
+</body>
+</html>

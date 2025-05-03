@@ -1,0 +1,282 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GastroLink</title>
+    <link rel="icon" href="{% static 'images/GASTRO_LINK-.png' %}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/client/orders.css' %}">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'landing_page' %}"><img src="{% static 'images/GASTRO_LINK-.png' %}" alt="GastroLink" class="logo"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse after-bg" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'order' %}">Menu</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'client_offers' %}">Offers</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'review_list' %}">Reviews</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'create_reservation' %}">Reservation</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 sidebar">
+            <div class="mb-4">
+                <h6>Choose a city</h6>
+                <form method="get">
+                    <select class="form-select" name="city" onchange="this.form.submit()">
+                        <option value="">All Cities</option>
+                        {% for city in cities %}
+                            <option value="{{ city }}" {% if city == selected_city %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+
+            {% if restaurants %}
+            <div class="mb-4">
+                <h6>Choose a restaurant</h6>
+                <form method="get">
+                    {% if selected_city %}
+                        <input type="hidden" name="city" value="{{ selected_city }}">
+                    {% endif %}
+                    <select class="form-select" name="restaurant" onchange="this.form.submit()">
+                        <option value="">Select Restaurant</option>
+                        {% for restaurant in restaurants %}
+                            <option value="{{ restaurant.id }}" {% if selected_restaurant and restaurant.id == selected_restaurant.id %}selected{% endif %}>
+                                {{ restaurant.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+            {% endif %}
+
+            {% if categories %}
+            <div class="mb-4">
+                <h6>Choose a category</h6>
+                <ul class="list-group mb-2">
+                    {% for category in categories %}
+                        <a href="?city={{ selected_city }}&restaurant={{ selected_restaurant.id }}&category={{ category.category }}" class="list-group-item list-group-item-action {% if category.category == selected_category %}active{% endif %}">
+                            {{ category.category }}
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Dishes -->
+        <div class="col-md-6 p-3">
+            {% if dishes %}
+                <h4 class="mb-3">
+                    {% if selected_category %}
+                        Dishes in "{{ selected_category }}"
+                    {% else %}
+                        All Dishes
+                    {% endif %}
+                </h4>
+                <div class="row" id="dishes-container">
+                    {% for dish in dishes %}
+                        <div class="col-md-6 mb-2">
+                            <div class="card h-100">
+                                <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }}">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ dish.name }}</h5>
+                                    <strong class="mb-2">${{ dish.price }}</strong>
+                                    <p class="text-muted">In stock: {{ dish.dailymenudish.current_quantity }}</p>
+                                    <div class="input-group mb-2">
+                                        <input type="number" class="form-control quantity-input" min="1" max="{{ dish.dailymenudish.current_quantity }}" value="1">
+                                        <button class="btn btn-success add-to-cart-btn"
+                                                data-dish-id="{{ dish.id }}"
+                                                data-dish-name="{{ dish.name }}"
+                                                data-dish-price="{{ dish.price }}"
+                                                data-max-quantity="{{ dish.dailymenudish.current_quantity }}">
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% elif selected_category %}
+                <p>No dishes found in this category.</p>
+            {% endif %}
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-md-3 p-3" id="order-cart">
+            <h5>Your Order</h5>
+            <ul class="list-group mb-3" id="order-summary">
+                <li class="list-group-item text-muted">Your cart is empty</li>
+            </ul>
+            <strong>Total: <span id="order-total">0</span> $</strong>
+            <button id="place-order-btn" class="btn btn-primary w-100 mt-3" disabled>Place Order</button>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Cart Button (for small screens) -->
+<button id="cart-toggle-btn" class="cart-toggle-btn d-md-none">
+    <i class="fas fa-shopping-cart"></i>
+    <span id="cart-count" class="cart-count">0</span>
+</button>
+
+<script>
+    $(document).ready(function() {
+        // Load cart from localStorage
+        let cart = JSON.parse(localStorage.getItem('gastroLinkCart')) || {};
+        
+        // Update cart count indicator
+        function updateCartCount() {
+            const count = Object.keys(cart).length;
+            $('#cart-count').text(count);
+        }
+        
+        // Initialize cart count
+        updateCartCount();
+
+        function updateOrderSummary() {
+            const $summary = $("#order-summary");
+            const $total = $("#order-total");
+            $summary.empty();
+            let total = 0;
+
+            if (Object.keys(cart).length === 0) {
+                $summary.append('<li class="list-group-item text-muted">Your cart is empty</li>');
+                $("#place-order-btn").prop('disabled', true);
+                $total.text('0');
+                localStorage.removeItem('gastroLinkCart');
+                updateCartCount();
+                return;
+            }
+
+            for (let dishId in cart) {
+                const item = cart[dishId];
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                $summary.append(`
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${item.name} (x${item.quantity})
+                        <div>
+                            <span class="me-2">$${itemTotal.toFixed(2)}</span>
+                            <button class="btn btn-sm btn-danger remove-item-btn" data-dish-id="${dishId}">Remove</button>
+                        </div>
+                    </li>
+                `);
+            }
+
+            $("#place-order-btn").prop('disabled', false);
+            $total.text(total.toFixed(2));
+            
+            // Save cart to localStorage
+            localStorage.setItem('gastroLinkCart', JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        // Initialize order summary with existing cart
+        updateOrderSummary();
+
+        $(document).on('click', '.add-to-cart-btn', function() {
+            const $btn = $(this);
+            const dishId = $btn.data('dish-id');
+            const dishName = $btn.data('dish-name');
+            const dishPrice = parseFloat($btn.data('dish-price'));
+            const maxQuantity = parseInt($btn.data('max-quantity'));
+
+            const $input = $btn.closest('.input-group').find('.quantity-input');
+            const quantity = parseInt($input.val());
+
+            if (quantity < 1 || quantity > maxQuantity) {
+                alert(`Please enter a quantity between 1 and ${maxQuantity}`);
+                return;
+            }
+
+            if (cart[dishId]) {
+                const newQty = cart[dishId].quantity + quantity;
+                if (newQty > maxQuantity) {
+                    alert(`Cannot add more than ${maxQuantity} of this dish`);
+                    return;
+                }
+                cart[dishId].quantity = newQty;
+            } else {
+                cart[dishId] = {
+                    name: dishName,
+                    price: dishPrice,
+                    quantity: quantity,
+                    maxQuantity: maxQuantity
+                };
+            }
+
+            updateOrderSummary();
+            $input.val(1); // Reset quantity input
+        });
+
+        $(document).on('click', '.remove-item-btn', function() {
+            const dishId = $(this).data('dish-id');
+            delete cart[dishId];
+            updateOrderSummary();
+        });
+
+        $("#place-order-btn").click(function() {
+            if (Object.keys(cart).length === 0) return;
+
+            // Check if all items are still available
+            for (let dishId in cart) {
+                const item = cart[dishId];
+                if (item.quantity > item.maxQuantity) {
+                    alert(`Sorry, ${item.name} is no longer available in the requested quantity. Please update your cart.`);
+                    return;
+                }
+            }
+
+            // Send cart to backend
+            $.ajax({
+                url: "{% url 'place_order' %}",
+                method: "POST",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    cart: JSON.stringify(cart),
+                    restaurant_id: '{{ selected_restaurant.id }}'
+                },
+                success: function(response) {
+                    // Clear cart after successful order
+                    cart = {};
+                    localStorage.removeItem('gastroLinkCart');
+                    updateOrderSummary();
+                    window.location.href = response.redirect_url;
+                },
+                error: function(xhr) {
+                    if (xhr.status === 400) {
+                        alert(xhr.responseJSON.error);
+                    } else {
+                        alert('Error placing order. Please try again.');
+                    }
+                }
+            });
+        });
+
+        // Toggle cart for mobile view
+        $('#cart-toggle-btn').click(function() {
+            $('#order-cart').toggleClass('active');
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

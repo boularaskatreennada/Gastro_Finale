@@ -1,0 +1,51 @@
+{% extends 'pdg/baseform.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/pdg/addMang.css' %}">
+{% endblock %}
+
+{% block titlee %}
+<h4 class="form-title">{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Employee</h4>
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="w-100">
+    {% csrf_token %}
+    <div class="row">
+        <!-- Left side: inputs -->
+        <div class="col-md-7">
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-user"></i>
+                {{ form.name }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-envelope"></i>
+                {{ form.email }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-phone"></i>
+                {{ form.phone }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-lock"></i>
+                {{ form.password }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-location-pin"></i>
+                {{ form.status }}
+            </div>
+            <div class="icon-input mb-3">
+                <i class="fa-solid fa-user-tie"></i>
+                {{ form.role }}
+            </div>
+        </div>
+
+        <div class="col-md-5 d-flex flex-column align-items-center justify-content-between">
+            <div class="buttons">
+                <a href="{% url 'employee_manager_list' %}" class="btn btn-outline btn1_color">Cancel</a>
+                <button type="submit" class="btn btn2_color">Add</button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
