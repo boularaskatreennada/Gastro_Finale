@@ -193,28 +193,43 @@ def place_order(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+
+
 @client_required
 def confirm_order(request, order_id):
     order = get_object_or_404(Order, id=order_id, client=request.user.client)
 
     if request.method == 'POST':
         mode = request.POST.get('mode')
-        address = request.POST.get('address', '').strip()  # optional
+        address = request.POST.get('address', '').strip()
+        table_number = request.POST.get('table_number')
 
-        if mode not in ['served', 'delivered']:
+        if mode not in ['served', 'delivered', 'take-away']:
             messages.error(request, "Invalid mode selected.")
             return redirect('confirm_order', order_id=order.id)
 
+
         order.mode = mode
+
+        if mode == 'served':
+            # Validate and save table_number
+            if table_number:
+                try:
+                    table_number_int = int(table_number)
+                    if table_number_int <= 0:
+                        raise ValueError
+                    order.table_number = table_number_int
+                except ValueError:
+                    messages.error(request, "Invalid table number.")
+                    return redirect('confirm_order', order_id=order.id)
+            else:
+                messages.error(request, "Table number is required for served orders.")
+                return redirect('confirm_order', order_id=order.id)
+        else:
+            order.table_number = None  # Clear table number for other modes
+
         order.save()
 
-
-        
-        return redirect('landing_page')  # You can create a success page
+        return redirect('landing_page')
 
     return render(request, 'client/confirmOrder.html', {'order': order})
-
-
-
-
-
