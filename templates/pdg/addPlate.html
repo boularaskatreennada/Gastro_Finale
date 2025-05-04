@@ -16,11 +16,11 @@
                 {{ form.name }}
             </div>
             <div class="icon-input mb-3">
-                <i class="fa-solid fa-utensils"></i>
+                <i class="fa-solid fa-bowl-food"></i>
                 {{ form.category }}
             </div>
             <div class="icon-input mb-3">
-                <i class="fa-solid fa-utensils"></i>
+                <i class="fa-solid fa-money-check-dollar"></i>
                 {{ form.price }}
             </div>
 
@@ -148,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Form submission handler
     const form = document.getElementById('dish-form');
     form.addEventListener('submit', function(e) {
         const selectedIngredients = [];
@@ -171,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('ingredients_data').value = JSON.stringify(selectedIngredients);
     });
 
-    // Image preview
+
     const imageInput = document.querySelector('#id_image');
     const previewImage = document.querySelector('#previewImage');
     

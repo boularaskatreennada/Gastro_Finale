@@ -53,6 +53,7 @@
     </div>
 
     <div class="right-side">
+        
         <label for="id_photo" class="upload-area position-relative">
             <img id="previewImage" class="w-100 h-100 rounded-circle" alt="Preview" style="display: none;">
             <div class="d-flex flex-column align-items-center justify-content-center" id="uploadIcon">
@@ -61,8 +62,12 @@
             </div>
         </label>
         
-        
         {{ form.image }}
+
+        
+
+
+
         <div class="buttons">
             <a href="{% url 'offers' %}" class="btn btn-outline btn1_color">Cancel</a>
             <button type="submit" class="btn btn2_color">Add</button>
@@ -70,21 +75,6 @@
     </div>
     
 </form>
-<script>
-    document.getElementById('id_photo').addEventListener('change', function () {
-  const file = this.files[0];
-  const preview = document.getElementById('previewImage');
-  const icon = document.getElementById('uploadIcon');
 
-  if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-          if (icon) icon.style.display = 'none';
-      };
-      reader.readAsDataURL(file);
-  }
-});
-</script>
+    
 {% endblock %}

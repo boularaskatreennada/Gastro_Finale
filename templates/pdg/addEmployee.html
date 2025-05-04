@@ -42,10 +42,11 @@
                 <i class="fa-solid fa-utensils"></i>
                 {{ form.restaurant }}
             </div>
-            <div class="icon-input mb-3 manager-only d-none">
+            <div class="icon-input mb-3">
                 <i class="fa-solid fa-lock"></i>
                 {{ form.password }}
             </div>
+            
             <div class="icon-input mb-3 manager-only d-none">
                 <i class="fa-solid fa-lock"></i>
                 {{ form.status }}
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    toggleFields(); // On page load
+    toggleFields();
     userTypeSelect.addEventListener('change', toggleFields);
 });
 </script>

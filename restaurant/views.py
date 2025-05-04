@@ -476,3 +476,23 @@ def delete_staff_employee(request, role, pk):
         return redirect('employee_manager_list')
 
     return render(request, 'manager/confirm_delete.html', {'employee': employee})
+
+
+
+
+
+
+
+
+def landing_page(request):
+
+    restaurants = Restaurant.objects.all()[:4]
+
+    reviews = Review.objects.select_related('client__user').order_by('-date')[:5]
+    
+    context = {
+        'restaurants': restaurants,
+        'reviews': reviews,
+    }
+    return render(request, 'client/landingPage.html', context)
+

@@ -13,5 +13,9 @@ class OfferForm(forms.ModelForm):
             'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Discount %'}),
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Promo Code'}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'image': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'id': 'id_photo',
+                'style': 'display:none;',
+            }),
         }

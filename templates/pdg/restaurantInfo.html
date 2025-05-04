@@ -171,26 +171,28 @@
             <thead>
                 <tr>
                     <th>Date</th>
-                    <th>Time</th>
                     <th>Client Name</th>
+                    <th>Email</th>
                     <th>People</th>
                     <th>Status</th>
+                    <th>Table</th>
                 </tr>
             </thead>
             <tbody>
                 {% for reservation in reservations %}
                 <tr>
-                    <td>{{ reservation.date }}</td>
-                    <td>{{ reservation.time|time:"H:i" }}</td>
+                    <td>{{ reservation.datetime|date:"Y-m-d H:i" }}</td>
                     <td>
                         {% if reservation.client %}
-                            {{ reservation.client.user.get_full_name }}
+                            {{ reservation.client.user.username }}
                         {% else %}
                             N/A
                         {% endif %}
                     </td>
-                    <td>{{ reservation.num_people }}</td>
-                    <td>{{ reservation.get_status_display }}</td>
+                    <td>{{reservation.client.user.email}}</td>
+                    <td>{{ reservation.number_of_people  }}</td>
+                    <td>{{ reservation.status }}</td>
+                    <td>{{reservation.table}}</td>
                 </tr>
                 {% endfor %}
             </tbody>

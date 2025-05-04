@@ -44,7 +44,8 @@ def add_offer(request):
 def edit_offer(request, pk):
     offer = get_object_or_404(Offer, pk=pk)
     if request.method == 'POST':
-        form = OfferForm(request.POST, instance=offer)
+        form = OfferForm(request.POST, request.FILES, instance=offer)
+
         if form.is_valid():
             form.save()
             return redirect('offers')
@@ -62,7 +63,6 @@ def delete_offer(request, pk):
 
 
 
-@client_required
 def client_offer_list(request):
     today = timezone.now().date()
     offers = Offer.objects.all()

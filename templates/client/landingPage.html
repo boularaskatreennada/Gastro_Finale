@@ -47,41 +47,22 @@
         </div>
     </header>
 
-    <!-- Popular Dishes -->
+    <!-- Popular Restaurants -->
     <section class="container my-5">
-        <h2 class="text-center">Our Popular Dishes</h2>
+        <h2 class="text-center">Our Restaurants</h2>
         <div class="row text-center">
-            <!-- Plat 1 -->
+            {% for restaurant in restaurants %}
             <div class="col-md-3">
                 <div class="dish-container">
-                    <img src="assets/paella.PNG" class="dish-img" alt="Paella Marisco">
-                    <p class="dish-name">Paella Marisco - <strong>10$</strong></p>
+                    {% if restaurant.image %}
+                    <img src="{{ restaurant.image.url }}" class="dish-img" alt="{{ restaurant.name }}">
+                    {% else %}
+                    <img src="{% static 'images/default-restaurant.jpg' %}" class="dish-img" alt="Default Restaurant Image">
+                    {% endif %}
+                    <p class="dish-name">{{ restaurant.name }} - <strong>{{ restaurant.city }}</strong></p>
                 </div>
             </div>
-            
-            <!-- Plat 2 -->
-            <div class="col-md-3">
-                <div class="dish-container">
-                    <img src="assets/shrimp.PNG" class="dish-img" alt="Shrimp Scampi">
-                    <p class="dish-name">Shrimp Scampi - <strong>10$</strong></p>
-                </div>
-            </div>
-            
-            <!-- Plat 3 -->
-            <div class="col-md-3">
-                <div class="dish-container">
-                    <img src="assets/carbonara.PNG" class="dish-img" alt="Spaghetti Carbonara">
-                    <p class="dish-name">Spaghetti Carbonara - <strong>10$</strong></p>
-                </div>
-            </div>
-            
-            <!-- Plat 4 -->
-            <div class="col-md-3">
-                <div class="dish-container">
-                    <img src="assets/penne.PNG" class="dish-img" alt="Penne Arrabiata">
-                    <p class="dish-name">Penne Arrabiata - <strong>10$</strong></p>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </section>
 
@@ -94,14 +75,14 @@
                     <h2>Discover Our App: <span class="text-danger">Gastro</span></h2>
                     <p>Download The Gastro App to easily reserve a table and order your food online.</p>
                     <div class="d-flex gap-3 mt-4">
-                        <img src="assets/app_store-removebg-preview.png" alt="App Store" class="store-button">
-                        <img src="assets/play_store-removebg-preview.png" alt="Google Play" class="store-button">
+                        <img src="{% static 'images/appstore.png' %}" alt="App Store" class="store-button">
+                        <img src="{% static 'images/googleplay.png' %}" alt="Google Play" class="store-button">
                     </div>
                 </div>
                 <!-- Colonne pour l'image -->
                 <div class="col-md-6 order-md-2 text-center">
                     <div class="app-image-container" id="appImage">
-                        <img src="assets/app mob.PNG" alt="App Preview" class="app-image img-fluid">
+                        <img src="{% static 'images/app.png' %}" alt="App Preview" class="app-image img-fluid">
                     </div>
                 </div>
             </div>
@@ -112,9 +93,26 @@
     <section class="container my-5">
         <h2 class="text-center">What Our Clients Say</h2>
         <div class="row">
-            <div class="col-md-4"> <div class="p-3 border rounded">Amazing service! - <strong>Oliver</strong></div> </div>
-            <div class="col-md-4"> <div class="p-3 border rounded">Food always fresh! - <strong>Sophia</strong></div> </div>
-            <div class="col-md-4"> <div class="p-3 border rounded">Seamless experience! - <strong>Liam</strong></div> </div>
+            {% for review in reviews %}
+            <div class="col-md-4">
+                <div class="p-3 border rounded">
+                    <div class="mb-2">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                                <i class="far fa-star text-warning"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <p>{{ review.comment }}</p>
+                    <strong>- {{ review.client.user.get_full_name|default:review.client.user.username }}</strong>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'review_list' %}" class="btn btn-outline-primary">See All Reviews</a>
         </div>
     </section>
 
@@ -126,3 +124,6 @@
     
 </body>
 </html>
+
+
+
