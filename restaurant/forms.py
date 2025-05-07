@@ -250,3 +250,28 @@ class StaffEmployeeForm(forms.Form):
 
 
 
+
+
+
+from django import forms
+from django.contrib.auth.forms import PasswordChangeForm
+from restaurant.models import User
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'phone']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+         
+            
+        }
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def init(self, *args, **kwargs):
+        super().init(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})

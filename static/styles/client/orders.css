@@ -181,7 +181,7 @@ body {
 
 /* Responsive tweaks */
 
-@media (max-width: 992px) {
+@media  (max-width: 992px) {
     .after-bg{
         background-color: var(--light);
         gap: 1;

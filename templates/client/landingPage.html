@@ -27,8 +27,10 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'client_offers' %}">Offers</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'review_list' %}">Reviews</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'create_reservation' %}">Reservation</a></li>
+                    
                 </ul>
-                <a href="{% url 'login' %}" class="btn-signin">Sign In</a>
+                <!--<a href="{% url 'login' %}" class="btn-signin">Sign In</a>-->
+                <a href="{% url 'profile' %}" class="btn-signin">profile</a>
             </div>
         </div>
     </nav>
@@ -41,7 +43,7 @@
                 Discover the best dining experience with GastroLink — order, reserve, and enjoy exceptional flavors effortlessly!
             </p>
             <div class="mt-4 d-flex flex-column flex-sm-row justify-content-center gap-3">
-                <a href="#" class="btn btn-danger"><i class="fas fa-utensils me-2"></i> Order Now</a>
+                <a href="{% url 'order' %}" class="btn btn-danger"><i class="fas fa-utensils me-2"></i> Order Now</a>
                 <a href="{% url 'create_reservation' %}" class="btn btn-warning"><i class="fas fa-chair me-2"></i> Reserve Now</a>
             </div>
         </div>

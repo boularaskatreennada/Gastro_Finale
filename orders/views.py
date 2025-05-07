@@ -18,7 +18,7 @@ from django.db.models import F, Q ,Count ,Sum
 from django.http import Http404
 
 @manager_required
-def orders_list(request):
+def orderslistManager(request):
     restaurant = request.user.manager.restaurant
 
     date_str = request.GET.get('date')
@@ -70,7 +70,7 @@ def update_complaint_status(request, complaint_id):
         
     return redirect('clients_orders_list')
 
-@client_required
+
 def clientOrder(request):
     selected_city = request.GET.get('city')
     selected_restaurant_id = request.GET.get('restaurant')
@@ -140,7 +140,7 @@ def clientOrder(request):
 
 
 @client_required
-def place_order(request):
+def placeOrderClient(request):
     if request.method == 'POST':
         data = json.loads(request.POST.get('cart'))
         restaurant_id = request.POST.get('restaurant_id')
@@ -231,7 +231,7 @@ def confirm_order(request, order_id):
 
         order.save()
 
-        return redirect('landing_page')
+        return redirect('profile')
 
     return render(request, 'client/confirmOrder.html', {'order': order})
 

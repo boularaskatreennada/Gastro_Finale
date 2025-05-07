@@ -53,10 +53,7 @@
               <option value="Cancelled" {% if request.GET.filterStatus == "Cancelled" %}selected{% endif %}>Cancelled</option>
             </select>
           </div>
-          <div class="col-6 col-md-2">
-            <label class="form-label small" for="filterTable">Table No.</label>
-            <input type="number" id="filterTable" name="filterTable" class="form-control shadow-sm filter" placeholder="e.g. 12" value="{{ request.GET.filterTable }}">
-          </div>
+          
           <div class="search-container mt-4 col-12 col-md-3">
             <i id="search-icon" class="bi bi-search"></i>
             <input type="text" name="search" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search" value="{{ request.GET.search }}">

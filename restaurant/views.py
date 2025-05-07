@@ -1,4 +1,5 @@
 import datetime
+from django.forms import DecimalField
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
@@ -17,6 +18,10 @@ from django.contrib import messages
 from .forms import ClientRegistrationForm
 from feedback.models import *
 from reservations.models import *
+from django.db.models.functions import TruncYear, TruncMonth, TruncDay
+from django.db.models import Sum, F, FloatField
+import json
+
 
 def client_register(request):
     if request.method == 'POST':
@@ -64,8 +69,60 @@ def custom_login(request):
 
 @pdg_required
 def pdg_dashboard(request):
-    return render(request, 'pdg/dashboard.html')
+    filter_type = request.GET.get('filter', 'Year')
+    current_filter = filter_type
 
+    # Get authenticated manager's restaurant (adjust as needed)
+    #restaurant = request.user.restaurant  
+
+    # Filter paid orders of that restaurant
+    orders = Order.objects.filter(status='paid')
+
+    # Apply date truncation
+    if filter_type == 'Year':
+        trunc = TruncYear('order_date')
+    elif filter_type == 'Month':
+        trunc = TruncMonth('order_date')
+    elif filter_type == 'Day':
+        trunc = TruncDay('order_date')
+
+    # Annotate period + revenue per order first (Sub-aggregation)
+    orders = orders.annotate(period=trunc)
+
+    # Then aggregate revenue per period (final step)
+    revenue_data = orders.values('period').annotate(
+        revenue=Sum(
+            F('orderdish__quantity') * F('orderdish__dish__price'),
+            output_field=FloatField()
+        )
+    ).order_by('period')
+
+    # Prepare data for chart
+    labels = []
+    revenues = []
+    for entry in revenue_data:
+        period = entry['period']
+        labels.append(
+            period.strftime('%Y') if filter_type == 'Year'
+            else period.strftime('%Y-%m') if filter_type == 'Month'
+            else period.strftime('%Y-%m-%d')
+        )
+        revenues.append(entry['revenue'] or 0)
+        print(labels)
+        print(revenues)
+
+
+    context = {
+    'labels_json': json.dumps(labels),
+    'revenues_json': json.dumps(revenues),
+    'current_filter': current_filter,
+    }
+
+    return render(request, 'pdg/dashboard.html', context)
+
+
+ 
+             
 @manager_required
 def manager_dashboard(request):   
     restaurant = request.user.manager.restaurant
@@ -497,3 +554,37 @@ def landing_page(request):
     }
     return render(request, 'client/landingPage.html', context)
 
+
+
+
+@client_required
+def profile(request):
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = CustomPasswordChangeForm(user=request.user, data=request.POST)
+        
+        if 'update_info' in request.POST and u_form.is_valid():
+            u_form.save()
+            messages.success(request, 'Your profile has been updated!')
+            return redirect('profile')
+            
+        elif 'change_password' in request.POST and p_form.is_valid():
+            p_form.save()
+            messages.success(request, 'Your password has been updated!')
+            return redirect('profile')
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = CustomPasswordChangeForm(user=request.user)
+    
+    # Récupérer l'historique des commandes et réservations
+    orders = Order.objects.filter(client=request.user.client).order_by('-order_date')[:5]
+    reservations = Reservation.objects.filter(client=request.user.client).order_by('-datetime')[:5]
+    
+    context = {
+        'u_form': u_form,
+        'p_form': p_form,
+        'orders': orders,
+        'reservations': reservations,
+    }
+    
+    return render(request, 'client/profil.html', context)

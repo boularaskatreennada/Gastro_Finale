@@ -6,6 +6,7 @@ from django import forms
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
+from finance.models import Expense
 from orders.models import Order, OrderDish
 from .models import *
 from restaurant.models import *
@@ -423,16 +424,12 @@ def generate_shopping_list(request):
     else:
         selected_date = date.today()
 
-    # Récupérer ou créer le DailyMenu pour cette date
     daily_menu, _ = DailyMenu.objects.get_or_create(date=selected_date, restaurant=restaurant)
 
-    # Récupérer ou créer la ShoppingList associée
     shopping_list, _ = ShoppingList.objects.get_or_create(menu=daily_menu)
 
-    # --- NOUVEAUTÉ : On supprime les anciens éléments pour recalculer proprement ---
     ShoppingListItem.objects.filter(shopping_list=shopping_list).delete()
 
-    # Calculer tous les ingrédients nécessaires
     dish_entries = DailyMenuDish.objects.filter(menu=daily_menu)
 
     ingredient_quantities = {}
@@ -448,7 +445,6 @@ def generate_shopping_list(request):
             else:
                 ingredient_quantities[key] = quantity
 
-    # Recréer les ShoppingListItems
     for (ingredient_id, unit), total_quantity in ingredient_quantities.items():
         ingredient = Ingredient.objects.get(id=ingredient_id)
         ShoppingListItem.objects.create(
@@ -461,7 +457,22 @@ def generate_shopping_list(request):
     items = ShoppingListItem.objects.filter(shopping_list=shopping_list)
 
     total_cost = sum(item.total_price for item in items)
+     
+    expense_exists = Expense.objects.filter(
+        restaurant=restaurant,
+        category='FOOD',
+        expense_date= date.today()
+    ).exists()
 
+    if not expense_exists:
+        Expense.objects.create(
+            restaurant=restaurant,
+            amount=total_cost,
+            description=f"shoppingList n°{date.today()}",
+            category='FOOD',
+            expense_date=date.today(),
+            created_by=request.user
+        )
     return render(request, 'manager/orders.html', {
         'items': items,
         'total_cost': total_cost,

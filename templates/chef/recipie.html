@@ -79,8 +79,9 @@
                 <div class="row ">
                   <div class=" col-12 col-md-4">
                     <p class="ms-3"><strong>Ingredients:</strong></p>
-                    {% for di in dish.dishingredient_set.all %}
+                    
                     <ul class="mb-2">
+                      {% for di in dish.dishingredient_set.all %}
                       <li> {{ di.ingredient.name }} — {{ di.quantity }} {{ di.ingredient.unit }}</li>
                       {% empty %}
                       <li>No ingredient found</li>
