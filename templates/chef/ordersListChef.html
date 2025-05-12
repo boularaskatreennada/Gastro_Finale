@@ -36,20 +36,20 @@
                   </a>
                 </li>
                 <li class="nav-item flex-fill text-center">
-                  <a href="{% url 'ordersListChef' %}?filter_type=Dine-in{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
-                     class="nav-link filter-link {% if filter_type == 'Dine-in' %}active{% endif %}">
+                  <a href="{% url 'ordersListChef' %}?filter_type=dine-in{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                     class="nav-link filter-link {% if filter_type == 'dine-in' %}active{% endif %}">
                     Dine In
                   </a>
                 </li>
                 <li class="nav-item flex-fill text-center">
-                  <a href="{% url 'ordersListChef' %}?filter_type=Takeaway{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
-                     class="nav-link filter-link {% if filter_type == 'Takeaway' %}active{% endif %}">
+                  <a href="{% url 'ordersListChef' %}?filter_type=takeaway{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                     class="nav-link filter-link {% if filter_type == 'takeaway' %}active{% endif %}">
                     Takeaway
                   </a>
                 </li>
                 <li class="nav-item flex-fill text-center">
-                  <a href="{% url 'ordersListChef' %}?filter_type=Delivery{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
-                     class="nav-link filter-link {% if filter_type == 'Delivery' %}active{% endif %}">
+                  <a href="{% url 'ordersListChef' %}?filter_type=delivered{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                     class="nav-link filter-link {% if filter_type == 'delivered' %}active{% endif %}">
                     Delivery
                   </a>
                 </li>
@@ -91,24 +91,21 @@
 
                   <div class="text-end">
                     <div class="d-flex">
-                      <form method="post" action="{% url 'update_order_status' order.pk %}" class="d-inline">
-                        {% csrf_token %}
-                        <select name="status" class="form-select form-select-sm d-inline w-auto bg-warning text-dark" onchange="this.form.submit()">
-                          {% if order.status == 'pending' %}
-                            <option  value="pending" selected>Pending</option>
-                            <option value="preparing">Preparing</option>
-                          {% elif order.status == 'preparing' %}
-                            <option value="preparing" selected>Preparing</option>
-                            <option value="done">Done</option>
-                          
+                      {% if order.status in 'pending preparing' %}
+                        <form method="post" action="{% url 'update_order_status' order.pk %}" class="d-inline">
+                          {% csrf_token %}
+                          <select name="status" class="form-select  d-inline  bg-warning text-dark order-status" onchange="this.form.submit()">
+                            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="preparing" {% if order.status == 'preparing' %}selected{% endif %}>Preparing</option>
+                            <option value="done" {% if order.status == 'done' %}selected{% endif %}>Done</option>
                           </select>
-                      </form>
-                          {% else %}
-                           <span class="order-status">
-                                {{ order.status }}
-                            </span>
-                          {% endif %}
-                      <button class="btn btn-link p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#items" aria-expanded="false" aria-controls="items">
+                        </form>
+                      {% else %}
+                        <span class="order-status bg-warning text-dark">
+                          {{ order.status }}
+                        </span>
+                      {% endif %}
+                      <button class="btn btn-link p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#items{{ order.pk }}" aria-expanded="false" aria-controls="items{{ order.pk }}">
                         <i id="chevron" class="bi bi-chevron-down"></i>
                       </button>
                     </div>
@@ -119,7 +116,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="collapse mt-2" id="items">
+                <div class="collapse mt-2" id="items{{ order.pk }}">
                   <div class="table-responsive">
                     <table class="table items-table mb-3">
                     

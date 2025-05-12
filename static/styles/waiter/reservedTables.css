@@ -18,6 +18,7 @@
     max-width: 300px; 
     width: 100%;
     border-radius: 20px !important;
+    margin-top: 10px !important;
 }
 #search-icon{
     position: absolute;
@@ -42,6 +43,10 @@
     color: white !important;
   }
   #clearFilters.active{
+    background-color: #fa4416c6 !important;
+    color: white !important;
+  }
+  #clearFilters.active::after{
     background-color: #fa4416c6 !important;
     color: white !important;
   }

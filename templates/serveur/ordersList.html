@@ -55,7 +55,6 @@
           <option value="pending"   {% if selected_status == 'pending' %}selected{% endif %}>New</option>
           <option value="preparing" {% if selected_status == 'preparing' %}selected{% endif %}>preparing</option>
           <option value="done"      {% if selected_status == 'done' %}selected{% endif %}>Ready</option>
-          <option value="served"    {% if selected_status == 'served' %}selected{% endif %}>Served</option>
           <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
           </select>
         </div>
@@ -72,10 +71,11 @@
           <option value="">All</option>
           <option value="served"     {% if request.GET.filterType == 'served' %}selected{% endif %}>Dine‑in</option>
           <option value="takeaway"   {% if request.GET.filterType == 'takeaway' %}selected{% endif %}>Takeaway</option>
+          <option value="delivered"   {% if request.GET.filterType == 'delivered' %}selected{% endif %}>delivered</option>
           </select>
         </div>
       
-        <!-- Table Number -->
+        <!-- Table Number 
         <div class="col-6 col-md-2">
           <label class="form-label small" for="filterTable">Table Number</label>
           <input
@@ -88,19 +88,19 @@
             onchange="location='?filterTable='+this.value"
           >
         </div>
-      
+        -->
         <!-- Payment Status -->
         <div class="col-6 col-md-2">
-          <label class="form-label small" for="filterPayment">Payment Status</label>
+          <label class="form-label small" for="filterType">Payment Status</label>
           <select
             id="filterPayment"
-            name="filterPayment"
+            name="filterType"
             class="form-select filter"
-            onchange="location='?filterPayment='+this.value"
+            onchange="location='?filterType='+this.value"
           >
-            <option value=""     >All</option>
-            <option value="paid"   {% if request.GET.filterPayment == 'paid' %}selected{% endif %}>Paid</option>
-        <option value="unpaid" {% if request.GET.filterPayment == 'unpaid' %}selected{% endif %}>Unpaid</option>
+            <option value="" >All</option>
+            <option value="paid"   {% if request.GET.filterType == 'paid' %}selected{% endif %}>Paid</option>
+            <option value="unpaid" {% if request.GET.filterType == 'unpaid' %}selected{% endif %}>Unpaid</option>
           </select>
         </div>
       
@@ -121,15 +121,11 @@
         {% for order in orders %}
         <!-- Order 1 -->
         <div class="order-row  d-flex justify-content-between align-items-left">
-         <!-- <div>
-            <h6 class="mb-1"> {{ order.client.name }}</h6>
-            <small> #{{ order.pk }} • {{ order.items_count }} </small>
-            <h6 class="mb-0 text-primary price">{{ order.total_price }}</h6>
-          </div>  -->
+        
           <div class=" align-items-center mb-2">
             <small class="text-muted m">Order #{{ order.pk }}</small>
-            {% if order.mode == "takeaway" %}
-                <h5 class="mb-0 me-2">{{ order.client.name }}</h5>
+            {% if order.server == NULL  %}
+                <h5 class="mb-0 me-2">{{ order.client.user.username }}</h5>
             {% else %}
                 <h5 class="mb-0 me-2">Table {{ order.table_number}}</h5>
             {% endif %}
@@ -144,10 +140,10 @@
           
           <div class="text-end">
             <div class="d-flex">
-              {% if order.status == 'Done' %}
-                <form method="post" action="{% url 'update_order_status' order.pk %}" class="d-inline">
+              {% if order.status == 'done' %}
+                <form method="post" action="{% url 'update_order_status_waiter' order.pk %}" class="d-inline ">
                   {% csrf_token %}
-                  <select name="status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                  <select name="status" class="form-select  d-inline bg-warning text-dark order-status  " onchange="this.form.submit()">
                     <option value="done" selected>Done</option>
                     <option value="paid">Paid</option>
                   </select>

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'styles/waiter/reservedTables.css ' %}">
+<link rel="stylesheet" href="{% static 'styles/waiter/reservedTables.css' %}">
 {% endblock %}
 
 {%  block content%}
@@ -29,7 +29,7 @@
       <div class="row g-2 align-items-center mb-3 mt-3">
         <form id="filterForm" method="get" class="row g-2 align-items-center mb-3 mt-3">
           <div class="col-12 col-md-1 d-grid">
-            <button type="submit" name="clear" value="1" class="btn btn-outline-secondary mt-4 shadow-sm">All</button>
+            <button id="clearFilters" type="submit" name="clear" value="1" class="btn  mt-4 shadow-sm filter">All</button>
           </div>
           <div class="col-6 col-md-2">
             <label class="form-label small" for="filterDate">Date</label>
@@ -46,9 +46,9 @@
           <div class="col-6 col-md-2">
             <label class="form-label small" for="filterStatus">Status</label>
             <select id="filterStatus" name="filterStatus" class="form-select shadow-sm filter">
-              <option value="" {% if not request.GET.filterStatus %}selected{% endif %}>All</option>
-              <option value="Pending" {% if request.GET.filterStatus == "Pending" %}selected{% endif %}>Pending</option>
-              <option value="Seated" {% if request.GET.filterStatus == "Seated" %}selected{% endif %}>Seated</option>
+                  <option value="pending" {% if request.GET.filterStatus == 'pending' %}selected{% endif %}>Pending</option>
+                  <option value="accepted" {% if request.GET.filterStatus  == 'accepted' %}selected{% endif %}>Accepted</option>
+                  <option value="refused" {% if request.GET.filterStatus  == 'refused' %}selected{% endif %}>Refused</option>
               <option value="Cancelled" {% if request.GET.filterStatus == "Cancelled" %}selected{% endif %}>Cancelled</option>
             </select>
           </div>
@@ -78,7 +78,7 @@
           
             <span class="badge  position-absolute top-0 end-0 m-2 duration"><i class="bi bi-clock-fill"></i>{{ reservation.datetime|date:"H:i" }}</span>
             <p class="mt-4 mb-1"><i class="bi bi-clock"></i><strong>Reservation Time:</strong>{{ reservation.datetime }} </p>
-            <p class="mb-1"><i class="bi bi-person"></i><strong>Customer:</strong> {{ reservation.client.user.get_full_name }}</p>
+            <p class="mb-1"><i class="bi bi-person"></i><strong>Customer:</strong> {{ reservation.client.user.username }}</p>
             <p class="mb-1"><i class="bi bi-telephone"></i><strong>Phone:</strong> {{ reservation.phone }} </p>
             <p class="mb-1"><i class="bi bi-people"></i><strong>Guests:</strong>{{ reservation.number_of_people }} </p>
             <div class="d-flex mb-3 position-relative">
