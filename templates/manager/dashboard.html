@@ -3,6 +3,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'styles/pdg/dash.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 
@@ -12,174 +13,201 @@
 
 <div class="main bg-white" >
     <nav class="navbar navbar-expand  bg-basic d-flex justify-content-between">
-        <h6 class="fw-bold">
+        <h6 class="fw-bold ">
             Admin Dashboard
         </h6>
-        <h6>{{ request.session.display_username }}</h6>
+        <div class="d-flex align-items-center">
+            <img src="{% static 'images/managerGastro.png' %}" alt="" style="width: 30px;">
+            <h6 >{{ request.session.display_username }}</h6>
+
+        </div>
     </nav>
 
     <main class="content px-3 py-4">
-        <div class="container-fluide ">
-            <div class="mb-3">
-                <h6 class="fw-bold">
-                    Customers
-                </h6>
-                <div class="row">
+        <div class="container-fluid">
+
+            <!-- Customers Section--> 
+            <div class="mb-4">
+                <h6 class="fw-bold">About Restaurant</h6>
+                <div class="row g-3">
                     <div class="col-12 col-md-4">
                         <div class="card shadow border border-gray rounded">
                             <div class="card-body d-flex align-items-center py-3">
-                                <i class='bx bxs-group'></i>
+                                <i class='bx bxs-group me-3 fs-2'></i>
                                 <div>
-                                    <h6 class="text-muted mb-1">Total number</h6>
-                                    <p class="mb-0 fs-4 fw-bold">200</p>
+                                    <h6 class="text-muted mb-1">Employees</h6>
+                                    <p class="mb-0 fs-4 fw-bold">{{total_employees}}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-12 col-md-4">
                         <div class="card shadow border border-gray rounded">
                             <div class="card-body d-flex align-items-center py-3">
-                                <i class="fa-solid fa-comments"></i>
+                                <i class="fa-solid fa-comments me-3 fs-2"></i>
                                 <div>
-                                    <h6 class="text-muted mb-1">Reviews</h6>
-                                    <p class="mb-0 fs-4 fw-bold">200</p>
+                                    <h6 class="text-muted mb-1">Complaints</h6>
+                                    <p class="mb-0 fs-4 fw-bold">{{responded_complaint_count}}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-12 col-md-4">
                         <div class="card shadow border border-gray rounded">
                             <div class="card-body d-flex align-items-center py-3">
+                                <i class="fa-solid fa-cart-shopping me-3 fs-2"></i>
                                 <div>
-                                    <h6 class="text-muted mb-1">Average rating</h6>
-                                    <p class="mb-0 fs-4 fw-bold text-success" id="average">4.0</p>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-regular fa-star"></i>
+                                    <h6 class="text-muted mb-1">Paid Orders for today</h6>
+                                    <p class="mb-0 fs-4 fw-bold text-success" id="average">{{paid_orders_today_count}}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
             </div>
+
+            <!-- Revenue Section -->
+            <div class="mb-4">
+                <h6 class="fw-bold">Revenue</h6>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="card shadow border border-gray rounded">
+                            <div class="card-body py-3">
+                                <p class="text-muted mb-2">Total revenue</p>
+                                <form method="get" class="mb-2">
+                                    <select class="form-control" name="filter" onchange="this.form.submit()">
+                                        <option value="Year" {% if current_filter == 'Year' %}selected{% endif %}>Year</option>
+                                        <option value="Month" {% if current_filter == 'Month' %}selected{% endif %}>Month</option>
+                                        <option value="Day" {% if current_filter == 'Day' %}selected{% endif %}>Day</option>
+                                    </select>
+                                </form>
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="card shadow border border-gray rounded">
+                            <div class="card-body py-3">
+                                <p class="text-muted mb-2">Profit Margin</p>
+                                <form method="get" class="mb-2">
+                                    <select class="form-control" name="filter" onchange="this.form.submit()">
+                                        <option value="Year" {% if current_filter == 'Year' %}selected{% endif %}>Year</option>
+                                        <option value="Month" {% if current_filter == 'Month' %}selected{% endif %}>Month</option>
+                                        <option value="Day" {% if current_filter == 'Day' %}selected{% endif %}>Day</option>
+                                    </select>
+                                </form>
+                                <canvas id="profitChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Section -->
+            <div class="mb-4">
+                <h6 class="fw-bold">Sales</h6>
+                <div class="row g-3">
+                    
+
+                    <div class="col-12 col-md-6">
+                        <div class="card shadow border border-gray rounded">
+                            <div class="card-body py-3">
+                                <p class="text-muted mb-2">Top selling items</p>
+                                <form method="get" class="mb-2">
+                                    <select class="form-control" name="filter" onchange="this.form.submit()">
+                                        <option value="Year" {% if current_filter == 'Year' %}selected{% endif %}>Year</option>
+                                        <option value="Month" {% if current_filter == 'Month' %}selected{% endif %}>Month</option>
+                                        <option value="Day" {% if current_filter == 'Day' %}selected{% endif %}>Day</option>
+                                    </select>
+                                </form>
+                                
+                                <canvas id="topItemsChart" width="400" height="200"></canvas>
+
+                                
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
-    <main class="content px-3 py-4">
-        <div class="container-fluide ">
-            <div class="mb-3">
-                <h6 class="fw-bold">
-                    Revenu
-                </h6>
-                <div class="row">
-                    <div class="col-12 col-md-6">
-                        <div class="card shadow border border-gray rounded">
-                            <div class="card-body d-flex align-items-center justify-content-between py-3">
-                                <div>
-                                    <p class="text-muted mb-1">Total revenu</p>
-                                </div>
-                                <div class="form-group"> 
-                                    <select class="form-control" id="sel1">
-                                      <option>Year</option>
-                                      <option>Month</option>
-                                      <option>Week</option>
-                                      <option>Day</option>
-                                    </select>
-                                  </div>
-                            </div>
-
-                            <!--charts here-->
-                            
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <div class="card shadow border border-gray rounded">
-                            <div class="card-body d-flex align-items-center justify-content-between py-3">
-                                <div>
-                                    <p class="text-muted mb-1">Profit Margin</p>
-                                </div>
-                                <div class="form-group">
-                                    <select class="form-control" id="sel1">
-                                      <option>Year</option>
-                                      <option>Month</option>
-                                      <option>Week</option>
-                                      <option>Day</option>
-                                    </select>
-                                  </div>
-                            </div>
-
-                            <!--charts here-->
-                            
-                        </div>
-                    </div>
-                    
-                </div>
-                
-            </div>
-        </div>
-    </main> 
-
-
-    <main class="content px-3 py-4">
-        <div class="container-fluide ">
-            <div class="mb-3">
-                <h6 class="fw-bold">
-                    Sales
-                </h6>
-                <div class="row">
-                    <div class="col-12 col-md-6">
-                        <div class="card shadow border border-gray rounded">
-                            <div class="card-body d-flex align-items-center justify-content-between py-3">
-                                <div>
-                                    <p class="text-muted mb-1">Sales by location</p>
-                                </div>
-                                <div class="form-group">
-                                    <select class="form-control" id="sel1">
-                                      <option>Year</option>
-                                      <option>Month</option>
-                                      <option>Week</option>
-                                      <option>Day</option>
-                                    </select>
-                                  </div>
-                            </div>
-
-                            <!--charts here-->
-                            
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <div class="card shadow border border-gray rounded">
-                            <div class="card-body d-flex align-items-center justify-content-between py-3">
-                                <div>
-                                    <p class="text-muted mb-1">Top selling items</p>
-                                </div>
-                                <div class="form-group">
-                                    <select class="form-control" id="sel1">
-                                      <option>Year</option>
-                                      <option>Month</option>
-                                      <option>Week</option>
-                                      <option>Day</option>
-                                    </select>
-                                  </div>
-                            </div>
-
-                            <!--charts here-->
-                            
-                        </div>
-                    </div>
-                    
-                </div>
-                
-            </div>
-        </div>
-    </main> 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    window.onload = function() {
+        const labels = JSON.parse('{{ labels_json|escapejs }}');
+        const revenueData = JSON.parse('{{ revenues_json|escapejs }}');
+        const profitData = JSON.parse('{{ profits_json|escapejs }}');
+    
+        // Add the top selling dishes data (from the Django context)
+        const topDishLabels = JSON.parse('{{ top_dish_labels_json|escapejs }}');
+        const topDishQuantities = JSON.parse('{{ top_dish_quantities_json|escapejs }}');
+    
+        // Function to create bar chart
+        const createChart = (ctxId, label, data, bgColor, borderColor) => {
+            new Chart(document.getElementById(ctxId), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: bgColor,
+                        borderColor: borderColor,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        };
+    
+        // Create charts for revenue and profit (existing ones)
+        createChart('revenueChart', 'Revenue', revenueData, 'rgba(75, 192, 192, 0.2)', 'rgba(75, 192, 192, 1)');
+        createChart('profitChart', 'Profit Margin', profitData, 'rgba(255, 206, 86, 0.2)', 'rgba(255, 206, 86, 1)');
+    
+        // Create chart for Top Selling Items (added with dish names on x-axis)
+        new Chart(document.getElementById('topItemsChart'), {
+            type: 'bar',
+            data: {
+                labels: topDishLabels, // Dish names
+                datasets: [{
+                    label: 'Top Selling Dishes',
+                    data: topDishQuantities, // Quantities sold
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Dish'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Quantity Sold'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    
+        // Optional placeholder for sales by location chart (empty data to avoid errors)
+        createChart('salesLocationChart', 'Sales by Location', [], 'rgba(153, 102, 255, 0.2)', 'rgba(153, 102, 255, 1)');
+    };
+</script>
+    
 
 {% endblock %}

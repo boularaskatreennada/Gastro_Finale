@@ -5,6 +5,7 @@ urlpatterns = [
     path('pdg-dashboard/', views.pdg_dashboard, name='pdg_dashboard'),
     path('login/', views.custom_login, name='login'),
     path('register/', views.client_register, name='client_register'),
+    path('logout/', views.custom_logout, name='logout'),
     
     path('manager-dashboard/', views.manager_dashboard, name='manager_dashboard'),
     path('Gastrolink/', views.landing_page , name='landing_page'),

@@ -13,9 +13,11 @@
           <div class="navbar-collapse collapse">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item dropdown">
-                  <a href="" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
-                      <img src="{% static 'images/téléchargement.jpg' %}" class="avatar  img-fluid rounded-circle border border-dark" alt="">
-                  </a>
+                <div class="d-flex align-items-center">
+                  <img src="{% static 'images/cheff.png' %}" alt="" style="width: 45px;">
+                  <h6 >{{ request.session.display_username }}</h6>
+      
+              </div>
               
               </li>
             </ul>

@@ -42,7 +42,7 @@
               {{ form.unit }}
             </div>
             <div class="col-md-2">
-              <label class="form-label">Price/Unit ($)</label>
+              <label class="form-label">Price/Unit (DA)</label>
               {{ form.price_per_unit }}
             </div>
             <div class="col-md-3 d-flex gap-2">
@@ -94,7 +94,7 @@
                   <td>{{ ing.name }}</td>
                   <td>{{ ing.get_category_display }}</td>
                   <td>{{ ing.get_unit_display }}</td>
-                  <td>${{ ing.price_per_unit }}</td>
+                  <td>{{ ing.price_per_unit }} DA</td>
                   <td>
                     <a href="{% url 'ingredients' ing.id %}" class="btn btn-sm btn-outline-success">
                       <i class="fas fa-edit"></i>

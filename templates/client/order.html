@@ -97,8 +97,8 @@
                                 <img src="{{ dish.image.url }}" class="card-img-top" alt="{{ dish.name }}">
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">{{ dish.name }}</h5>
-                                    <strong class="mb-2">${{ dish.price }}</strong>
-                                    <p class="text-muted">In stock: {{ dish.dailymenudish.current_quantity }}</p>
+                                    <strong class="mb-2">{{ dish.price }} DA </strong>
+                                    <!--<p class="text-muted">In stock: {{ dish.dailymenudish.current_quantity }}</p>-->
                                     <div class="input-group mb-2">
                                         <input type="number" class="form-control quantity-input" min="1" max="{{ dish.dailymenudish.current_quantity }}" value="1">
                                         <button class="btn btn-success add-to-cart-btn"

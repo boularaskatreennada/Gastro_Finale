@@ -1,4 +1,5 @@
 import datetime
+from math import trunc
 from django.forms import DecimalField
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render
@@ -6,19 +7,19 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from finance.models import Expense
 from menu.models import DailyMenu
-from orders.models import Order
+from orders.models import *
 from .models import *
 from .forms import *
 from .decorators import *
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required 
+from django.contrib.auth import get_user_model, logout
 from django.utils import timezone
 from django.contrib import messages
 from .forms import ClientRegistrationForm
 from feedback.models import *
 from reservations.models import *
-from django.db.models.functions import TruncYear, TruncMonth, TruncDay
+from django.db.models.functions import TruncYear, TruncMonth, TruncDay, TruncDate
 from django.db.models import Sum, F, FloatField
 import json
 
@@ -67,29 +68,32 @@ def custom_login(request):
     
     return render(request, 'login.html')
 
-@pdg_required
-def pdg_dashboard(request):
-    filter_type = request.GET.get('filter', 'Year')
-    current_filter = filter_type
+def custom_logout(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('login')  
 
-    # Get authenticated manager's restaurant (adjust as needed)
-    #restaurant = request.user.restaurant  
 
-    # Filter paid orders of that restaurant
-    orders = Order.objects.filter(status='paid')
 
-    # Apply date truncation
+def generate_dashboard_data(orders, expenses, filter_type):
     if filter_type == 'Year':
-        trunc = TruncYear('order_date')
+        trunc_orders = TruncYear('order_date')
+        trunc_expenses = TruncYear('expense_date')
+        date_format = '%Y'
     elif filter_type == 'Month':
-        trunc = TruncMonth('order_date')
+        trunc_orders = TruncMonth('order_date')
+        trunc_expenses = TruncMonth('expense_date')
+        date_format = '%Y-%m'
     elif filter_type == 'Day':
-        trunc = TruncDay('order_date')
+        trunc_orders = TruncDate('order_date')
+        trunc_expenses = TruncDay('expense_date')
+        date_format = '%Y-%m-%d'
 
-    # Annotate period + revenue per order first (Sub-aggregation)
-    orders = orders.annotate(period=trunc)
+    # Annotate period
+    orders = orders.annotate(period=trunc_orders)
+    expenses = expenses.annotate(period=trunc_expenses)
 
-    # Then aggregate revenue per period (final step)
+    # Aggregate revenue per period
     revenue_data = orders.values('period').annotate(
         revenue=Sum(
             F('orderdish__quantity') * F('orderdish__dish__price'),
@@ -97,36 +101,148 @@ def pdg_dashboard(request):
         )
     ).order_by('period')
 
-    # Prepare data for chart
-    labels = []
-    revenues = []
+    # Aggregate expenses per period
+    expense_data = expenses.values('period').annotate(
+        total_expense=Sum('amount')
+    ).order_by('period')
+
+    # Build dictionaries for quick lookup
+    revenue_dict = {}
     for entry in revenue_data:
         period = entry['period']
-        labels.append(
-            period.strftime('%Y') if filter_type == 'Year'
-            else period.strftime('%Y-%m') if filter_type == 'Month'
-            else period.strftime('%Y-%m-%d')
-        )
-        revenues.append(entry['revenue'] or 0)
-        print(labels)
-        print(revenues)
+        if isinstance(period, datetime.datetime):
+            period = period.date()
+        key = period.strftime(date_format)
+        revenue_dict[key] = entry['revenue'] or 0
 
+    expense_dict = {}
+    for entry in expense_data:
+        period = entry['period']
+        if isinstance(period, datetime.datetime):
+            period = period.date()
+        key = period.strftime(date_format)
+        expense_dict[key] = float(entry['total_expense'] or 0)
+
+    # Merge periods
+    all_periods = set(revenue_dict.keys()).union(expense_dict.keys())
+    sorted_periods = sorted(all_periods)
+
+    # Prepare chart data
+    labels, revenues, expenses_list, profits = [], [], [], []
+    for period in sorted_periods:
+        rev = revenue_dict.get(period, 0)
+        exp = expense_dict.get(period, 0)
+        profit = rev - exp
+
+        labels.append(period)
+        revenues.append(rev)
+        expenses_list.append(exp)
+        profits.append(profit)
+
+    return labels, revenues, expenses_list, profits
+
+@pdg_required
+def pdg_dashboard(request):
+    client_count = Client.objects.count()
+    review_count = Review.objects.count()
+
+
+    today = timezone.now().date()
+
+    # Get all orders with status = paid and order_date = today (all restaurants)
+    paid_orders_today = Order.objects.filter(
+        status=OrderStatus.PAID,
+        order_date__date=today
+    )
+
+    # Count them
+    paid_orders_today_count = paid_orders_today.count()
+
+    filter_type = request.GET.get('filter', 'Year')
+    orders = Order.objects.filter(status='paid')
+    expenses = Expense.objects.all()
+
+    labels, revenues, expenses_list, profits = generate_dashboard_data(orders, expenses, filter_type)
+
+
+    top_dishes = OrderDish.objects.values('dish__name') \
+        .annotate(total_quantity=Sum('quantity')) \
+        .order_by('-total_quantity')[:5]
 
     context = {
-    'labels_json': json.dumps(labels),
-    'revenues_json': json.dumps(revenues),
-    'current_filter': current_filter,
+        'paid_orders_today_count': paid_orders_today_count,
+        'client_count': client_count,
+        'review_count': review_count,
+        'labels_json': json.dumps(labels),
+        'revenues_json': json.dumps(revenues),
+        'expenses_json': json.dumps(expenses_list),
+        'profits_json': json.dumps(profits),
+        'current_filter': filter_type,
+        'top_dish_labels_json': json.dumps([dish['dish__name'] for dish in top_dishes]),
+        'top_dish_quantities_json': json.dumps([dish['total_quantity'] for dish in top_dishes]),
     }
 
     return render(request, 'pdg/dashboard.html', context)
 
-
- 
-             
+# For Manager (restaurant-specific)
 @manager_required
-def manager_dashboard(request):   
+def manager_dashboard(request):
+    manager = get_object_or_404(Manager, user=request.user)
+    
+
+    restaurant = manager.restaurant
+
+    active_chefs = Chef.objects.filter(restaurant=restaurant, status=EmployeeStatus.ACTIVE).count()
+    active_servers = Server.objects.filter(restaurant=restaurant, status=EmployeeStatus.ACTIVE).count()
+    active_delivery_persons = DeliveryPerson.objects.filter(restaurant=restaurant, status=EmployeeStatus.ACTIVE).count()
+    total_employees = active_chefs + active_servers + active_delivery_persons
+    
+    responded_complaint_count = Complaint.objects.filter(
+        restaurant=restaurant,
+        status=ComplaintStatus.RESPONDED
+    ).count()
+
+
+    today = timezone.now().date()
+
+    
+    paid_orders_today_count = Order.objects.filter(
+        restaurant=restaurant,
+        status=OrderStatus.PAID,
+        order_date__date=today
+    ).count()
+
+
+    filter_type = request.GET.get('filter', 'Year')
     restaurant = request.user.manager.restaurant
-    return render(request, 'manager/dashboard.html', {'restaurant': restaurant})
+
+    orders = Order.objects.filter(status='paid', restaurant=restaurant)
+    expenses = Expense.objects.filter(restaurant=restaurant)
+
+    labels, revenues, expenses_list, profits = generate_dashboard_data(orders, expenses, filter_type)
+
+    top_dishes = OrderDish.objects.filter(order__restaurant=restaurant) \
+        .values('dish__name') \
+        .annotate(total_quantity=Sum('quantity')) \
+        .order_by('-total_quantity')[:5]
+
+    context = {
+        'paid_orders_today_count': paid_orders_today_count,
+        'total_employees': total_employees,
+        'responded_complaint_count': responded_complaint_count,
+        'labels_json': json.dumps(labels),
+        'revenues_json': json.dumps(revenues),
+        'expenses_json': json.dumps(expenses_list),
+        'profits_json': json.dumps(profits),
+        'current_filter': filter_type,
+        'top_dish_labels_json': json.dumps([dish['dish__name'] for dish in top_dishes]),
+        'top_dish_quantities_json': json.dumps([dish['total_quantity'] for dish in top_dishes]),
+        
+    }
+
+    return render(request, 'manager/dashboard.html', context)
+
+             
 
 @chef_required
 def chef_dashboard(request):
