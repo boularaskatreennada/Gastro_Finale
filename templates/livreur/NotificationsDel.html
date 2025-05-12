@@ -26,7 +26,7 @@
     
 
     <div class="list-group flex-fill" id="notifContainer">
-      <!-- item -->
+      <!-- item 
       <div class="list-group-item d-flex align-items-start">
         <span class="badge bg-success me-3"><i class="bi bi-check-circle-fill"></i></span>
         <div class="flex-fill">
@@ -46,7 +46,7 @@
           <small class="text-muted">Order #34754 has been canceled. Do not pick up the order.</small>
         </div>
       </div>
-      <!-- 
+      
       <div class="list-group-item d-flex align-items-start">
         <span class="badge bg-dark text-white me-3"><i class="bi bi-clock-fill"></i></span>
         <div class="flex-fill">
@@ -54,7 +54,7 @@
           <small class="text-muted">The customer for order #1234 has reported a delay. Please contact them for more info.</small>
         </div>
       </div>
-      -->
+      
     
 
 
@@ -62,4 +62,68 @@
 
     </div>
   </div>
+  <script>
+    const socket = new WebSocket('ws://' + window.location.host + '/ws/delivery/');
+    
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const notificationHTML = `
+            <div class="list-group-item d-flex align-items-start">
+                <span class="badge bg-success me-3"><i class="bi bi-check-circle-fill"></i></span>
+                <div class="flex-fill">
+                    <p class="mb-1"><strong>Order #${data.order_id} Ready!</strong></p>
+                    <small class="text-muted">
+                        Client: ${data.client_name}<br>
+                        Address: ${data.address}<br>
+                        Total: $${data.total}<br>
+                        Items: ${data.items.join(', ')}
+                    </small>
+                    <div class="mt-2">
+                        <button onclick="acceptOrder(${data.order_id})" 
+                                class="btn btn-success btn-sm">
+                            Accept Delivery
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add new notification at the top
+        const container = document.getElementById('notifContainer');
+        container.insertAdjacentHTML('afterbegin', notificationHTML);
+    };
+    
+    function acceptOrder(orderId) {
+        socket.send(JSON.stringify({
+            action: 'accept_order',
+            order_id: orderId
+        }));
+        
+        // Disable button after acceptance
+        event.target.disabled = true;
+        event.target.textContent = 'Accepted!';
+    }
+    </script> -->
+    <script>
+    // notificationsDel.html
+const socket = new WebSocket('ws://' + window.location.host + '/ws/delivery/notifications/');
+
+socket.onmessage = function(e) {
+    const message = JSON.parse(e.data);
+    
+    // Only handle notification messages
+    if (message.type === 'notification') {
+        const data = message.data;
+        const notificationHTML = `
+            <div class="list-group-item">
+                <p><strong>Order #${data.order_id || 'N/A'}</strong></p>
+                <p>Client: ${data.client || 'Unknown'}</p>
+                <p>Phone: ${data.phone || 'Not provided'}</p>
+                <p>Items: ${(data.items && data.items.length) ? data.items.join(', ') : 'No items'}</p>
+            </div>
+        `;
+        document.getElementById('notifContainer').insertAdjacentHTML('afterbegin', notificationHTML);
+    }
+};
+    </script>
 {% endblock %}

@@ -39,8 +39,14 @@ class OrderDish(models.Model):
     class Meta:
         unique_together = ('order', 'dish')
 
+class DeliveryStatus(models.TextChoices):
+    PENDING ='pending', 'Pending'
+    DELIVERED = 'delivered', 'Delivered'
+    INPROGRESS = 'in-progress', 'In-progress'
+    
 class Delivery(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.CASCADE)
     delivery_date = models.DateTimeField()
-    status = models.CharField(max_length=50)
+    status = models.CharField(max_length=50,choices=DeliveryStatus.choices)
+

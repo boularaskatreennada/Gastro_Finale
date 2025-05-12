@@ -143,12 +143,12 @@
           
           <div class="text-end">
             <div class="d-flex">
-              {% if order.status == 'ready' %}
+              {% if order.status == 'Done' %}
                 <form method="post" action="{% url 'update_order_status' order.pk %}" class="d-inline">
                   {% csrf_token %}
                   <select name="status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
-                    <option value="ready" selected>Ready</option>
-                    <option value="served">Served</option>
+                    <option value="done" selected>Done</option>
+                    <option value="paid">Paid</option>
                   </select>
                 </form>
               {% else %}

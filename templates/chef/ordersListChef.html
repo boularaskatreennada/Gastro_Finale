@@ -91,16 +91,16 @@
                     <div class="d-flex">
                       <form method="post" action="{% url 'update_order_status' order.pk %}" class="d-inline">
                         {% csrf_token %}
-                        <select name="status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                        <select name="status" class="form-select form-select-sm d-inline w-auto bg-warning text-dark" onchange="this.form.submit()">
                           {% if order.status == 'pending' %}
-                            <option class="bg-warning text-dark" value="pending" selected>Pending</option>
+                            <option  value="pending" selected>Pending</option>
                             <option value="preparing">Preparing</option>
                           {% elif order.status == 'preparing' %}
                             <option value="preparing" selected>Preparing</option>
-                            <option value="ready">Ready</option>
+                            <option value="done">Done</option>
                           
                           </select>
-                        </form>
+                      </form>
                           {% else %}
                            <span class="order-status">
                                 {{ order.status }}

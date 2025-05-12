@@ -15,14 +15,14 @@
     height: 40px;
     width: 40px;
   }
-.list-group-item {
+.notification {
     border: none;
     border-bottom: 1px solid #e9ecef;
     padding: 1rem 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-  .list-group-item:hover{
+  .notification:hover{
     background-color:  #b2b2b194;
     transform: translateY(-5px);      
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);

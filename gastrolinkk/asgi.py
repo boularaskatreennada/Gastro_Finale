@@ -1,16 +1,20 @@
-"""
-ASGI config for gastrolinkk project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
-"""
-
 import os
 
 from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+import orders.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gastrolinkk.settings')
 
-application = get_asgi_application()
+print("🚀 Loaded websocket_urlpatterns:", orders.routing.websocket_urlpatterns)
+
+django_asgi = get_asgi_application()
+application = ProtocolTypeRouter({
+    "http": django_asgi,
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            orders.routing.websocket_urlpatterns
+        )
+    ),
+})
