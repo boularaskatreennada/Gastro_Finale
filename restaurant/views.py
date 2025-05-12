@@ -58,7 +58,7 @@ def custom_login(request):
             elif user.user_type == 'SERVER':
                 return redirect('takeOrder')
             elif user.user_type == 'DELIVERY':
-                return redirect('delivery_dashboard')
+                return redirect('DeliveryOrders')
             elif user.user_type == 'CLIENT':
                 return redirect('landing_page')
             elif user.user_type == 'SUPPLIER':

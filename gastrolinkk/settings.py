@@ -26,13 +26,15 @@ SECRET_KEY = 'django-insecure-tum#+5vo#e506+a(k#_y@3xv)#o2e0ejts)e@46#1tmpktzfp)
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['192.168.41.179', 'localhost' , '192.168.0.156']
+#ALLOWED_HOSTS = ['192.168.41.179', 'localhost' , '192.168.0.156']
 
 AUTH_USER_MODEL = 'restaurant.User'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels', 
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -80,8 +82,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'gastrolinkk.wsgi.application'
-
-
+ASGI_APPLICATION = 'gastrolinkk.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+       
+        #channels_redis.core.RedisChannelLayer
+        #"CONFIG": {
+         #   "hosts": [("127.0.0.1", 6379)],
+        #},
+    },
+}
+CHANNELS_ASGI_APPLICATION = 'gastrolinkk.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 

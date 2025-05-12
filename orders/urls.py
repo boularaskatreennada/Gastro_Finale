@@ -16,6 +16,6 @@ urlpatterns = [
    path('placeOrder/', views.placeOrder, name='place_order'),
    path('ordersListChef/', views.order_list_chef, name='ordersListChef'),
    path('deliveryOrders/',views.delivery_orders,name='DeliveryOrders'),
-   path('NotificationDel/',views.delivery_orders,name='NotificationsDel'),
+   path('delivery/notifications/',views.notifications_del,name='delivery_notifications'),
 ]
 

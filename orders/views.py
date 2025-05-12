@@ -363,6 +363,8 @@ def edit_order(request, pk):
 
     return render(request, 'serveur/takeOrder.html', context)
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 @chef_required
 def update_order_status(request, pk):
     order = get_object_or_404(Order, pk=pk)
@@ -371,6 +373,28 @@ def update_order_status(request, pk):
         if new_status in dict(OrderStatus.choices):
             order.status = new_status
             order.save()
+                    # Only send notification for done orders with delivery mode
+            
+            if new_status == 'done' and order.mode == 'delivered':
+             channel_layer = get_channel_layer()
+            
+            # Send to all connected clients
+             async_to_sync(channel_layer.group_send)(
+                "delivery_group",  # Custom channel name
+                {
+                    "type": "send.notification",
+                    "data": {
+                        "order_id": str(order.id),
+                        "client": order.client.user.username,
+                        "address": order.client.user.phone,
+                       # "total": order.total_price,
+                        "items": [
+                            f"{item.quantity}x {item.dish.name}"
+                            for item in order.orderdish_set.all()
+                        ]or ["No items listed"]
+                    }
+                }
+            )
     return redirect('ordersListChef')
 
 @waiter_required
@@ -384,7 +408,8 @@ def cancel_order(request, pk):
 @delivery_required
 def delivery_orders(request):
     order= Delivery.objects.all()
-    Delivery.objects.filter(delivery_person=request.user)
+    livreur = get_object_or_404(DeliveryPerson, user=request.user)
+    Delivery.objects.filter(delivery_person=livreur)
     return render(request, 'livreur/DeliveryOrders.html', {
         'orders': order, })
 
@@ -522,5 +547,11 @@ def placeOrder(request):
             return redirect('takeOrder')
 
 
-
+@delivery_required
+def notifications_del(request):
+    # Get pending delivery orders
+    pending_deliveries = Delivery.objects.filter(status='pending')
+    return render(request, 'livreur/notificationsDel.html', {
+        'pending_deliveries': pending_deliveries
+    })
 
