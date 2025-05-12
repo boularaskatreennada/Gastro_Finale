@@ -109,21 +109,37 @@
 const socket = new WebSocket('ws://' + window.location.host + '/ws/delivery/notifications/');
 
 socket.onmessage = function(e) {
-    const message = JSON.parse(e.data);
+  console.log("📩 Raw WS message:", e.data); // <— add this
+    const data = JSON.parse(e.data);
     
-    // Only handle notification messages
-    if (message.type === 'notification') {
-        const data = message.data;
+    
+   
+       
         const notificationHTML = `
             <div class="list-group-item">
                 <p><strong>Order #${data.order_id || 'N/A'}</strong></p>
                 <p>Client: ${data.client || 'Unknown'}</p>
                 <p>Phone: ${data.phone || 'Not provided'}</p>
                 <p>Items: ${(data.items && data.items.length) ? data.items.join(', ') : 'No items'}</p>
+                <button type="button" class="btn btn-sm btn-success accept-btn" data-order-id="${data.order_id}"> Accept </button> 
             </div>
+            
         `;
         document.getElementById('notifContainer').insertAdjacentHTML('afterbegin', notificationHTML);
-    }
+
+   
 };
+document.getElementById('notifContainer').addEventListener('click', e => {
+    if (!e.target.matches('.accept-btn')) return;
+    const orderId = e.target.dataset.orderId;       // grabs data-order-id
+    console.log('▶️ About to send:', {action:'accept_order', order_id: orderId});
+    socket.send(JSON.stringify({
+      action: 'accept_order',
+      order_id: orderId
+    }));
+    e.target.disabled = true;
+    e.target.textContent = 'Accepted';
+  });
+
     </script>
 {% endblock %}

@@ -246,8 +246,7 @@ def orders_list(request):
     restaurant = server.restaurant
     status = request.GET.get('filterStatus')
     order_type = request.GET.get('filterType')
-    table_number = request.GET.get('filterTable')
-    payment_status = request.GET.get('filterPayment')
+
     search = request.GET.get('search')
     date_str = request.GET.get('date')
 
@@ -278,10 +277,7 @@ def orders_list(request):
         orders = orders.filter(status=status)
     if order_type:
         orders = orders.filter(mode=order_type)
-    if table_number:
-        orders = orders.filter(table__id=table_number)
-    if payment_status:
-        orders = orders.filter(payment_status=payment_status)
+    
     if search:
         orders = orders.filter(
             Q(table__name__icontains=search) |
@@ -292,6 +288,7 @@ def orders_list(request):
     return render(request, 'serveur/ordersList.html', {
         'orders': orders,
         'selected_date': selected_date,
+        
     })
 
 
@@ -301,7 +298,7 @@ def order_list_chef(request):
        # get chefs restaurant
     chef = get_object_or_404(Chef, user=request.user)
     restaurant = chef.restaurant
-    filter_type = request.GET.get('filter_type')
+    filter_type = request.GET.get('filter_type','')
     date_str = request.GET.get('date')
     if date_str:
         try:
@@ -317,16 +314,20 @@ def order_list_chef(request):
              .filter(
                  restaurant=restaurant,
                  order_date__date=selected_date  
-             ).exclude(status='cancelled')
-             .order_by('-order_date')
+             ).exclude(status='cancelled').annotate(
+                items_count=Count('orderdish', distinct=True),
+                total_price=Sum(F('orderdish__quantity') * F('orderdish__dish__price')
+                )).order_by('-order_date')
              .prefetch_related('orderdish_set__dish')
     )
+
     if filter_type:
         orders = orders.filter(mode=filter_type)
 
     return render(request, 'chef/ordersListChef.html', {
         'orders': orders,
-        'restaurant': restaurant
+        'restaurant': restaurant,
+        'filter_type': filter_type,
     })
 
 @waiter_required
@@ -370,19 +371,28 @@ def update_order_status(request, pk):
     order = get_object_or_404(Order, pk=pk)
     if request.method == 'POST':
         new_status = request.POST.get('status')
+        print(f"🐞 DEBUG: Chef submitted status={new_status}, order.mode={order.mode}")  # 🔍
+
         if new_status in dict(OrderStatus.choices):
             order.status = new_status
             order.save()
-                    # Only send notification for done orders with delivery mode
+            print(f"🐞 DEBUG: order.status set to {order.status}")  # 🔍
             
-            if new_status == 'done' and order.mode == 'delivered':
+            if order.mode == 'delivered'and new_status == 'done'  :
+             Delivery.objects.create(
+                    order=order,
+                    delivery_person=None,
+                    delivery_date=timezone.now(),
+                    status=DeliveryStatus.PENDING
+                )
+             print(f"🔔 Broadcasting notification for order {order.id}")  # 🔍
              channel_layer = get_channel_layer()
-            
+             
             # Send to all connected clients
              async_to_sync(channel_layer.group_send)(
                 "delivery_group",  # Custom channel name
                 {
-                    "type": "send.notification",
+                    "type": "send_notification",
                     "data": {
                         "order_id": str(order.id),
                         "client": order.client.user.username,
@@ -395,7 +405,18 @@ def update_order_status(request, pk):
                     }
                 }
             )
+             print(f"✅ Notification sent for order {order.id}")  # 🔍
     return redirect('ordersListChef')
+
+@waiter_required
+def update_order_status_waiter(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in dict(OrderStatus.choices):
+            order.status = new_status
+            order.save()
+    return redirect('ordersList')
 
 @waiter_required
 def cancel_order(request, pk):
@@ -407,11 +428,18 @@ def cancel_order(request, pk):
 
 @delivery_required
 def delivery_orders(request):
-    order= Delivery.objects.all()
+   
     livreur = get_object_or_404(DeliveryPerson, user=request.user)
-    Delivery.objects.filter(delivery_person=livreur)
+    orders = Delivery.objects.filter(delivery_person=livreur)
+    filter_type = request.GET.get('filter_type', '') 
+    
+    if filter_type:
+        orders = orders.filter(status=filter_type)
+    
     return render(request, 'livreur/DeliveryOrders.html', {
-        'orders': order, })
+        'delivery_orders': orders,
+        'filter_type': filter_type,
+         'delivery_status_choices': DeliveryStatus.choices, })
 
 @delivery_required
 def update_delivery_order(request, order_id):
@@ -437,10 +465,13 @@ def take_order(request):
     
     try:
         today_menu = DailyMenu.objects.get(restaurant=restaurant, date=today)
+        
         # 3️⃣ Fetch all the dishes on that menu
         menu_entries = DailyMenuDish.objects.filter(menu=today_menu).select_related('dish')
+        categories = MainMenu.objects.filter(
+            id__in=menu_entries.values_list('dish__menu_id', flat=True).distinct())
         if category and category.lower() != "all":
-            menu_entries = menu_entries.filter(dish__category__iexact=category)
+            menu_entries = menu_entries.filter(dish__menu__category__iexact=category)
         if search:
             menu_entries = menu_entries.filter(
                 Q(dish__name__icontains=search) |
@@ -448,11 +479,13 @@ def take_order(request):
             )
     except DailyMenu.DoesNotExist:
         menu_entries = []
+        categories = []
 
     # 4️⃣ Render, passing the list of entries
     return render(request, 'serveur/takeOrder.html', {
         'menu_entries': menu_entries,
-        
+        'categories': categories,
+        'selected_category': category or 'all',
         })
 
 @waiter_required

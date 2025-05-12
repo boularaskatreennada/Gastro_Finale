@@ -35,14 +35,22 @@ body {
     width: 40px;
 }
 .filter{
-    background-color: #fff;
-    color: #fa4516;
+    background-color: #fff !important;
+    color: #fa4516 !important;
     border: 1px solid #fa4516 !important;
     margin-left: 10px;
 }
 .filter:hover{
-    background-color: #fa4416d4;
+    background-color: #fa4416d4 ;
     color: #fff;
+}
+.filter.active{
+    background-color: #fa4416d4 !important;
+    color: #fff !important;
+}
+.filter.active::after{
+    background-color: #fa4416d4 !important;
+    color: #fff !important;
 }
 .search-container{
     max-width: 300px; 

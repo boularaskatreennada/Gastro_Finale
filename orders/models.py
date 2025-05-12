@@ -46,7 +46,7 @@ class DeliveryStatus(models.TextChoices):
     
 class Delivery(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.CASCADE)
+    delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.CASCADE,null=True, blank=True)
     delivery_date = models.DateTimeField()
     status = models.CharField(max_length=50,choices=DeliveryStatus.choices)
 
