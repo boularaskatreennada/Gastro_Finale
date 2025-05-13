@@ -446,8 +446,8 @@ def delivery_orders(request):
          'delivery_status_choices': DeliveryStatus.choices, })
 
 @delivery_required
-def update_delivery_order(request, order_id):
-    order = get_object_or_404(Order, pk=order_id)
+def update_delivery_order(request, pk):
+    order = get_object_or_404(Delivery, pk=pk)
     if request.method == 'POST':
         new_status = request.POST.get('status')
         if new_status in dict(DeliveryStatus.choices):

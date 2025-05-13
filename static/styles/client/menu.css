@@ -86,7 +86,6 @@
     background-color: var(--primary);
     color: white;
   }
-  
   .menu-items {
     flex: 1;
     display: grid;

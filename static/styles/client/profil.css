@@ -197,6 +197,8 @@ body {
 }
 
 /* History Section */
+
+/* History Section */
 .history-section {
     display: block;
 }
@@ -228,7 +230,6 @@ body {
 .history-tab.active {
     color: var(--primary);
 }
-
 .history-tab.active:after {
     content: '';
     position: absolute;
@@ -245,9 +246,6 @@ body {
 }
 
 /* Orders style */
-.orders-list {
-    display: block;
-}
 
 .order-item {
     display: flex;
@@ -278,6 +276,7 @@ body {
     text-align: right;
     font-size: 19.2px;
 }
+
 
 /* Reservations style */
 .reservations-list {
@@ -548,4 +547,79 @@ body {
     .section-title {
         font-size: 24px;
     }
+}
+#orders-list {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+    font-family: Arial, sans-serif;
+}
+
+#orders-list > div {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fafafa;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+#orders-list > div > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+#orders-list button {
+    background-color: var(--secondary);
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.3s;
+    margin-top: 8px;
+}
+
+#orders-list button:hover {
+    background-color: var(--primary);
+}
+
+#orders-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+#orders-list th,
+#orders-list td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+#orders-list th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+#orders-list tfoot td {
+    font-weight: bold;
+    background-color: #f9f9f9;
+}
+
+#orders-list div[style*="display:none;"] {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

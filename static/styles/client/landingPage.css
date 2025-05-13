@@ -20,7 +20,7 @@ body {
     height: 80px;
     padding: 0 2rem;
     box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-    background-color: white !important;
+    background-color: #f8e3a3;
 }
 
 .navbar-brand {
@@ -42,7 +42,7 @@ body {
 }
 
 .logo {
-    width: 160px;
+    width: 130px;
     transition: transform 0.3s ease;
     margin-top: 10px;
 }
@@ -115,7 +115,7 @@ header h1 {
 
 header p {
     font-size: 1.2rem;
-    color: #555;
+    color: #1d3557;
     max-width: 600px;
     text-align: center;
     margin: 0 auto; /* center horizontally */

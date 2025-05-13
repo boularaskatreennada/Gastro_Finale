@@ -54,10 +54,11 @@
           {% for dish in menu_entries %}
             <div class="col ">
                 <div class=" menu-card">
-                    <img src="https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Cæesar Salad" class="menu-item-img">
+                    <img src="{{ dish.dish.image.url }}" alt="Cæesar Salad" class="menu-item-img">
+                    
                     <div class="menu-item-content">
                         <div class="menu-item-name">{{dish.dish.name}}</div>
-                        <div class="menu-item-desc">{{dish.dish.description}}</div>
+                        <!--<div class="menu-item-desc">{{dish.dish.description}}</div>-->
                         <div class="menu-item-footer">
                             <span class="menu-item-price">{{dish.dish.price}}</span>
                             <button class="add-btn" data-id="{{ dish.dish.id }}" data-name="{{ dish.dish.name }}" data-price="{{ dish.dish.price }}">Add</button>

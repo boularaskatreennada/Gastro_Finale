@@ -106,6 +106,7 @@ body {
     flex-direction: column;
     position: relative;
     overflow: hidden;
+    height:180px;
 }
 
 .menu-card:hover {

@@ -569,7 +569,7 @@ def add_staff_employee(request):
         data = form.cleaned_data
 
         user = User.objects.create_user(
-         username=data['email'],
+         username=data['name'],
          email=data['email'],
          first_name=data['name'].split(' ')[0],
          last_name=' '.join(data['name'].split(' ')[1:]) if len(data['name'].split(' ')) > 1 else '',
@@ -617,6 +617,7 @@ def edit_staff_employee(request, role, pk):
     if request.method == 'POST' and form.is_valid():
         data = form.cleaned_data
         user = instance.user
+        user.username= data['name']
         user.first_name = data['name'].split(' ')[0]
         user.last_name = ' '.join(data['name'].split(' ')[1:]) if len(data['name'].split(' ')) > 1 else ''
         user.email = data['email']
@@ -696,10 +697,36 @@ def profile(request):
     orders = Order.objects.filter(client=request.user.client).order_by('-order_date')[:5]
     reservations = Reservation.objects.filter(client=request.user.client).order_by('-datetime')[:5]
     
+    orders_qs = Order.objects.filter(client=request.user.client).order_by('-order_date')[:5]
+    order_details = []
+    for order in orders_qs:
+        items = []
+        total = 0
+        for od in order.orderdish_set.select_related('dish'):
+            item_total = od.quantity * od.dish.price
+            items.append({
+                'name': od.dish.name,
+                'quantity': od.quantity,
+                'price': od.dish.price,
+                'total': item_total,
+            })
+            total += item_total
+        order_details.append({
+            'id': order.id,
+            'date': order.order_date,
+            'restaurant': order.restaurant.name,
+            'status': order.get_status_display(),
+            'items': items,
+            'total': total,
+        })
+
+    # Historique des réservations
+    reservations = Reservation.objects.filter(client=request.user.client).order_by('-datetime')[:5]
+
     context = {
         'u_form': u_form,
         'p_form': p_form,
-        'orders': orders,
+        'order_details': order_details,
         'reservations': reservations,
     }
     
