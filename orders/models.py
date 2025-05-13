@@ -49,4 +49,4 @@ class Delivery(models.Model):
     delivery_person = models.ForeignKey(DeliveryPerson, on_delete=models.CASCADE,null=True, blank=True)
     delivery_date = models.DateTimeField()
     status = models.CharField(max_length=50,choices=DeliveryStatus.choices)
-
+    address= models.CharField(max_length=255, blank=True, null=True)

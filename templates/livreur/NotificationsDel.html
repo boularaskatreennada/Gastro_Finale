@@ -119,7 +119,8 @@ socket.onmessage = function(e) {
             <div class="list-group-item">
                 <p><strong>Order #${data.order_id || 'N/A'}</strong></p>
                 <p>Client: ${data.client || 'Unknown'}</p>
-                <p>Phone: ${data.phone || 'Not provided'}</p>
+                <p>Phone: ${data.client.phone || 'Not provided'}</p>
+                <p>address ${data.address || 'Not provided'}</p>
                 <p>Items: ${(data.items && data.items.length) ? data.items.join(', ') : 'No items'}</p>
                 <button type="button" class="btn btn-sm btn-success accept-btn" data-order-id="${data.order_id}"> Accept </button> 
             </div>
