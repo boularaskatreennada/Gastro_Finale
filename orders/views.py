@@ -230,7 +230,14 @@ def confirm_order(request, order_id):
             order.table_number = None  # Clear table number for other modes
 
         order.save()
-
+        if mode == 'delivered':
+            Delivery.objects.create(
+                    order=order,
+                    delivery_person=None,
+                    delivery_date=timezone.now(),
+                    status=DeliveryStatus.PENDING,
+                    address=address
+                )
         return redirect('profile')
 
     return render(request, 'client/confirmOrder.html', {'order': order})
@@ -369,6 +376,7 @@ from channels.layers import get_channel_layer
 @chef_required
 def update_order_status(request, pk):
     order = get_object_or_404(Order, pk=pk)
+   # delivery_order=get_object_or_404(Delivery,pk=pk)
     if request.method == 'POST':
         new_status = request.POST.get('status')
         print(f"🐞 DEBUG: Chef submitted status={new_status}, order.mode={order.mode}")  # 🔍
@@ -379,12 +387,7 @@ def update_order_status(request, pk):
             print(f"🐞 DEBUG: order.status set to {order.status}")  # 🔍
             
             if order.mode == 'delivered'and new_status == 'done'  :
-             Delivery.objects.create(
-                    order=order,
-                    delivery_person=None,
-                    delivery_date=timezone.now(),
-                    status=DeliveryStatus.PENDING
-                )
+             
              print(f"🔔 Broadcasting notification for order {order.id}")  # 🔍
              channel_layer = get_channel_layer()
              
@@ -397,6 +400,7 @@ def update_order_status(request, pk):
                         "order_id": str(order.id),
                         "client": order.client.user.username,
                         "address": order.client.user.phone,
+                        "phone": order.client.user.phone,
                        # "total": order.total_price,
                         "items": [
                             f"{item.quantity}x {item.dish.name}"

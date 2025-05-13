@@ -70,7 +70,7 @@
           <div class="card-body">
             <h5 class="card-title text-danger"><i class="bi bi-box-seam-fill"></i> order# {{ delivery.order.pk }}</h5>
             <p class="mb-1"><i class="bi bi-person-fill"></i> {{ delivery.order.client.user.username}}</p>
-            <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ delivery.order.client.address }}</p>
+            <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ delivery.address }}</p>
             <p class="mb-1"><i class="bi bi-telephone-fill"></i>  {{ delivery.order.client.user.phone }}</p>
             <p class="mb-1"><i class="bi bi-currency-dollar"></i> Total: <strong>${{ delivery.order.total_price }}</strong></p>
             <p class="mb-1"><i class="bi bi-list-ul"></i> Items: {{ delivery.order.orderdish_set.count }}</p>
@@ -88,7 +88,7 @@
                 </select>
               </form>
             </div>
-            <button class="btn btn-outline-primary direction"><i class="bi bi-geo-alt"></i> Get Directions</button>
+            <button type="button"class="open-gm-btn btn btn-outline-primary direction"data-address="{{ delivery.order.delivery_address|escapejs }}"><i class="bi bi-geo-alt"></i> Get Directions</button>
           </div>
         </div>
       </div>
@@ -98,4 +98,32 @@
     </div>
   </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Select all buttons with class "direction"
+    const buttons = document.querySelectorAll('.direction');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dest = encodeURIComponent(btn.dataset.address);
+        // Ask for the livreur's current position
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(position => {
+            const ori = `${position.coords.latitude},${position.coords.longitude}`;
+            const url = `https://www.google.com/maps/dir/?api=1` +
+                        `&origin=${ori}` +
+                        `&destination=${dest}` +
+                        `&travelmode=driving`;
+            window.open(url, '_blank');
+          }, err => {
+            alert('Could not get your location: ' + err.message);
+          });
+        } else {
+          alert('Geolocation is not supported by your browser.');
+        }
+      });
+    });
+  });
+
+</script>
 {% endblock %}

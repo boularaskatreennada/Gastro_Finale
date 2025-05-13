@@ -38,7 +38,7 @@ class DeliveryConsumer(AsyncWebsocketConsumer):
         if msg.get('action') == 'accept_order':
             order_id = msg['order_id']
             user = self.scope['user']
-        print(f"🔍 accept_order for {order_id}")  # ← debug
+            print(f"🔍 accept_order for {order_id}")  # ← debug
             # 1) Lookup DeliveryPerson for this user
         try:
             delivery_person = await database_sync_to_async(lambda: user.deliveryperson)()
@@ -48,9 +48,17 @@ class DeliveryConsumer(AsyncWebsocketConsumer):
                 "message": "You are not registered as a delivery person."
             }))
             return
+        try:
+            delivery= await database_sync_to_async(
+             lambda: Delivery.objects.get(order_id=order_id,))()
+        except Delivery.DoesNotExist:
+            await self.send(text_data=json.dumps({
+                "type": "error",
+                "message": "no delivery found "
+            }))
+            return
+    
         
-        delivery = await database_sync_to_async(
-        lambda: get_object_or_404(Delivery,order_id=order_id))()
         delivery.delivery_person = delivery_person
         delivery.status = DeliveryStatus.INPROGRESS
         delivery.delivery_date = timezone.now()
