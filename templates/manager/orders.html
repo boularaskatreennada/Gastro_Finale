@@ -47,15 +47,15 @@
                 <td>{{ item.ingredient.name }}</td>
                 <td>{{ item.required_quantity|floatformat:2 }}</td>
                 <td>{{ item.get_unit_display }}</td>
-                <td>{{ item.ingredient.price_per_unit }} DH</td>
-                <td>{{ item.total_price|floatformat:2 }} DH</td>
+                <td>{{ item.ingredient.price_per_unit }} DA</td>
+                <td>{{ item.total_price|floatformat:2 }} DA</td>
             </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr class="table-active">
                 <td colspan="4" class="text-end"><strong>Total Cost:</strong></td>
-                <td><strong>{{ total_cost|floatformat:2 }} $</strong></td>
+                <td><strong>{{ total_cost|floatformat:2 }} DA</strong></td>
             </tr>
         </tfoot>
         </table>

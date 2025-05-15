@@ -99,7 +99,11 @@
             </div>
             <div class="buttons">
                 <a href="{% url 'menu' %}" class="btn btn-outline btn1_color">Cancel</a>
-                <button type="submit" class="btn btn2_color">Update</button>
+                
+                <button type="submit" class="btn btn2_color">
+                   {% if edit_mode %}Update{% else %}Add{% endif %}
+                </button>
+
             </div>
         </div>
     </div>

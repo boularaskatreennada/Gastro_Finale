@@ -41,7 +41,7 @@
             <td>{{ expense.expense_date }}</td>
             <td>{{ expense.description }}</td>
             <td>{{ expense.get_category_display }}</td>
-            <td>{{ expense.amount }} €</td>
+            <td>{{ expense.amount }} DA</td>
             <td class="d-flex justify-content-evenly align-items-center">
               <a href="{% url 'expense_update' expense.pk %}" class="text-success">edit <i class="fa-solid fa-user-pen"></i></a>
               <form action="{% url 'expense_delete' expense.pk %}" method="post" onsubmit="return confirm('Are you sure?');">

@@ -110,6 +110,7 @@ def add_plate(request):
         'form': form,
         'ingredients_by_category': dict(ingredients_by_category),
         'ingredient_categories': Ingredient.CATEGORY_CHOICES,
+        'edit_mode': False,
     }
     return render(request, 'pdg/addPlate.html', context)
 

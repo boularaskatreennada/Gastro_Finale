@@ -22,6 +22,7 @@ from reservations.models import *
 from django.db.models.functions import TruncYear, TruncMonth, TruncDay, TruncDate
 from django.db.models import Sum, F, FloatField
 import json
+from datetime import date, datetime
 
 
 def client_register(request):
@@ -110,7 +111,7 @@ def generate_dashboard_data(orders, expenses, filter_type):
     revenue_dict = {}
     for entry in revenue_data:
         period = entry['period']
-        if isinstance(period, datetime.datetime):
+        if isinstance(period, datetime):
             period = period.date()
         key = period.strftime(date_format)
         revenue_dict[key] = entry['revenue'] or 0
@@ -118,7 +119,7 @@ def generate_dashboard_data(orders, expenses, filter_type):
     expense_dict = {}
     for entry in expense_data:
         period = entry['period']
-        if isinstance(period, datetime.datetime):
+        if isinstance(period, datetime):
             period = period.date()
         key = period.strftime(date_format)
         expense_dict[key] = float(entry['total_expense'] or 0)
@@ -317,89 +318,6 @@ def delete_restaurant(request, pk):
     return render(request, 'pdg/restaurants.html', {'restaurant': restaurant})
 
 
-
-@pdg_required
-def restaurant_information(request, restaurant_id):
-    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
-    view_type = request.GET.get('view', 'daily_menu')  # default to 'daily_menu'
-    today = timezone.now().date()
-
-    context = {
-        'restaurant': restaurant,
-        'view_type': view_type,
-    }
-
-    if view_type == 'daily_menu':
-        date_str = request.GET.get('date')
-        if date_str:
-            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        else:
-            selected_date = today
-        
-        menus = DailyMenu.objects.filter(restaurant=restaurant, date=selected_date)
-        context['menus'] = menus
-        context['selected_date'] = selected_date
-
-    elif view_type == 'expenses':
-        month = request.GET.get('month')
-        year = request.GET.get('year')
-
-        if month and year:
-            expenses = Expense.objects.filter(
-                restaurant=restaurant,
-                expense_date__month=month,
-                expense_date__year=year
-            )
-        else:
-            now = timezone.now()
-            expenses = Expense.objects.filter(
-                restaurant=restaurant,
-                expense_date__month=now.month,
-                expense_date__year=now.year
-            )
-        context['expenses'] = expenses
-
-    elif view_type == 'orders':
-        date_str = request.GET.get('date')
-        if date_str:
-            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        else:
-            selected_date = today
-        
-        orders = Order.objects.filter(
-            restaurant=restaurant,
-            order_date__date=selected_date
-        )
-        context['orders'] = orders
-        context['selected_date'] = selected_date
-
-    elif view_type == 'complaints': 
-
-        date_str = request.GET.get('date')
-        if date_str:
-            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        else:
-            selected_date = today
-        
-        complaints = Complaint.objects.filter( restaurant=restaurant,).order_by('-date')
-        context['complaints'] = complaints
-
-    elif view_type == 'reservations':
-        date_str = request.GET.get('date')
-        if date_str:
-           selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        else:
-           selected_date = today
-
-        reservations = Reservation.objects.filter(
-           restaurant=restaurant,
-           datetime__date=selected_date
-        ).order_by('-datetime') 
-        context['reservations'] = reservations
-        context['selected_date'] = selected_date
-
-
-    return render(request, 'pdg/restaurantInfo.html', context)
 
 
 
@@ -731,3 +649,96 @@ def profile(request):
     }
     
     return render(request, 'client/profil.html', context)
+
+
+
+
+
+
+
+
+
+@pdg_required
+def restaurant_information(request, restaurant_id):
+    
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    view_type = request.GET.get('view', 'daily_menu')  # default to 'daily_menu'
+    today = timezone.now().date()
+
+    context = {
+        'restaurant': restaurant,
+        'view_type': view_type,
+    }
+
+    if view_type == 'daily_menu':
+        date_str = request.GET.get('date')
+        if date_str:
+            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        else:
+            selected_date = today
+        
+        menus = DailyMenu.objects.filter(restaurant=restaurant, date=selected_date)
+        context['menus'] = menus
+        context['selected_date'] = selected_date
+
+    elif view_type == 'expenses':
+        month = request.GET.get('month')
+        year = request.GET.get('year')
+
+        if month and year:
+            expenses = Expense.objects.filter(
+                restaurant=restaurant,
+                expense_date__month=month,
+                expense_date__year=year
+            )
+        else:
+            now = timezone.now()
+            expenses = Expense.objects.filter(
+                restaurant=restaurant,
+                expense_date__month=now.month,
+                expense_date__year=now.year
+            )
+        context['expenses'] = expenses
+
+    elif view_type == 'orders':
+        date_str = request.GET.get('date')
+        if date_str:
+            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        else:
+            selected_date = today
+        
+        orders = Order.objects.filter(
+            restaurant=restaurant,
+            status=OrderStatus.PAID,
+            order_date__date=selected_date
+        )
+        context['orders'] = orders
+        context['selected_date'] = selected_date
+
+    elif view_type == 'complaints': 
+
+        date_str = request.GET.get('date')
+        if date_str:
+            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        else:
+            selected_date = today
+        
+        complaints = Complaint.objects.filter( restaurant=restaurant,).order_by('-date')
+        context['complaints'] = complaints
+
+    elif view_type == 'reservations':
+        date_str = request.GET.get('date')
+        if date_str:
+           selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        else:
+           selected_date = today
+
+        reservations = Reservation.objects.filter(
+           restaurant=restaurant,
+           datetime__date=selected_date
+        ).order_by('-datetime') 
+        context['reservations'] = reservations
+        context['selected_date'] = selected_date
+
+
+    return render(request, 'pdg/restaurantInfo.html', context)
