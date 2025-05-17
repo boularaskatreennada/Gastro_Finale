@@ -7,29 +7,41 @@ from django.core.validators import RegexValidator
 
 
 class ClientRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    phone = forms.CharField(max_length=20, required=True)
-
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+        'class': 'form-control inputField',
+        'placeholder': 'Email'
+    }))
+    
     class Meta:
         model = User
-        fields = ('username', 'email', 'phone', 'password1', 'password2')
-
+        fields = ['username', 'email', 'phone', 'password1', 'password2']
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
-            field.widget.attrs['placeholder'] = field.label
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control inputField',
+            'placeholder': 'Username'
+        })
+        self.fields['phone'].widget.attrs.update({
+            'class': 'form-control inputField',
+            'placeholder': 'Phone'
+        })
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control inputField',
+            'placeholder': 'Password'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control inputField',
+            'placeholder': 'Confirm Password'
+        })
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.user_type = 'CLIENT'
-        user.email = self.cleaned_data['email']
-        user.phone = self.cleaned_data['phone']
         if commit:
             user.save()
-            Client.objects.create(user=user)
+            Client.objects.create(user=user)  # Ensure Client is created
         return user
-
 
 class RestaurantForm(forms.ModelForm):
     class Meta:

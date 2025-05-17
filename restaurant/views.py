@@ -16,7 +16,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, logout
 from django.utils import timezone
 from django.contrib import messages
-from .forms import ClientRegistrationForm
 from feedback.models import *
 from reservations.models import *
 from django.db.models.functions import TruncYear, TruncMonth, TruncDay, TruncDate
@@ -24,29 +23,21 @@ from django.db.models import Sum, F, FloatField
 import json
 from datetime import date, datetime
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from .forms import ClientRegistrationForm
-
 def client_register(request):
     if request.method == 'POST':
-        print("Raw POST data:", request.POST)  # Debug raw input
         form = ClientRegistrationForm(request.POST)
-        print("Form is bound:", form.is_bound)  # Debug form binding
-        print("Form is valid:", form.is_valid())  # Debug validation
-        
         if form.is_valid():
-            print("Attempting to save...")  # Debug
             user = form.save()
-            print("User created:", user)  # Debug
             login(request, user)
-            return redirect('landing_page')
+            messages.success(request, "Registration successful!")
+            return redirect('landing_page')  # Make sure this URL name matches your urls.py
         else:
-            print("Form errors:", form.errors.as_json())  # Detailed error dump
+            # Return the form with errors
             return render(request, 'login.html', {'form': form})
     else:
         form = ClientRegistrationForm()
     return render(request, 'login.html', {'form': form})
+
 
 def custom_login(request):
     if request.method == 'POST':
