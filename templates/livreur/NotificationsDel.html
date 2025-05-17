@@ -36,7 +36,7 @@
               {{ d.order.orderdish_set.all|join:", " }}
             </p>
             {% if not d.delivery_person %}
-              <button type="button" class="btn btn-sm btn-success accept-btn" data-order-id="{d.order.id}"> Accept </button>
+              <button type="button" class="btn btn-sm btn-success accept-btn" data-order-id="{{d.order.id}}"> Accept </button>
             {% endif %}
             </div>
        {% endfor %}
