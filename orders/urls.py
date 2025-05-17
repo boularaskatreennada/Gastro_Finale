@@ -18,5 +18,6 @@ urlpatterns = [
    path('deliveryOrders/',views.delivery_orders,name='DeliveryOrders'),
    path('delivery/notifications/',views.notifications_del,name='delivery_notifications'),
    path('update-delivery-status/<int:pk>/', views.update_delivery_order, name='update_delivery_status'),
+   path('Notifications',views.notifications_del,name='NotificationsDel'),
 ]
 

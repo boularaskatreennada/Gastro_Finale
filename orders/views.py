@@ -409,7 +409,10 @@ def update_order_status(request, pk):
                     }
                 }
             )
-             print(f"✅ Notification sent for order {order.id}")  # 🔍
+            order_delivery = get_object_or_404(Delivery,order=order)
+            order_delivery.notified = True
+            order_delivery.save()
+             
     return redirect('ordersListChef')
 
 @waiter_required
@@ -586,9 +589,10 @@ def placeOrder(request):
 
 @delivery_required
 def notifications_del(request):
-    # Get pending delivery orders
-    pending_deliveries = Delivery.objects.filter(status='pending')
+    deliveries = Delivery.objects.filter(
+        notified=True).select_related('order__client__user')
+    
     return render(request, 'livreur/notificationsDel.html', {
-        'pending_deliveries': pending_deliveries
+        'deliveries': deliveries,
     })
 

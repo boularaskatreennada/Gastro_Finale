@@ -14,13 +14,7 @@ body {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
     min-height: 100vh;
-    background: linear-gradient(
-        135deg,
-        #f8e3a3 0%,  /* Beige */
-        #f8e3a3 60%, 
-        #ffffff 60%,  /* White */
-        #ffffff 100%
-    );
+    background: linear-gradient(240deg, rgba(252, 222, 133, 0.995) 10%, rgba(255,255,255,1) 90%);
     background-repeat: no-repeat;
     background-attachment: fixed;
     color: #333;
@@ -184,12 +178,12 @@ body {
     margin-top: 15px;
 }
 
-.form-label {
+.form-label ,.form-group {
     font-weight: 600;
     color: var(--dark);
     margin-bottom: 0.5rem;
     display: block;
-    padding-left: 30px;
+    
 }
 
 .form-control, .form-select {
@@ -267,59 +261,59 @@ body {
 <div class="reservation-layout">
   <div class="reservation-form-section">
     <div class="reservation-card">
-      <form method="post">
-        {% csrf_token %}
-        <h3 class="mb-4" style="color: var(--dark);">
-          Modifier la réservation #{{ reservation.pk }}
-        </h3>
-
         <!-- Restaurant (read-only) -->
-        <div class="form-group">
-          <label class="form-label">
-            <i class="fas fa-store form-icon"></i> Restaurant
-          </label>
-          <input type="text" class="form-control" 
-                 value="{{ restaurant.name }}" readonly>
-        </div>
+            <h3 class="mb-4" style="color: var(--dark);">
+            Modify reservation N°{{ reservation.pk }}
+            </h3>
+            <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-store form-icon"></i> Restaurant
+            </label>
+            <input type="text" class="form-control" 
+                    value="{{ restaurant.name }}" readonly>
+            </div>
 
-        <!-- Client (read-only) -->
-        <div class="form-group">
-          <label class="form-label">
-            <i class="fas fa-user form-icon"></i> Client
-          </label>
-          <input type="text" class="form-control"
-                 value="{{ reservation.client.user.username }}" readonly>
-        </div>
+            <!-- Client (read-only) -->
+            <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-user form-icon"></i> Client
+            </label>
+            <input type="text" class="form-control"
+                    value="{{ reservation.client.user.username }}" readonly>
+            </div>
+        <form method="post">
+            {% csrf_token %}
+            
 
-        <!-- Table Number -->
-        <div class="form-group">
-          {{ form.table.label_tag }}
-          {{ form.table }}
-        </div>
+            
 
-        <!-- Date & Time -->
-        <div class="row">
-          <div class="col-md-6 form-group">
-            {{ form.datetime.label_tag }}
-            {{ form.datetime }}
-          </div>
-          <div class="col-md-6 form-group">
-            {{ form.number_of_people.label_tag }}
-            {{ form.number_of_people }}
-          </div>
-        </div>
+            <!-- Table Number -->
+            <div class="form-group">
+            {{ form.phone.label_tag }}
+            {{ form.phone }}
+            </div>
 
-        <!-- Status -->
-        <div class="form-group">
-          {{ form.status.label_tag }}
-          {{ form.status }}
-        </div>
+            <!-- Date & Time -->
+            <div class="row">
+            <div class="col-md-6 form-group">
+                {{ form.datetime.label_tag }}
+                {{ form.datetime }}
+                {% if form.datetime.errors %}
+                    <div class="text-danger">{{ form.datetime.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 form-group">
+                {{ form.number_of_people.label_tag }}
+                {{ form.number_of_people }}
+            </div>
+            </div>
 
-        <!-- Submit -->
-        <button type="submit" class="submit-reservation">
-          <i class="fas fa-check-circle"></i> Enregistrer
-        </button>
-      </form>
+
+            <!-- Submit -->
+            <button type="submit" class="submit-reservation">
+            <i class="fas fa-check-circle"></i> Save
+            </button>
+        </form>
     </div>
   </div>
 </div>

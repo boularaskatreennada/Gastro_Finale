@@ -88,7 +88,7 @@
                 </select>
               </form>
             </div>
-            <button type="button"class="open-gm-btn btn btn-outline-primary direction"data-address="{{ delivery.order.delivery_address|escapejs }}"><i class="bi bi-geo-alt"></i> Get Directions</button>
+            <button type="button"class="open-gm-btn btn btn-outline-primary direction"data-address="{{ delivery.address|escapejs }}"><i class="bi bi-geo-alt"></i> Get Directions</button>
           </div>
         </div>
       </div>
@@ -100,30 +100,17 @@
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Select all buttons with class "direction"
-    const buttons = document.querySelectorAll('.direction');
+  const buttons = document.querySelectorAll('.direction');
 
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const dest = encodeURIComponent(btn.dataset.address);
-        // Ask for the livreur's current position
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(position => {
-            const ori = `${position.coords.latitude},${position.coords.longitude}`;
-            const url = `https://www.google.com/maps/dir/?api=1` +
-                        `&origin=${ori}` +
-                        `&destination=${dest}` +
-                        `&travelmode=driving`;
-            window.open(url, '_blank');
-          }, err => {
-            alert('Could not get your location: ' + err.message);
-          });
-        } else {
-          alert('Geolocation is not supported by your browser.');
-        }
-      });
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dest = encodeURIComponent(btn.dataset.address);
+      const url = `https://www.google.com/maps/dir/?api=1` +
+                  `&destination=${dest}` +
+                  `&travelmode=driving`;
+      window.open(url, '_blank');
     });
   });
-
+});
 </script>
 {% endblock %}
