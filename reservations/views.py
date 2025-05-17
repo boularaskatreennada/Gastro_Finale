@@ -1,7 +1,7 @@
 # views.py
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import ReservationForm
+from .forms import EditReservationForm, ReservationForm
 from .models import Client
 from django.core.exceptions import ObjectDoesNotExist
 from restaurant.decorators import client_required
@@ -87,38 +87,23 @@ def reserved_tables(request):
 @waiter_required
 def update_reservation(request, pk):
     
-     #  Identify waiter → his restaurant
-    serveur     = get_object_or_404(Server, user=request.user)
-    restaurant  = serveur.restaurant
-
-    # Fetch the reservation, only if it belongs to this restaurant
-    reservation = get_object_or_404(
-        Reservation, 
-        pk=pk,
-       restaurant=restaurant
-    )
-
-    # Limit the table choices to this restaurant
-    
+    serveur = get_object_or_404(Server, user=request.user)
+    restaurant = serveur.restaurant
+    reservation = get_object_or_404(Reservation, pk=pk, restaurant=restaurant)
 
     if request.method == 'POST':
-        # Bind form to POST + instance
-        form = ReservationForm(instance=reservation, initial={
-    'datetime': reservation.datetime.strftime('%Y-%m-%dT%H:%M')
-})
-
+        # Bind form to POST data and instance
+        form = EditReservationForm(request.POST, instance=reservation)
         
-        
-
         if form.is_valid():
             form.save()
-           # messages.success(request, "Réservation mise à jour avec succès.")
-            return redirect('reservations:list')
+            return redirect('reserved_tables')
+        else:
+         print(form.errors)
     else:
-        #  On GET, show a form pre-filled with existing data
-        form = ReservationForm(instance=reservation)
        
-
+        form = EditReservationForm(instance=reservation)
+       
     return render(request, 'serveur/editReservation.html', {
         'form': form,
         'reservation': reservation,

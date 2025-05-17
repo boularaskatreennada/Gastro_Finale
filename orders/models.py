@@ -50,3 +50,4 @@ class Delivery(models.Model):
     delivery_date = models.DateTimeField()
     status = models.CharField(max_length=50,choices=DeliveryStatus.choices)
     address= models.CharField(max_length=255, blank=True, null=True)
+    notified = models.BooleanField(default=False)
