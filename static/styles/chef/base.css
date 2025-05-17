@@ -9,22 +9,22 @@ div.wrapper{
     width: 100%;  
 }
 
-.main{
+#main{
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    width: 100%;
+    width: 95%;
     overflow: hidden;
     transition: all 0.25s ease-in-out;
     background-color: rgb(255, 255, 255);
-    margin-left: 3.5rem;
+    margin-left: 3.7rem;
     padding:0rem;
     
 }
 #sidebar{
     padding: 0rem;
-    width:3.5rem;
-    min-width: 3.5rem;
+    width:3.6rem;
+    min-width: 3.6rem;
     transition: all 0.25s ease-in-out;
     background-color:var(--secondColor);
     display: flex;
@@ -34,7 +34,6 @@ div.wrapper{
     left: 0;         /* Sticks to the left side of the page */
     height: 100vh;   /* Full viewport height */
     z-index: 1000; 
-    margin-right: 1rem;
 }
 .logo{
     margin-top: 0;

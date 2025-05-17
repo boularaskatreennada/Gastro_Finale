@@ -74,7 +74,27 @@ body {
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
   text-decoration: none;
+
 }
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary); /* Rouge GastroLink */
+   
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+}
+.avatar-circle a{
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
 
 
 /* Reviews Header */
@@ -191,14 +211,29 @@ body {
 }
 
 @media (max-width: 992px) {
-  .navbar {
-    padding: .2rem 1rem;
-   
-  }
   .navbar-collapse {
     background-color: white;
+    display: flex;
+    flex-direction: column !important;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 5px;
+    box-shadow: var(--shadow);
+    width: 100%;
+  }
+
+  .navbar-nav {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    background-color: white;
+    z-index: 100;
+  }
+
+  .navbar-nav .nav-item {
+    margin-bottom: 0.5rem;
   }
 }
+
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
@@ -210,13 +245,28 @@ body {
       grid-template-columns: 1fr;
   }
   
-  .navbar-collapse {
-      background-color: white;
-      padding: 1rem;
-      margin-top: 1rem;
-      border-radius: 5px;
-      box-shadow: var(--shadow);
-  }
+  .navbar-brand::before {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .navbar-brand::after {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .pasta-icon {
+        width: 25px;
+        bottom: -12px;
+    }
+    .navbar-collapse{
+        background-color: white;
+        width: 100%;
+    }
+    .navbar-brand{
+        height: none;
+        width: none;
+    }
 }
 
 /* Animation */

@@ -20,5 +20,6 @@ urlpatterns = [
     path('remove-dish/<int:daily_menu_dish_id>/', views.remove_dish_from_daily_menu, name='remove_dish_from_daily_menu'),
 
     path('manager/orders/', views.generate_shopping_list, name='generate_shopping_list'),
-     path('recipes/', views.recipes_list, name='recipie'),
+     path('manager/shopping-list/pdf/', views.download_shopping_list_pdf, name='download_shopping_list_pdf'),
+    path('recipes/', views.recipes_list, name='recipie'),
 ]

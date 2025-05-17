@@ -17,6 +17,8 @@ from django.views.decorators.http import require_POST
 from django.db.models import F, Q ,Count ,Sum
 from django.http import Http404
 
+
+
 @manager_required
 def orderslistManager(request):
     restaurant = request.user.manager.restaurant
@@ -146,6 +148,8 @@ def placeOrderClient(request):
         restaurant_id = request.POST.get('restaurant_id')
         restaurant = get_object_or_404(Restaurant, id=restaurant_id)
         client = request.user.client
+        
+        
 
         today = date.today()
 
@@ -238,6 +242,15 @@ def confirm_order(request, order_id):
                     status=DeliveryStatus.PENDING,
                     address=address
                 )
+            
+        try:
+            client = request.user.client
+            client.loyality_points += 1
+            client.save()
+            print(f"Updated loyalty points for {client.user.username}")
+        except Exception as e:
+            print(f"Error updating loyalty points: {e}")
+    
         return redirect('profile')
 
     return render(request, 'client/confirmOrder.html', {'order': order})
@@ -591,4 +604,6 @@ def notifications_del(request):
     return render(request, 'livreur/notificationsDel.html', {
         'pending_deliveries': pending_deliveries
     })
+
+
 

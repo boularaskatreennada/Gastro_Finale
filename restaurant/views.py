@@ -24,17 +24,25 @@ from django.db.models import Sum, F, FloatField
 import json
 from datetime import date, datetime
 
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import ClientRegistrationForm
 
 def client_register(request):
     if request.method == 'POST':
+        print("Raw POST data:", request.POST)  # Debug raw input
         form = ClientRegistrationForm(request.POST)
+        print("Form is bound:", form.is_bound)  # Debug form binding
+        print("Form is valid:", form.is_valid())  # Debug validation
+        
         if form.is_valid():
+            print("Attempting to save...")  # Debug
             user = form.save()
+            print("User created:", user)  # Debug
             login(request, user)
-            messages.success(request, "Registration successful!")
-            return redirect('landing_page')  # Make sure this URL name matches your urls.py
+            return redirect('landing_page')
         else:
-            # Return the form with errors
+            print("Form errors:", form.errors.as_json())  # Detailed error dump
             return render(request, 'login.html', {'form': form})
     else:
         form = ClientRegistrationForm()
@@ -48,7 +56,7 @@ def custom_login(request):
         
         if user is not None:
             login(request, user)
-            user.user_type = user.user_type.upper()  # Convert to uppercase
+            user.user_type = user.user_type.upper()
             request.session['display_username'] = user.get_full_name() or user.username
             if user.user_type == 'PDG':
                 return redirect('pdg_dashboard')

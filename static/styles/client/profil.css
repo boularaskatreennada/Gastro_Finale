@@ -125,6 +125,24 @@ body {
     color: var(--dark);
     margin-bottom: 4.8px;
 }
+.avatar-circle-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary); /* Rouge GastroLink */
+   
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+}
+.avatar-circle-link a{
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+}
 
 .sidebar-email {
     color: #666;
@@ -369,7 +387,10 @@ body {
     outline: none;
 }
 
-.btn-save {
+.btn-save,
+.btn-cancel,
+.btn.btn-info,
+.btn.btn-pass {
     background-color: var(--primary);
     color: white;
     border: none;
@@ -622,4 +643,143 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+form {
+    background: #fdfdfd;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    margin-top: 15px;
+    max-width: 500px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn {
+    padding: 8px 14px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn.btn-save {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn.btn-cancel {
+    background-color:var(--light);
+   
+}
+
+
+.btn.btn-info,
+.btn.btn-pass {
+    font-size: 14px;
+    padding: 8px 14px;
+    border-radius: 6px;
+}
+
+.btn.btn-info,
+.btn.btn-info:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn.btn-pass,
+.btn.btn-pass:hover {
+    background-color: var(--secondary);
+    color: white;
+}
+
+
+
+@media (max-width: 992px) {
+  .navbar-collapse {
+    background-color: white;
+    display: flex;
+    flex-direction: column !important;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 5px;
+    box-shadow: var(--shadow);
+    width: 100%;
+  }
+
+  .navbar-nav {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    background-color: white;
+    z-index: 100;
+  }
+
+  .navbar-nav .nav-item {
+    margin-bottom: 0.5rem;
+  }
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .reviews-header h1 {
+      font-size: 2.5rem;
+  }
+ 
+  .reviews-container {
+      grid-template-columns: 1fr;
+  }
+  
+  .navbar-brand::before {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .navbar-brand::after {
+        width: 30px;
+        height: 30px;
+    }
+    
+   
+    .navbar-collapse{
+        background-color: white;
+        width: 100%;
+    }
+    .navbar-brand{
+        height: none;
+        width: none;
+    }
 }

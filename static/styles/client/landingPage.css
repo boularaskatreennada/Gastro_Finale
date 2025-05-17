@@ -84,6 +84,7 @@ body {
     transition: all 0.3s ease;
     margin-left: 1rem;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-decoration: none;
 }
 
 .btn-signin:hover {
@@ -91,6 +92,26 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0,0,0,0.15);
 }
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary); /* Rouge GastroLink */
+   
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+}
+.avatar-circle a{
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
 
 /* Hero Section majestueuse */
 header {
@@ -358,6 +379,28 @@ footer p {
     .logo{
         width: 70px;
     }
+    
+@media (max-width: 992px) {
+  .navbar-collapse {
+    background-color: white;
+    display: flex;
+    flex-direction: column !important;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 5px;
+    box-shadow: var(--shadow);
+    width: 300px;
+  }
+
+  .navbar-nav {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .navbar-nav .nav-item {
+    margin-bottom: 0.5rem;
+  }
+}
 }
 
 @media (max-width: 768px) {

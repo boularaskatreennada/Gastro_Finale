@@ -19,14 +19,27 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse after-bg" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link" href="{% url 'order' %}">Menu</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'client_offers' %}">Offers</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'review_list' %}">Reviews</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'create_reservation' %}">Reservation</a></li>
+                    {% if user.is_authenticated and user.user_type == "CLIENT" %}
+                      <div class="sidebar-header">
+                        <div class="avatar-circle" style="background-color: #d9230f;">
+                           <a href="{% url 'profile' %}">{{ user.username.0|upper }}</a> 
+                        </div>
+                      </div>
+                    {% else %}
+                    <li class="nav-item">
+                      <a href="{% url 'login' %}" class="btn-signin">Sign In</a>
+                    </li>
+                    {% endif %}
                 </ul>
                 
+            
+        
             </div>
         </div>
     </nav>

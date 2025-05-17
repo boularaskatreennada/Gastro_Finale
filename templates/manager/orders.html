@@ -26,6 +26,11 @@
         <input type="date" id="menuDatePicker" class="form-control" 
         style="width: 250px; margin-right: 10px;" 
         value="{{ selected_date|date:'Y-m-d' }}">
+
+         <a href="{% url 'download_shopping_list_pdf' %}?date={{ selected_date|date:'Y-m-d' }}" 
+           class="btn btn-outline-primary ms-2">
+           Download PDF
+          </a>
  
       </div>
 
