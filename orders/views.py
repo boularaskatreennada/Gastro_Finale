@@ -388,31 +388,65 @@ def update_order_status(request, pk):
             
             if order.mode == 'delivered'and new_status == 'done'  :
              
-             print(f"🔔 Broadcasting notification for order {order.id}")  # 🔍
-             channel_layer = get_channel_layer()
              
-            # Send to all connected clients
-             async_to_sync(channel_layer.group_send)(
-                "delivery_group",  # Custom channel name
-                {
-                    "type": "send_notification",
-                    "data": {
-                        "order_id": str(order.id),
-                        "client": order.client.user.username,
-                        "address": order.client.user.phone,
-                        "phone": order.client.user.phone,
-                       # "total": order.total_price,
-                        "items": [
-                            f"{item.quantity}x {item.dish.name}"
-                            for item in order.orderdish_set.all()
-                        ]or ["No items listed"]
+                channel_layer = get_channel_layer()
+             
+                # Send to all connected clients
+                async_to_sync(channel_layer.group_send)(
+                    "delivery_group",  # Custom channel name
+                    {
+                        "type": "send_notification",
+                        "data": {
+                            "order_id": str(order.id),
+                            "client": order.client.user.username,
+                            "address": order.client.user.phone,
+                            "phone": order.client.user.phone,
+                        # "total": order.total_price,
+                            "items": [
+                                f"{item.quantity}x {item.dish.name}"
+                                for item in order.orderdish_set.all()
+                            ]or ["No items listed"]
+                        }
                     }
+                )
+                order_delivery = get_object_or_404(Delivery,order=order)
+                order_delivery.notified = True
+                order_delivery.save()
+
+            if order.mode == 'served' and new_status == 'done':
+                if order.server:
+                    target_server = order.server
+
+                # 1.2) …otherwise find the active server with the fewest served orders
+                else:
+                    servers = Server.objects.filter(
+                        restaurant=order.restaurant,
+                        status='active'
+                    ).annotate(
+                        served_count=Count(
+                            'order',
+                            filter=Q(order__mode='served', order__status='done')
+                        )
+                    )
+                    target_server = servers.order_by('served_count').first()
+                print(f"🐞 DEBUG: Sending Served‐order notification for Order #{order.id} to Server “{target_server.user.username}” (User ID {target_server.user.id})")
+                channel_layer = get_channel_layer()
+                payload = {
+                    "order_id": str(order.id),
+                    "table":    order.table_number or "N/A",
+                    "items":    [f"{i.quantity}× {i.dish.name}" for i in order.orderdish_set.all()],
                 }
-            )
-            order_delivery = get_object_or_404(Delivery,order=order)
-            order_delivery.notified = True
-            order_delivery.save()
-             
+
+                async_to_sync(channel_layer.group_send)(
+                    f"server_{target_server.user.id}",
+                    {
+                        "type": "send_notification",
+                        "data": payload
+                    }
+                )
+                order.server = target_server
+                order.notified = True
+                order.save()
     return redirect('ordersListChef')
 
 @waiter_required
@@ -596,3 +630,15 @@ def notifications_del(request):
         'deliveries': deliveries,
     })
 
+@waiter_required
+def notifications_serveur(request):
+    my_server = request.user.server
+    orders = Order.objects.filter(
+        notified=True,server=my_server).select_related('client__user', 'server', 'restaurant')
+    
+    print(f"🐞 DEBUG: notifications_serveur found {orders.count()} orders")
+    count = Order.objects.filter(notified=True).count()
+    print(f"🐞 DEBUG: Found {count} notified orders in DB")
+    return render(request, 'serveur/Notifications.html', {
+        'orders':orders,
+    })

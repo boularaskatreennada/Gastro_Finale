@@ -1,0 +1,63 @@
+{% include 'serveur/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/livreur/notificationsDel.css' %}">
+{% endblock %}
+
+{%  block content%}
+
+<div class="flex-fill mb-3 d-flex flex-column main">
+    <nav class="navbar navbar-expand px-3 py-1 bg-basic">
+        <h3>Notifications</h3>
+
+        <div class="navbar-collapse collapse">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+                <a href="" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
+                    <img src="{% static 'images/téléchargement.jpg' %}" class="avatar  img-fluid rounded-circle border border-dark" alt="">
+                </a>
+            
+            </li>
+          </ul>
+        </div>
+    </nav>
+    
+    
+
+    <div class="list-group flex-fill" id="notifContainer">
+      {% for o in orders %}
+        <div class="list-group-item">
+          <p><strong>Order #{{ o.id }} is ready to be served!</strong></p>
+          <p>Table: {{ o.table_number }}</p>
+          <p>Items:
+            {% for item in o.orderdish_set.all %}
+              {{ item.quantity }}×{{ item.dish.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </p>
+          
+        </div>
+      {% empty %}
+       <p>No pending service notifications.</p>
+      {% endfor %}
+    </div>
+
+<script>
+ const socket = new WebSocket(
+    (location.protocol==='https:'?'wss://':'ws://')
+    +window.location.host
+    +'/ws/server/notifications/'
+  );
+  socket.onmessage = e => {
+    const d = JSON.parse(e.data);
+    const html = `
+      <div class="list-group-item">
+        <strong>Order #${d.order_id} Served!</strong><br>
+        Table: ${d.table}<br>
+        Items: ${d.items.join(', ')}<br>
+        <small>${new Date(d.timestamp).toLocaleTimeString()}</small>
+      </div>`;
+    document.getElementById('notifContainer').insertAdjacentHTML('afterbegin', html);
+  };
+    </script>
+{% endblock %}

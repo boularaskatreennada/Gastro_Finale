@@ -82,8 +82,11 @@ background-color: white;
 #Durée{
     border-radius: 30px;
 }
-#tables-num{
-    background-color: #FA4516;
+.tables-num-input{
+    background-color: #fa4416da;
+    color: #fff;
+    width: 40px !important;
+    font-size:small !important;
 }
 .items{
     color: #FA4516;

@@ -47,6 +47,11 @@
                         <i class="mdi mdi-table-chair " aria-hidden="true"></i>
                     <span>Reserved tables</span>
                 </a></li>
+                <li class="sidebar-item" id="{% block delivery_notifications_active %}{% endblock %}">
+                    <a href="{% url 'server_notifications' %}" class="sidebar-link">
+                        <i class="bi bi-bell-fill"></i>
+                    <span>Notifications</span>
+                </a></li>
             </ul>
             <div class="sidebar-footer">
                 <ul class="sidebar-nav">

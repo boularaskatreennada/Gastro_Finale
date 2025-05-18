@@ -6,6 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from orders.models import Delivery, DeliveryStatus
 from restaurant.models import DeliveryPerson
+
 class DeliveryConsumer(AsyncWebsocketConsumer):
     group_name = "delivery_group"
 
@@ -73,3 +74,34 @@ class DeliveryConsumer(AsyncWebsocketConsumer):
                 "by": user.username,
             }
         )
+
+# orders notif
+
+class ServerConsumer(AsyncWebsocketConsumer):
+    
+
+    async def connect(self):
+        user = self.scope['user']
+
+        # 2) check in a thread if they have a Server profile
+        is_server = await database_sync_to_async(
+            lambda u: hasattr(u, 'server')
+        )(user)
+
+        if not is_server:
+            # reject non‐servers
+            return await self.close()
+
+        # 3) now store it for later
+        self.user = user
+        self.group_name = f"server_{user.id}"
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        print(f"🛰️ ServerConsumer: {user.username} joined {self.group_name}")
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+    async def send_notification(self, event):
+        # event["data"] will come from your chef view
+        await self.send(text_data=json.dumps(event["data"]))

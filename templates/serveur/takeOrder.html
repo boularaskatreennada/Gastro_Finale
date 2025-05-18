@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'styles/waiter/order.css' %}">
+<link rel="stylesheet" href="{% static 'styles/waiter/order.css ' %}">
 <script src="{% static 'js/serveur/takeOrder.js' %}"></script>
 {% endblock %}
 
@@ -58,9 +58,9 @@
                     
                     <div class="menu-item-content">
                         <div class="menu-item-name">{{dish.dish.name}}</div>
-                        <!--<div class="menu-item-desc">{{dish.dish.description}}</div>-->
+                        
                         <div class="menu-item-footer">
-                            <span class="menu-item-price">{{dish.dish.price}}</span>
+                            <span class="menu-item-price">{{dish.dish.price}}DA</span>
                             <button class="add-btn" data-id="{{ dish.dish.id }}" data-name="{{ dish.dish.name }}" data-price="{{ dish.dish.price }}">Add</button>
                         </div>
                     </div>
@@ -91,9 +91,9 @@
                     <div class="order-header">
                         <h5 class="m-0">Your Order</h5>
                         <!-- ** New: Choose table ** -->
-                        <div class="mb-3 mt-3">
+                        <div class="mb-3 mt-3 ">
                             
-                            <input type="number"name="table_number"id="tableInput" class="form-control"placeholder="Table.." min="1"required
+                            <input type="number"name="table_number"id="tableInput" class="form-control table-number "placeholder="Table N°..." min="1"required
                                 {% if order and order.table %}
                                     value="{{ order.table_number }}"
                                 {% endif %}
@@ -106,11 +106,11 @@
                         <div class="empty-cart">Your cart is empty</div>
                     </div>
                     
-                    <textarea class="order-note" placeholder="Any special instructions?"></textarea>
+                    
                     
                     <div class="order-total">
                         <span>Total:</span>
-                        <span>0 $</span>
+                        <span>0 DA</span>
                     </div>
                     
                     <button class="submit-btn" disabled>Place Order</button>

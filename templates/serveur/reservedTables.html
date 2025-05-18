@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'styles/waiter/reservedTables.css' %}">
+<link rel="stylesheet" href="{% static 'styles/waiter/reservedTables.css ' %}">
 {% endblock %}
 
 {%  block content%}
@@ -63,7 +63,7 @@
   <!-- Cards grid -->
   <div  class="row g-4" >
     {% for reservation in reservations %}
-      <div  class="col-sm-6 col-md-4">
+      <div  class="col-sm-6 col-md-3">
         <div id="cardContainer" class="card shadow-sm">
           <div id="card" class="card-body position-relative">
             
@@ -71,8 +71,8 @@
               <input type="number"
               name="table_number"
               value="{{ reservation.table }}"
-              placeholder="Table #"
-              class="form-control form-control-sm"
+              placeholder="N°"
+              class="form-control form-control-sm tables-num-input"
               style="width:70px; display:inline-block; font-size:0.8em; padding:2px 6px;" {% if reservation.status != 'accepted' %}readonly{% endif %}>
             </span>
           
