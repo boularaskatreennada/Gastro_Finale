@@ -72,8 +72,8 @@
             <p class="mb-1"><i class="bi bi-person-fill"></i> {{ delivery.order.client.user.username}}</p>
             <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ delivery.address }}</p>
             <p class="mb-1"><i class="bi bi-telephone-fill"></i>  {{ delivery.order.client.user.phone }}</p>
-            <p class="mb-1"><i class="bi bi-currency-dollar"></i> Total: <strong>${{ delivery.order.total_price }}</strong></p>
-            <p class="mb-1"><i class="bi bi-list-ul"></i> Items: {{ delivery.order.orderdish_set.count }}</p>
+            <p class="mb-1"> Total: <strong>{{ delivery.order.total_amount }} DA</strong></p>
+            <p class="mb-1">Items: {{ delivery.order.orderdish_set.count }}</p>
             <div class="mb-3">
               <label class="form-label mb-0" for="Status"><i class="bi bi-clock-fill"></i> Status:</label>
               <form method="post" action="{% url 'update_delivery_status' delivery.pk %}">

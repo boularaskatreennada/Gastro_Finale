@@ -16,14 +16,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model, logout
 from django.utils import timezone
 from django.contrib import messages
-from .forms import ClientRegistrationForm
 from feedback.models import *
 from reservations.models import *
 from django.db.models.functions import TruncYear, TruncMonth, TruncDay, TruncDate
 from django.db.models import Sum, F, FloatField
 import json
 from datetime import date, datetime
-
 
 def client_register(request):
     if request.method == 'POST':
@@ -40,6 +38,7 @@ def client_register(request):
         form = ClientRegistrationForm()
     return render(request, 'login.html', {'form': form})
 
+
 def custom_login(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -48,7 +47,7 @@ def custom_login(request):
         
         if user is not None:
             login(request, user)
-            user.user_type = user.user_type.upper()  # Convert to uppercase
+            user.user_type = user.user_type.upper()
             request.session['display_username'] = user.get_full_name() or user.username
             if user.user_type == 'PDG':
                 return redirect('pdg_dashboard')

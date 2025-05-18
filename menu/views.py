@@ -1,11 +1,12 @@
 from collections import defaultdict
+import io
 
 from django.utils import timezone
 import json
 from django import forms
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-
+from reportlab.pdfgen import canvas
 from finance.models import Expense
 from orders.models import Order, OrderDish
 from .models import *
@@ -480,7 +481,67 @@ def generate_shopping_list(request):
         'selected_date': selected_date
     })
 
+@manager_required
+def download_shopping_list_pdf(request):
+    manager = Manager.objects.get(user=request.user)
+    restaurant = manager.restaurant
 
+    date_str = request.GET.get('date')
+    try:
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except (TypeError, ValueError):
+        selected_date = date.today()
+
+    daily_menu = DailyMenu.objects.filter(date=selected_date, restaurant=restaurant).first()
+    if not daily_menu:
+        return HttpResponse("No shopping list found for selected date.", status=404)
+
+    shopping_list = ShoppingList.objects.filter(menu=daily_menu).first()
+    if not shopping_list:
+        return HttpResponse("No shopping list found for selected date.", status=404)
+
+    items = ShoppingListItem.objects.filter(shopping_list=shopping_list)
+
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer)
+    p.setFont("Helvetica", 14)
+    p.drawString(100, 800, f"Shopping List - {selected_date.strftime('%Y-%m-%d')}")
+
+    y = 770
+    p.setFont("Helvetica", 10)
+    p.drawString(50, y, "Ingredient")
+    p.drawString(200, y, "Quantity")
+    p.drawString(300, y, "Unit")
+    p.drawString(370, y, "Unit Price")
+    p.drawString(470, y, "Total Price")
+    y -= 20
+
+    for item in items:
+        if y < 40:
+            p.showPage()
+            y = 800
+        p.drawString(50, y, item.ingredient.name)
+        p.drawString(200, y, f"{item.required_quantity:.2f}")
+        p.drawString(300, y, item.get_unit_display())
+        p.drawString(370, y, f"{item.ingredient.price_per_unit:.2f} DA")
+        p.drawString(470, y, f"{item.total_price:.2f} DA")
+        y -= 20
+
+    total_cost = sum(item.total_price for item in items)
+    if y < 60:
+        p.showPage()
+        y = 800
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(370, y - 10, "Total:")
+    p.drawString(470, y - 10, f"{total_cost:.2f} DA")
+
+    p.showPage()
+    p.save()
+
+    buffer.seek(0)
+    return HttpResponse(buffer, content_type='application/pdf', headers={
+        'Content-Disposition': f'attachment; filename="shopping_list_{selected_date}.pdf"'
+    })
 
 
 

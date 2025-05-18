@@ -43,7 +43,6 @@ class ClientRegistrationForm(UserCreationForm):
             Client.objects.create(user=user)  # Ensure Client is created
         return user
 
-
 class RestaurantForm(forms.ModelForm):
     class Meta:
         model = Restaurant
