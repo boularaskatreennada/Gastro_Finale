@@ -23,7 +23,7 @@
          </div>
         </nav>
     
-    <!-- filter section -->
+    <!-- filter -->
     <div class="d-flex flex-wrap justify-content-left gap-2 mb-4">
         <button class="btn  btn-sm filter {% if selected_category == 'all' %}active{% endif %}" data-filter="all" onclick="filterCategory('all')">
         All
@@ -75,7 +75,7 @@
           
   </div>
 
-            <!-- Panier vertical à droite -->
+            <!-- Panier -->
           <form method="post" action="{% url 'place_order' %}" id="orderForm">
                {% csrf_token %}
                {% if order %}
@@ -87,15 +87,15 @@
                     <input type="hidden" name="quantity"  value="">
                     
                 </div>
-                <div class="col-4 order-summary " >
+                <div class="col-4 order-summary" >
                     <div class="order-header">
                         <h5 class="m-0">Your Order</h5>
-                        <!-- ** New: Choose table ** -->
+                        
                         <div class="mb-3 mt-3 ">
                             
-                            <input type="number"name="table_number"id="tableInput" class="form-control table-number "placeholder="Table N°..." min="1"required
-                                {% if order and order.table %}
-                                    value="{{ order.table_number }}"
+                            <input type="number" name="table_number" id="tableInput" class="form-control table-number "placeholder="Table N°..." min="1"
+                                {% if order and order.table_number %}
+                                    value="{{order.table_number}}"
                                 {% endif %}
                             >
                         </div>
@@ -116,13 +116,14 @@
                     <button class="submit-btn" disabled>Place Order</button>
                 </div>
             </form>
-        <!-- Bouton toggle pour mobile -->
+        <!-- Bouton  -->
         <button class="cart-toggle">
             🛒
             <span class="cart-badge">0</span>
         </button>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
   <script>
           function filterCategory(category) {
             const url = new URL(window.location.href);
@@ -135,14 +136,15 @@
         }
       document.addEventListener('DOMContentLoaded', function() {
           
-          // Gestion du panier
+          let cart = JSON.parse(`{{ order_items_json|default:"[]"|escapejs }}`);
+
                 
-            {% if order_items_json %}
+           /* {% if order_items_json %}
                 let cart = {{ order_items_json|safe }};
             {% else %}
                 let cart = [];
             {% endif %}
-          
+          */
           // Sélection des éléments du DOM
           const orderItemsEl = document.querySelector('.order-items');
           const orderCountEl = document.querySelector('.order-count');
@@ -156,12 +158,10 @@
 
           
             orderForm.addEventListener('submit', function(e) {
-            // 1️⃣ Clear old hidden inputs
+            
             cartFields.innerHTML = '';
 
-            // 2️⃣ For each item in `cart`, append
-            //    <input type="hidden" name="item_id" value="…">
-            //    <input type="hidden" name="quantity" value="…">
+            
             cart.forEach(item => {
                 cartFields.innerHTML += `
                 <input type="hidden" name="item_id"   value="${item.id}">
@@ -172,7 +172,7 @@
             
             });
 
-          // Fonction pour mettre à jour l'affichage du panier
+          
           function updateCartDisplay() {
               if (cart.length === 0) {
                   orderItemsEl.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
@@ -209,7 +209,7 @@
               orderTotalEl.textContent = `${total} $`;
               submitBtn.disabled = false;
               
-              // Ajout des écouteurs d'événements pour les boutons de contrôle
+              
               document.querySelectorAll('.order-item-btn.minus').forEach(btn => {
                   btn.addEventListener('click', function() {
                     
@@ -235,7 +235,7 @@
               });
           }
           
-          // Fonction pour ajouter un article au panier
+          
           function addToCart(itemId, itemName, itemPrice) {
               const existingItem = cart.find(item => item.id === itemId);
               
@@ -252,13 +252,13 @@
               
               updateCartDisplay();
               
-              // Sur mobile, ouvrir le panier quand on ajoute un article
+              
               if (window.innerWidth <= 992) {
                   orderSummary.classList.add('open');
               }
           }
           
-          // Fonction pour mettre à jour la quantité d'un article
+          
           function updateItemQuantity(itemId, change) {
               const item = cart.find(item => item.id === itemId);
               
@@ -273,41 +273,42 @@
               }
           }
           
-          // Fonction pour supprimer un article du panier
+          
           function removeItemFromCart(itemId) {
               cart = cart.filter(item => item.id !== itemId);
               updateCartDisplay();
           }
           
-          // Fonction pour passer la commande
+          
           function submitOrder() {
               const note = document.querySelector('.order-note').value;
               
-              // Ici, vous enverriez normalement les données au serveur
+              
               console.log('Order submitted:', {
                   items: cart,
                   note: note,
                   total: cart.reduce((sum, item) => sum + (item.quantity * item.price), 0)
               });
               
-              // Réinitialiser le panier après la commande
+              
               cart = [];
               updateCartDisplay();
               document.querySelector('.order-note').value = '';
               
-              // Afficher un message de confirmation
+              
               alert('Your order has been placed successfully!');
               
-              //  fermer le panier après la commande
+              
               
                   orderSummary.classList.remove('open');
               
           }
-          //open summery when click 
+          
           cartToggle.addEventListener('click', () => {
                 orderSummary.classList.toggle('open');
+                
               });
-          // Écouteurs d'événements
+          
           document.querySelectorAll('.add-btn').forEach(btn => {
               btn.addEventListener('click', function() {
                   
@@ -318,30 +319,32 @@
               });
           });
           
-          //submitBtn.addEventListener('click', submitOrder);
           
           
-          // Fermer le panier quand on clique à l'extérieur (sur mobile)
+          
+          
           document.addEventListener('click', function(e) {
-              if (
-                  !orderSummary.contains(e.target) && 
-                  !cartToggle.contains(e.target) &&
-                  orderSummary.classList.contains('open')) {
-                  orderSummary.classList.remove('open');
-              }
+              const isControlButton = !!e.target.closest('.order-item-btn');
+
+                if (
+                !isInsideSummary &&
+                !isToggle &&
+                !isAddButton &&
+                !isControlButton &&
+                orderSummary.classList.contains('open')
+                ) {
+                orderSummary.classList.remove('open');
+                }
           });
           
           
 
           
-          // Initialiser l'affichage du panier
+          
           updateCartDisplay();
           
           updateChart();
       });
   </script>
-        </div>
-      </div> 
-</div>
  
 {%endblock%}

@@ -2,30 +2,32 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'styles/livreur/DeliveryOrders.css' %}">
+<link rel="stylesheet" href="{% static 'styles/livreur/DeliveryOrders.css ' %}">
 {% endblock %}
 
 {%  block content%}
-<div class="flex-fill mb-3 d-flex flex-column main bg-basic">
-    <nav class="navbar navbar-expand px-3 py-1 bg-basic">
-        <h3>Delivery Orders</h3>
+<div id='main' class=" bg-white">
+    
+      <div class="d-flex justify-content-between align-items-center ">
+        <nav class="navbar navbar-expand px-3 py-1 bg-basic">
+          <h2 class=" ">Delivery Orders</h2>
 
-        <div class="navbar-collapse collapse">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item dropdown">
-                <a href="" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
-                    <img src="{% static 'images/téléchargement.jpg' %}" class="avatar  img-fluid rounded-circle border border-dark" alt="">
-                </a>
-            
-            </li>
-          </ul>
-        </div>
-    </nav>
-        
+          <div class="navbar-collapse collapse">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item dropdown">
+                <div class="d-flex align-items-center">
+                  <img src="{% static 'images/waiter.png' %}" alt="" style="width: 40px;">
+                  <h6 >{{ request.session.display_username }}</h6>
       
+              </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
    
 
-    <!-- Tabs for status filter -->
+    <!--  filter -->
     <div class="container-fluid my-3">
         <div class="filter-bar">
           <ul class="nav nav-pills justify-content-between">
@@ -61,42 +63,45 @@
      
     
 
-    <!-- Cards container -->
-    <div class="row g-4 flex-fill" id="cardsContainer">
-      {% for delivery in delivery_orders %}
-      <!-- example card; duplicate/adapt for each order -->
-      <div class="col-12 col-md-3" data-status="Pending">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title text-danger"><i class="bi bi-box-seam-fill"></i> order# {{ delivery.order.pk }}</h5>
-            <p class="mb-1"><i class="bi bi-person-fill"></i> {{ delivery.order.client.user.username}}</p>
-            <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ delivery.address }}</p>
-            <p class="mb-1"><i class="bi bi-telephone-fill"></i>  {{ delivery.order.client.user.phone }}</p>
-            <p class="mb-1"> Total: <strong>{{ delivery.order.total_amount }} DA</strong></p>
-            <p class="mb-1">Items: {{ delivery.order.orderdish_set.count }}</p>
-            <div class="mb-3">
-              <label class="form-label mb-0" for="Status"><i class="bi bi-clock-fill"></i> Status:</label>
-              <form method="post" action="{% url 'update_delivery_status' delivery.pk %}">
-                {% csrf_token %}
-                <select id="Status" name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
-                  {% for value, label in delivery_status_choices %}
-                    <option value="{{ value }}"
-                      {% if delivery.status == value %}selected{% endif %}>
-                      {{ label }}
-                    </option>
-                  {% endfor %}
-                </select>
-              </form>
+    <!-- Cards  -->
+      <div class="container-fluid px-3">
+        <div class="row g-4" id="cardsContainer">
+          {% for delivery in delivery_orders %}
+          
+          <div class="col-sm-6 col-md-3 " data-status="Pending">
+            <div class="card shadow-sm {% if delivery.status == 'pending' %} order-pending {% endif %}">
+              <div class="card-body ">
+                <h5 class="card-title text-danger"><i class="bi bi-box-seam-fill "></i> order# {{ delivery.order.pk }}</h5>
+                <p class="mb-1"><i class="bi bi-person-fill icon-color"></i> {{ delivery.order.client.user.username}}</p>
+                <p class="mb-1"><i class="bi bi-geo-alt-fill icon-color"></i> {{ delivery.address }}</p>
+                <p class="mb-1"><i class="bi bi-telephone-fill icon-color"></i>  {{ delivery.order.client.user.phone }}</p>
+                <p class="mb-1"> <i class="bi bi-currency-dollar icon-color"></i>Total: <strong>{{ delivery.order.total_amount }} DA</strong></p>
+                <p class="mb-1"><i class="bi bi-basket3-fill icon-color"></i>Items: {{ delivery.order.orderdish_set.count }}</p>
+                <div class=" d-flex mb-3">
+                  <label class="form-label mb-0" for="Status"><i class="bi bi-clock-fill icon-color"></i> Status: </label>
+                  <form method="post" action="{% url 'update_delivery_status' delivery.pk %} " >
+                    {% csrf_token %}
+                    <select id="Status" name="status" class="form-select form-select-sm d-inline-block w-auto ms-1" onchange="this.form.submit()">
+                      {% for value, label in delivery_status_choices %}
+                        <option value="{{ value }}"
+                          {% if delivery.status == value %}selected{% endif %}>
+                          {{ label }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </form>
+                </div>
+                <button type="button"class="open-gm-btn btn  direction"data-address="{{ delivery.address|escapejs }}"{% if delivery.status == 'delivered' %}disabled{% endif %}><i class="bi bi-geo-alt"></i> Get Directions</button>
+              </div>
             </div>
-            <button type="button"class="open-gm-btn btn btn-outline-primary direction"data-address="{{ delivery.address|escapejs }}"><i class="bi bi-geo-alt"></i> Get Directions</button>
           </div>
+          {% empty %}
+          <p>Aucune livraison trouvée.</p>
+          {% endfor %}
         </div>
       </div>
-      {% empty %}
-      <p>Aucune livraison trouvée.</p>
-      {% endfor %}
-    </div>
-  </div>
+    
+  
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {

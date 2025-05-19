@@ -266,7 +266,6 @@ def orders_list(request):
     restaurant = server.restaurant
     status = request.GET.get('filterStatus')
     order_type = request.GET.get('filterType')
-
     search = request.GET.get('search')
     date_str = request.GET.get('date')
 
@@ -300,15 +299,12 @@ def orders_list(request):
     
     if search:
         orders = orders.filter(
-            Q(table__name__icontains=search) |
-            Q(server__user__username__icontains=search) |
-            Q(orderdish__dish__name__icontains=search)
-        ).distinct()
+            Q(client__user__username__icontains=search)).distinct()
     
     return render(request, 'serveur/ordersList.html', {
         'orders': orders,
         'selected_date': selected_date,
-        
+        'search': search,
     })
 
 
@@ -320,6 +316,7 @@ def order_list_chef(request):
     restaurant = chef.restaurant
     filter_type = request.GET.get('filter_type','')
     date_str = request.GET.get('date')
+    search = request.GET.get('search')
     if date_str:
         try:
             selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -344,17 +341,23 @@ def order_list_chef(request):
     if filter_type:
         orders = orders.filter(mode=filter_type)
 
+    if search:
+        orders = orders.filter(
+            Q(client__user__username__icontains=search)).distinct()
+    
+    
     return render(request, 'chef/ordersListChef.html', {
         'orders': orders,
         'restaurant': restaurant,
         'filter_type': filter_type,
+        'search': search,
     })
 
 @waiter_required
 def edit_order(request, pk):
     order = get_object_or_404(Order, pk=pk)
    
-    # Get all dishes in today's menu 
+    # Get all dishes in today menu 
     today_menu = DailyMenu.objects.filter(
         restaurant=order.restaurant,
         date=timezone.localdate()
@@ -364,8 +367,8 @@ def edit_order(request, pk):
         raise Http404("No menu for today")
 
     menu_entries = DailyMenuDish.objects.filter(menu=today_menu).select_related('dish')
-
-    # Prepare existing order items for JS cart initialization
+     
+    # existing order 
     order_items = []
     for od in order.orderdish_set.select_related('dish').all():
         order_items.append({
@@ -374,11 +377,21 @@ def edit_order(request, pk):
             'price': float(od.dish.price),
             'quantity': od.quantity,
         })
+    category = request.GET.get('category')
+    
+
+    categories = MainMenu.objects.filter(
+        id__in=menu_entries.values_list('dish__menu_id', flat=True).distinct()
+    )
+    if category and category.lower() != "all":
+        menu_entries = menu_entries.filter(dish__menu__category__iexact=category)
 
     context = {
         'menu_entries': menu_entries,
-        'order_items_json': json.dumps(order_items),  # pass as JSON string
+        'order_items_json': json.dumps(order_items),  
         'order': order,
+        'categories': categories,
+        'selected_category': category or 'all',
         
     }
 
@@ -389,24 +402,24 @@ from channels.layers import get_channel_layer
 @chef_required
 def update_order_status(request, pk):
     order = get_object_or_404(Order, pk=pk)
-   # delivery_order=get_object_or_404(Delivery,pk=pk)
+   
     if request.method == 'POST':
         new_status = request.POST.get('status')
-        print(f"🐞 DEBUG: Chef submitted status={new_status}, order.mode={order.mode}")  # 🔍
+        
 
         if new_status in dict(OrderStatus.choices):
             order.status = new_status
             order.save()
-            print(f"🐞 DEBUG: order.status set to {order.status}")  # 🔍
+            
             
             if order.mode == 'delivered'and new_status == 'done'  :
              
              
                 channel_layer = get_channel_layer()
              
-                # Send to all connected clients
+                # Send to all connected 
                 async_to_sync(channel_layer.group_send)(
-                    "delivery_group",  # Custom channel name
+                    "delivery_group",  
                     {
                         "type": "send_notification",
                         "data": {
@@ -414,7 +427,7 @@ def update_order_status(request, pk):
                             "client": order.client.user.username,
                             "address": order.client.user.phone,
                             "phone": order.client.user.phone,
-                        # "total": order.total_price,
+                        
                             "items": [
                                 f"{item.quantity}x {item.dish.name}"
                                 for item in order.orderdish_set.all()
@@ -430,7 +443,7 @@ def update_order_status(request, pk):
                 if order.server:
                     target_server = order.server
 
-                # 1.2) …otherwise find the active server with the fewest served orders
+                
                 else:
                     servers = Server.objects.filter(
                         restaurant=order.restaurant,
@@ -442,7 +455,7 @@ def update_order_status(request, pk):
                         )
                     )
                     target_server = servers.order_by('served_count').first()
-                print(f"🐞 DEBUG: Sending Served‐order notification for Order #{order.id} to Server “{target_server.user.username}” (User ID {target_server.user.id})")
+                
                 channel_layer = get_channel_layer()
                 payload = {
                     "order_id": str(order.id),
@@ -476,7 +489,7 @@ def update_order_status_waiter(request, pk):
 def cancel_order(request, pk):
     order = get_object_or_404(Order, id=pk)
     if request.method == 'POST':
-        order.status = OrderStatus.CANCELLED
+        order.status = OrderStatus.CANCELED
         order.save()
     return redirect('ordersList')
 
@@ -489,7 +502,7 @@ def delivery_orders(request):
     
     if filter_type:
         orders = orders.filter(status=filter_type)
-    
+    orders = orders.select_related('order').order_by('-order__order_date')
     return render(request, 'livreur/DeliveryOrders.html', {
         'delivery_orders': orders,
         'filter_type': filter_type,
@@ -497,22 +510,26 @@ def delivery_orders(request):
 
 @delivery_required
 def update_delivery_order(request, pk):
-    order = get_object_or_404(Delivery, pk=pk)
+    delivery = get_object_or_404(Delivery, pk=pk)
+    order = delivery.order  
     if request.method == 'POST':
         new_status = request.POST.get('status')
         if new_status in dict(DeliveryStatus.choices):
-            order.status = new_status
-            order.save()
+            delivery.status = new_status
+            delivery.save()
+            if new_status=="delivered":
+                order.status='paid'
+                order.save()
     return redirect('DeliveryOrders')
 
 @waiter_required
 def take_order(request):
-    # 1️⃣ Find the restaurant from the logged-in waiter
+    # Find the restaurant 
     server     = get_object_or_404(Server, user=request.user)
     restaurant = server.restaurant
     
 
-    # 2️⃣ Grab (or bail if missing) today’s DailyMenu
+    
     today = date.today()
     category = request.GET.get('category')
     search = request.GET.get('search')
@@ -520,7 +537,7 @@ def take_order(request):
     try:
         today_menu = DailyMenu.objects.get(restaurant=restaurant, date=today)
         
-        # 3️⃣ Fetch all the dishes on that menu
+        # all the dishes on that menu
         menu_entries = DailyMenuDish.objects.filter(menu=today_menu).select_related('dish')
         categories = MainMenu.objects.filter(
             id__in=menu_entries.values_list('dish__menu_id', flat=True).distinct())
@@ -535,7 +552,7 @@ def take_order(request):
         menu_entries = []
         categories = []
 
-    # 4️⃣ Render, passing the list of entries
+    
     return render(request, 'serveur/takeOrder.html', {
         'menu_entries': menu_entries,
         'categories': categories,
@@ -546,36 +563,39 @@ def take_order(request):
 def placeOrder(request):
     server = get_object_or_404(Server, user=request.user)
     restaurant = server.restaurant
+    
     table_number = request.POST.get('table_number')
 
-    
-    today = date.today() # Use timezone-aware date
-    order_id = request.POST.get('order_id')  # <-- NEW
-    # Use transaction to lock rows and avoid race conditions
+     
+        
+    today = date.today() 
+    order_id = request.POST.get('order_id')  
+    # transaction to lock rows and avoid race conditions
     with transaction.atomic():
         today_menu = DailyMenu.objects.filter(
             restaurant=restaurant,
             date=today
         ).first()
         if not today_menu:
-          #  messages.error(request, "No menu for today.")
+          
             return redirect('takeOrder')
 
         if request.method == 'POST':
             item_ids = request.POST.getlist('item_id')
             quantities = request.POST.getlist('quantity')
-            note = request.POST.get('note', '')
-
-            # Lock the menu entries for update
+            
             menu_entries = DailyMenuDish.objects.select_for_update().filter(menu=today_menu)
             menu_map = {entry.dish_id: entry for entry in menu_entries}
-            # --- NEW LOGIC ---
+            
             if order_id:
                 order = get_object_or_404(Order, pk=order_id)
-                order.table_number = table_number
+                if order.mode == OrderMode.SERVED:
+                    order.table_number = table_number
+                else:
+                    order.table_number = None
                 
-                # Restore original stock quantities
-                if order.orderdish_set.exists():  # Prevent None error
+                
+                if order.orderdish_set.exists(): 
                     original_menu = order.orderdish_set.first().dish.dailymenudish_set.first().menu
                     for old_item in order.orderdish_set.all():
                         DailyMenuDish.objects.filter(
@@ -601,36 +621,36 @@ def placeOrder(request):
                     dish_id = int(dish_id_str)
                     qty = int(qty_str)
                 except ValueError:
-                    continue  # skip invalid data
+                    continue  
 
                 if qty <= 0:
                     continue
 
                 entry = menu_map.get(dish_id)
                 if not entry:
-                  #  messages.error(request, f"Dish ID {dish_id} not on today's menu.")
+                  
                     continue
 
-                # Check quantity and decrement safely
+                
                 if qty > entry.current_quantity:
                     qty = entry.current_quantity
 
                 if qty <= 0:
                     continue
 
-                # Create order item
+                
                 OrderDish.objects.create(
                     order=order,
                     dish=entry.dish,
                     quantity=qty
                 )
 
-                # Decrement available quantity using F expression (safe for concurrency)
+                # Decrement
                 DailyMenuDish.objects.filter(pk=entry.pk).update(
                     current_quantity=F('current_quantity') - qty
                 )
 
-            #messages.success(request, f"Order #{order.pk} created!")
+            
             return redirect('takeOrder')
 
 
@@ -649,10 +669,7 @@ def notifications_serveur(request):
     my_server = request.user.server
     orders = Order.objects.filter(
         notified=True,server=my_server).select_related('client__user', 'server', 'restaurant')
-    
-    print(f"🐞 DEBUG: notifications_serveur found {orders.count()} orders")
-    count = Order.objects.filter(notified=True).count()
-    print(f"🐞 DEBUG: Found {count} notified orders in DB")
+
     return render(request, 'serveur/Notifications.html', {
         'orders':orders,
     })

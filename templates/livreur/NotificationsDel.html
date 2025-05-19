@@ -2,59 +2,65 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'styles/livreur/notificationsDel.css' %}">
+<link rel="stylesheet" href="{% static 'styles/livreur/notificationsDel.css ' %}">
 {% endblock %}
-
 {%  block content%}
 
-<div class="flex-fill mb-3 d-flex flex-column main">
-    <nav class="navbar navbar-expand px-3 py-1 bg-basic">
-        <h3>Notifications</h3>
+     <div id='main' class="bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <nav class="navbar navbar-expand px-3 py-1 bg-basic">
+            <h2 class=" ">Notifications</h2>
 
-        <div class="navbar-collapse collapse">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item dropdown">
-                <a href="" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
-                    <img src="{% static 'images/téléchargement.jpg' %}" class="avatar  img-fluid rounded-circle border border-dark" alt="">
-                </a>
-            
-            </li>
-          </ul>
-        </div>
-    </nav>
-    
-    
-
-    <div class="list-group flex-fill" id="notifContainer">
-      {% for d in deliveries %}
-          <div class="list-group-item">
-            <p><strong>The Order {{ d.order.id }} is ready to be delivered!</strong></p>
-            <p>Client: {{ d.order.client.user.username }}</p>
-            <p>Phone: {{ d.order.client.user.phone }}</p>
-            <p>Address: {{ d.address }}</p>
-            <p>Items: 
-              {{ d.order.orderdish_set.all|join:", " }}
-            </p>
-            {% if not d.delivery_person %}
-              <button type="button" class="btn btn-sm btn-success accept-btn" data-order-id="{{d.order.id}}"> Accept </button>
-            {% endif %}
+            <div class="navbar-collapse collapse">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                  <div class="d-flex align-items-center">
+                    <img src="{% static 'images/waiter.png' %}" alt="" style="width: 40px;">
+                    <h6 >{{ request.session.display_username }}</h6>
+        
+                </div>
+                </li>
+              </ul>
             </div>
-       {% endfor %}
-    </div>
-
+          </nav>
+        </div>
+        
+        
+         <div class="container-fluid ">
+            <div class="list-group flex-fill" id="notifContainer">
+              {% for d in deliveries %}
+                <div class="list-group-item">
+                  <p ><strong style="color: rgb(126, 64, 13);">The Order {{ d.order.id }} is ready to be delivered!</strong></p>
+                  <p><strong style="color: rgb(20, 59, 90);">Client:</strong> {{ d.order.client.user.username }}</p>
+                  <p><strong style="color: rgb(20, 59, 90);">Phone:</strong> {{ d.order.client.user.phone }}</p>
+                  <p><strong style="color: rgb(20, 59, 90);">Address:</strong> {{ d.address }}</p>
+                  <p><strong style="color: rgb(20, 59, 90);">Items:</strong> 
+                    {% for item in d.order.orderdish_set.all %}
+                      {{ item.quantity }}×{{ item.dish.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                  </p>
+                  {% if not d.delivery_person %}
+                    <button type="button" class="btn btn-sm btn-success accept-btn" data-order-id="{{d.order.id}}"> Accept </button>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+         </div>
+        
+      </div>
 <script>
-    // notificationsDel.html
+    
 const socket = new WebSocket('ws://' + window.location.host + '/ws/delivery/notifications/');
 
 socket.onmessage = function(e) {
-  console.log("📩 Raw WS message:", e.data); // <— add this
+  console.log("📩 Raw WS message:", e.data); 
     const data = JSON.parse(e.data);
     
     
    
        
         const notificationHTML = `
-            <div class="list-group-item">
+            <div class="list-group-item unread">
                 <p><strong>The Order ${data.order_id} is ready to be delivered!</strong></p>
                 <p>Client: ${data.client || 'Unknown'}</p>
                 <p>Phone: ${data.client.phone || 'Not provided'}</p>
@@ -70,7 +76,7 @@ socket.onmessage = function(e) {
 };
 document.getElementById('notifContainer').addEventListener('click', e => {
     if (!e.target.matches('.accept-btn')) return;
-    const orderId = e.target.dataset.orderId;       // grabs data-order-id
+    const orderId = e.target.dataset.orderId;       
     console.log('▶️ About to send:', {action:'accept_order', order_id: orderId});
     socket.send(JSON.stringify({
       action: 'accept_order',

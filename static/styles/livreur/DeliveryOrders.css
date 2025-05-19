@@ -1,10 +1,10 @@
-.main{
-    margin-left: 60px;
+#main{
+   margin-left: 55px !important;
 }
 .navbar{
     background-color: white;
     box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
-    width: 95%;
+    width: 100%;
   }
   .navbar-expand .navbar-collapse{
     min-width: 200px;
@@ -61,20 +61,26 @@
   .card:hover{
     transform: scale(1.03);    
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background-color: rgba(255, 228, 196, 0.183) !important;
+    border: 1px solid rgba(255, 228, 196, 0.183) !important;;
   }
   .card-title {
     font-weight: 600;
     color: #d35400;
   }
-  .btn-outline-primary {
+  .icon-color{
+    color:orangered !important;
+  }
+  .btn {
     color: #d35400;
     border-color: #d35400;
   }
-  .btn-outline-primary:hover{
+  .btn:hover{
     color: #fff;
     background-color: #d35400ce;
     border-color: #d35400;
   }
+ 
   #Status{
     background-color: rgba(0, 128, 0, 0.799) !important;
     border-radius: 10px;
@@ -86,3 +92,6 @@
     transform: scale(1.05);    
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
+  .order-pending {
+  background-color: #d7d0d059 !important ; /* light grey */
+}

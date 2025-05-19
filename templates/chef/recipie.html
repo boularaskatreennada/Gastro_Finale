@@ -7,7 +7,7 @@
 
 {%  block content%}
 
-    <div id="main"  >
+      <div id="main"  >
       
         <nav class="navbar navbar-expand px-4 py-1 bg-basic">
           <h2 class="mb-0">Recipies</h2>
@@ -24,38 +24,45 @@
        </nav>
          
        
+        
         <div class="container-fluid my-3">
           <div class="filter-bar">
             <ul class="nav nav-pills justify-content-between flex-wrap">
               <li class="nav-item flex-fill text-center">
-                <a class="nav-link filter-link active py-1 px-2" href="#">All</a>
+                <a href="{% url 'recipie' %}" 
+                  class="nav-link filter-link py-1 px-2 {% if not selected_category %}active{% endif %}">
+                  All
+                </a>
               </li>
+              {% for category in categories %}
               <li class="nav-item flex-fill text-center">
-                <a class="nav-link filter-link py-1 px-2" href="#">Appetizers</a>
+                <a href="{% url 'recipie' %}?category={{ category|urlencode }}" 
+                  class="nav-link filter-link py-1 px-2 {% if selected_category == category %}active{% endif %}">
+                  {{ category }}
+                </a>
               </li>
-              <li class="nav-item flex-fill text-center">
-                <a class="nav-link filter-link py-1 px-2" href="#">Salads</a>
-              </li>
-              <li class="nav-item flex-fill text-center">
-                <a class="nav-link filter-link py-1 px-2" href="#">Main Courses</a>
-              </li>
-              <li class="nav-item flex-fill text-center">
-                <a class="nav-link filter-link py-1 px-2" href="#">Desserts</a>
-              </li>
+              {% endfor %}
             </ul>
           </div>
         </div>
 
-        <div class="search-container "style=" width: 100%;">
-          <i id="search-icon" class="bi bi-search "></i>
-          <input type="text" class="form-control search-input" placeholder="Search..." aria-label="Search">
+        <form method="get" action="{% url 'recipie' %}" class="search-form mb-3" style="width: 100%;">
+          <div class="search-container "style=" width: 100%;">
+            <i id="search-icon" class="bi bi-search "></i>
+            <input type="text" name="search" class="form-control search-input" placeholder="Search..." aria-label="Search" value="{{ search_query }} ">
+            
           
-        
-        </div>
-        <!-- Recipes Section -->
-        <div class="mt-4">
+          </div>
+            {% if selected_category %}
+              <input type="hidden" name="category" value="{{ selected_category }}">
+            {% endif %}
+          </div>
+        </form>
+
+        <!-- Recipes  -->
+        <div class=" container mt-4">
           {% for dish in dishes %}
-            <div class="row mb-2">
+              <div class="row mb-2">
                 <div class="col-12">
                   
                   <div class="recipe-card" data-bs-toggle="collapse" data-bs-target="#recipe{{ dish.pk }}" aria-expanded="false" aria-controls="recipe{{ dish.pk }}">
@@ -68,7 +75,7 @@
                     </div>
                   </div>
                 </div>
-            </div>
+              </div>
             
             <div class="collapse" id="recipe{{ dish.pk }}">
               <div class="card card-body mb-3">
@@ -95,10 +102,7 @@
             <p>no plate avaible</p>
             
           {% endfor %}
-            
         </div>
-      <!-- End Main Content -->
-  
-    </div>
+      </div>
   
 {% endblock %}

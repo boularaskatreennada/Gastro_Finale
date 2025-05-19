@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'styles/waiter/ordersList.css' %}">
+<link rel="stylesheet" href="{% static 'styles/waiter/ordersList.css ' %}">
 {% endblock %}
 
 {%  block content%}
@@ -29,98 +29,64 @@
       
       
     </div>
-      <!-- === Filter Bar === -->
+      <!-- Filter  -->
       <div class="row g-2 align-items-center mb-3">
-        <!-- “All” button clears all filters -->
+        <!-- All -->
         <div class="col-12 col-md-1 d-grid">
-          <button
-            id="clearFilters"
-            class="btn btn-outline-secondary mt-4 shadow-sm"
-            onclick="location.href='{{ request.path }}';"
-          >
+          <button id="clearFilters"class="btn btn-outline-secondary mt-4 shadow-sm"onclick="location.href='{{ request.path }}';">
             All
           </button>
         </div>
       
-        <!-- Order Status -->
+        <!-- Order Statu -->
         <div class="col-6 col-md-2">
           <label class="form-label small" for="filterStatus">Order Status</label>
-          <select
-            id="filterStatus"
-            name="filterStatus"
-            class="form-select filter"
-            onchange="location='?filterStatus='+this.value"
-          >
+          <select id="filterStatus"name="filterStatus"class="form-select filter"onchange="location='?filterStatus='+this.value">
           <option value="" {% if not selected_status %}selected{% endif %}>All</option>
           <option value="pending"   {% if selected_status == 'pending' %}selected{% endif %}>New</option>
           <option value="preparing" {% if selected_status == 'preparing' %}selected{% endif %}>preparing</option>
           <option value="done"      {% if selected_status == 'done' %}selected{% endif %}>Ready</option>
           <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          <option value="paid"   {% if request.GET.filterType == 'paid' %}selected{% endif %}>Paid</option>
           </select>
         </div>
       
         <!-- Order Type -->
         <div class="col-6 col-md-2">
           <label class="form-label small" for="filterType">Order Type</label>
-          <select
-            id="filterType"
-            name="filterType"
-            class="form-select filter"
-            onchange="location='?filterType='+this.value"
-          >
+          <select id="filterType" name="filterType" class="form-select filter" onchange="location='?filterType='+this.value">
           <option value="">All</option>
           <option value="served"     {% if request.GET.filterType == 'served' %}selected{% endif %}>Dine‑in</option>
-          <option value="takeaway"   {% if request.GET.filterType == 'takeaway' %}selected{% endif %}>Takeaway</option>
-          <option value="delivered"   {% if request.GET.filterType == 'delivered' %}selected{% endif %}>delivered</option>
+          <option value="take-away"   {% if request.GET.filterType == 'take-away' %}selected{% endif %}>Take-away</option>
+          <option value="delivered"   {% if request.GET.filterType == 'delivered' %}selected{% endif %}>Delivered</option>
           </select>
         </div>
       
-        <!-- Table Number 
-        <div class="col-6 col-md-2">
-          <label class="form-label small" for="filterTable">Table Number</label>
-          <input
-            type="number"
-            id="filterTable"
-            name="filterTable"
-            class="form-control filter"
-            placeholder="e.g. 5"
-            value="{{ request.GET.filterTable|default_if_none:'' }}"
-            onchange="location='?filterTable='+this.value"
-          >
-        </div>
-        -->
-        <!-- Payment Status -->
-        <div class="col-6 col-md-2">
-          <label class="form-label small" for="filterType">Payment Status</label>
-          <select
-            id="filterPayment"
-            name="filterType"
-            class="form-select filter"
-            onchange="location='?filterType='+this.value"
-          >
-            <option value="" >All</option>
-            <option value="paid"   {% if request.GET.filterType == 'paid' %}selected{% endif %}>Paid</option>
-            <option value="unpaid" {% if request.GET.filterType == 'unpaid' %}selected{% endif %}>Unpaid</option>
-          </select>
-        </div>
+        
+        
       
-        <!-- Free‑text Search -->
-        <div class="col-12 col-md-2 mt-4">
-          <div class="search-container">
-            <i id="search-icon" class="bi bi-search"></i>
-            <input type="text" name="search" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search" value="{{ request.GET.search|default_if_none:''}}">
+        <!--Search -->
+        
+          <div class="col-12 col-md-6 mt-4 ms-4">
+            <form method="get" action="{% url 'ordersList' %}"></form>
+              <div class="search-container">
+                <i id="search-icon" class="bi bi-search"></i>
+                <input type="text" name="search" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search" value="{{ request.GET.search|default_if_none:''}}" onkeypress="if(event.key === 'Enter'){ this.form.submit(); }">
+              </div>
+            </form> 
           </div>
-        </div>
+         
+          
       </div>
       
 
   
-      <!-- Orders List -->
+      <!-- Orders list -->
       
       <div>
         {% for order in orders %}
-        <!-- Order 1 -->
-        <div class="order-row  d-flex justify-content-between align-items-left">
+        <!-- Order  -->
+        <div class="order-row  d-flex justify-content-between align-items-left {% if order.status == 'pending' %} order-pending {% endif %}">
         
           <div class=" align-items-center mb-2">
             <small class="text-muted m">Order #{{ order.pk }}</small>
@@ -129,7 +95,7 @@
             {% else %}
                 <h5 class="mb-0 me-2">Table {{ order.table_number}}</h5>
             {% endif %}
-            
+             <small class="text-muted mt-4">{{order.order_date|date:"H:i"}}</small>
           </div>
           <div class="mb-1 mt-2">
             <small class="text-muted ">
@@ -158,15 +124,9 @@
               </button>
             </div>
             <div class="d-flex justify-content-end">
-              {% if order.status == 'cancelled' %}
-              <button id="btnModify" type="submit" class="btn btn-sm me-2 mt-2 items" disabled>
-                <i class="bi bi-pencil-fill"></i> Modify
-              </button>
-              <button id="btnCancel" type="submit" class="btn btn-sm mt-2 items" disabled>
-                <i class="bi bi-trash"></i>  Cancel
-              </button>
-              {% else %}
-                <!-- Cancel Order -->
+              {% if order.status == 'pending'  %}
+              
+                <!-- Cancel Orders -->
               <form method="post" action="{% url 'edit_order' order.pk %}" style="display:inline">
                 {% csrf_token %}
                 <button id="btnModify" type="submit" class="btn btn-sm me-2 mt-2 items">
@@ -174,13 +134,20 @@
                 </button>
               </form>
 
-              <!-- Modify Order Status -->
+              <!-- Modify  -->
               <form method="post" action="{% url 'cancel_order' order.pk %}" style="display:inline">
                 {% csrf_token %}
                 <button id="btnCancel" type="submit" class="btn btn-sm mt-2 items">
                   <i class="bi bi-trash"></i>  Cancel
                 </button>
               </form>
+              {% else %}
+                <button id="btnModify" type="submit" class="btn btn-sm me-2 mt-2 items" disabled>
+                  <i class="bi bi-pencil-fill"></i> Modify
+                </button>
+              <button id="btnCancel" type="submit" class="btn btn-sm mt-2 items" disabled>
+                <i class="bi bi-trash"></i>  Cancel
+              </button>
               {% endif %}
             </div>
           </div>

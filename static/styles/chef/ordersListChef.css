@@ -95,16 +95,19 @@ body{
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-  .order-row:hover{
+  .order-row:hover,.order-pending:hover{
     background-color:  #f8e3a294;
     transform: translateY(-5px);      
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
   .order-status {
+    display: flex;
+    justify-content: center; /* horizontal center */
+    align-items: center; 
     border-radius: 20px;
     padding: 0.2rem 0.6rem;
     font-size: 0.85rem;
-    width: 70px;
+    width: 95px;
     color: rgb(255, 255, 255) !important;
   }
   .price{
@@ -122,3 +125,6 @@ body{
 .items-table tbody tr {
     background-color: #d4d7d9 !important; /* !important ensures it overrides Bootstrap defaults */
   }
+   .order-pending {
+  background-color:  #d7d0d059 !important ; /* light grey */
+}

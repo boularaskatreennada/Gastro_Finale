@@ -21,7 +21,7 @@ body{
 .search-container{
    
     width: 100%;
-    
+    margin-top: 13px;
 }
 #search-icon{
     position: absolute;
@@ -69,13 +69,16 @@ background-color: white;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-  .order-row:hover ,.order-row:active{
+  .order-row:hover ,.order-row:active,.order-pending:hover{
     background-color:  #f8e3a294;
     transform: translateY(-5px);      
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
   
 .order-status {
+  display: flex;
+    justify-content: center; /* horizontal center */
+    align-items: center; 
     border-radius: 10px;
     padding: 0.2rem 0.6rem;
     font-size: 0.85rem;
@@ -113,3 +116,6 @@ background-color: white;
     background-color: #fff !important;
     color:green !important;
   }
+  .order-pending {
+  background-color: #d7d0d059 !important ; /* light grey */
+}

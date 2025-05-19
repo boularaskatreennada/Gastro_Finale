@@ -22,11 +22,21 @@ from django.views.decorators.csrf import csrf_exempt
 
 @chef_required
 def recipes_list(request):
-    # Récupère tous les plats
+    selected_category = request.GET.get('category', '')
+    search_query = request.GET.get('search', '').strip()
     dishes = Dish.objects.prefetch_related('dishingredient_set__ingredient').all()
+    categories = MainMenu.objects.values_list('category', flat=True).distinct()
+    if search_query:
+        dishes = dishes.filter(name__icontains=search_query)
+    
+    if selected_category:
+        dishes = dishes.filter(menu__category=selected_category)
 
     return render(request, 'chef/recipie.html', {
         'dishes': dishes,
+        'categories': categories,
+        'selected_category': selected_category,
+        'search_query': search_query,
     })
 
 @pdg_required

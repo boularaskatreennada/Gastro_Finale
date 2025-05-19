@@ -7,5 +7,6 @@ urlpatterns = [
     path('update_reservation/<int:pk>/', views.update_reservation, name='update_reservation'),
     path('cancel_reservation/<int:pk>/', views.cancel_reservation, name='cancel_reservation'),
     path('update_reservation_status/<int:pk>/', views.update_reservation_status, name='update_reservation_status'),
+    path('update_reservation_table/<int:pk>/', views.update_reservation_table, name='update_reservation_table'),
     
 ]  

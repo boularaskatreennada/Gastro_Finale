@@ -2,45 +2,56 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'styles/livreur/notificationsDel.css' %}">
+<link rel="stylesheet" href="{% static 'styles/livreur/notificationsDel.css ' %}">
 {% endblock %}
 
 {%  block content%}
+   <div id="main" class="bg-white">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <nav class="navbar navbar-expand px-3 py-1 bg-basic">
+          <h2 class=" ">Notifications</h2>
 
-<div class="flex-fill mb-3 d-flex flex-column main">
-    <nav class="navbar navbar-expand px-3 py-1 bg-basic">
-        <h3>Notifications</h3>
-
-        <div class="navbar-collapse collapse">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item dropdown">
-                <a href="" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
-                    <img src="{% static 'images/téléchargement.jpg' %}" class="avatar  img-fluid rounded-circle border border-dark" alt="">
-                </a>
-            
-            </li>
-          </ul>
-        </div>
-    </nav>
-    
-    
-
-    <div class="list-group flex-fill" id="notifContainer">
-      {% for o in orders %}
-        <div class="list-group-item">
-          <p><strong>Order #{{ o.id }} is ready to be served!</strong></p>
-          <p>Table: {{ o.table_number }}</p>
-          <p>Items:
-            {% for item in o.orderdish_set.all %}
-              {{ item.quantity }}×{{ item.dish.name }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-          </p>
+          <div class="navbar-collapse collapse">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item dropdown">
+                <div class="d-flex align-items-center">
+                  <img src="{% static 'images/waiter.png' %}" alt="" style="width: 40px;">
+                  <h6 >{{ request.session.display_username }}</h6>
+      
+              </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
           
-        </div>
-      {% empty %}
-       <p>No pending service notifications.</p>
-      {% endfor %}
+        
+        
+        
+      </div>
+      
+      
+      <div class="container-fluid ">
+        <div class="list-group flex-fill" id="notifContainer">
+          {% for o in orders %}
+            <div class="list-group-item unread"data-order-id="{{ o.id }}">
+              <p ><strong style="color: rgb(149, 71, 3);">Order #{{ o.id }} is ready to be served!</strong></p>
+              <p> <strong style="color: rgb(20, 20, 86);">Table:</strong> {{ o.table_number }}</p>
+              <p> <strong style="color: rgb(20, 20, 86);">Items:</strong>
+                {% for item in o.orderdish_set.all %}
+                  {{ item.quantity }}×{{ item.dish.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              </p>
+              <button class="btn btn-success btn-sm mark-read-btn">Mark as Read</button>
+            </div>
+          {% empty %}
+          <p>No pending service notifications.</p>
+          {% endfor %}
+       </div>
+      </div>
+      
+
     </div>
+   
 
 <script>
  const socket = new WebSocket(
@@ -51,13 +62,46 @@
   socket.onmessage = e => {
     const d = JSON.parse(e.data);
     const html = `
-      <div class="list-group-item">
+      <div class="list-group-item unread"data-order-id="{{ o.id }}">
         <strong>Order #${d.order_id} Served!</strong><br>
         Table: ${d.table}<br>
         Items: ${d.items.join(', ')}<br>
         <small>${new Date(d.timestamp).toLocaleTimeString()}</small>
+        <button class="btn btn-success btn-sm mark-read-btn">Mark as Read</button>
       </div>`;
     document.getElementById('notifContainer').insertAdjacentHTML('afterbegin', html);
   };
+
+ document.getElementById('notifContainer').addEventListener('click', function(e) {
+  if (e.target.classList.contains('mark-read-btn')) {
+    const itemDiv = e.target.closest('.list-group-item');
+    if (itemDiv) {
+      itemDiv.classList.remove('unread'); 
+      e.target.remove(); 
+
+      // Save read notification IDs in localStorage
+      let readNotifs = JSON.parse(localStorage.getItem('readNotifications') || '[]');
+      const orderId = itemDiv.dataset.orderId;
+      if (!readNotifs.includes(orderId)) {
+        readNotifs.push(orderId);
+        localStorage.setItem('readNotifications', JSON.stringify(readNotifs));
+      }
+    }
+  }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  let readNotifs = JSON.parse(localStorage.getItem('readNotifications') || '[]');
+  readNotifs.forEach(id => {
+    const itemDiv = document.querySelector(`.list-group-item[data-order-id="${id}"]`);
+    if (itemDiv) {
+      itemDiv.classList.remove('unread');
+      const btn = itemDiv.querySelector('.mark-read-btn');
+      if (btn) btn.remove();
+    }
+  });
+});
+
+
     </script>
 {% endblock %}

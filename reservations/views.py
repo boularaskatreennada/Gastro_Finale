@@ -43,17 +43,19 @@ def reserved_tables(request):
 
     
 
-    # Get filters from GET
+    
     filter_date = request.GET.get('filterDate')
     filter_time = request.GET.get('filterTime')
     filter_status = request.GET.get('filterStatus')
-
+    clear = request.GET.get('clear') == '1'
     search = request.GET.get('search')
-    clear = request.GET.get('clear')
+    
     reservations = Reservation.objects.filter(restaurant=restaurant)
-    if clear:
-        # Redirect to clear filters
-        return redirect('reserved_tables')  
+    
+    if clear and not any((request.GET.get('search'), request.GET.get('filterDate'),
+                        request.GET.get('filterTime'), request.GET.get('filterStatus'))):
+        return redirect('reserved_tables')
+     
 
     if filter_date:
         try:
@@ -75,13 +77,14 @@ def reserved_tables(request):
 
     if search:
         reservations = reservations.filter(
-            Q(client__name__icontains=search) |
-            Q(table__id__icontains=search)
-        )
+            Q(client__user__username__icontains=search) |
+            Q(table__icontains=search)
+        ).distinct()
 
     return render(request, 'serveur/reservedTables.html', {
         'reservations': reservations,
         'restaurant': restaurant,
+         'search':search,
     })
 
 @waiter_required
@@ -92,7 +95,7 @@ def update_reservation(request, pk):
     reservation = get_object_or_404(Reservation, pk=pk, restaurant=restaurant)
 
     if request.method == 'POST':
-        # Bind form to POST data and instance
+        
         form = EditReservationForm(request.POST, instance=reservation)
         
         if form.is_valid():
@@ -125,6 +128,16 @@ def update_reservation_status(request, pk):
     return redirect('reserved_tables')
 
 @waiter_required
+def update_reservation_table(request, pk):
+    reservation = get_object_or_404(Reservation, pk=pk)
+    if reservation.status == 'accepted':
+        table_number = request.POST.get('table_number')
+        if table_number:
+            reservation.table = table_number
+            reservation.save()
+    return redirect(request.META.get('HTTP_REFERER', 'some_default_url'))
+
+@waiter_required
 def cancel_reservation(request,pk):
     server = get_object_or_404(Server, user=request.user)
     reservation = get_object_or_404(
@@ -134,7 +147,7 @@ def cancel_reservation(request,pk):
     )
     
     if request.method == 'POST':
-        reservation.status = Reservation.Status.CANCELLED
+        reservation.status = 'canceled'
         reservation.save()
     
     return redirect('reserved_tables')

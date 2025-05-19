@@ -1,11 +1,11 @@
 /* styles-notification.css */
-.main{
-    margin-left: 60px;
+#main{
+    margin-left: 55px;
 }
 .navbar{
     background-color: white;
     box-shadow:0 0 2rem 0 rgba(33, 37,41 , .1) ;
-    width: 95%;
+    width: 100%;
   }
   .navbar-expand .navbar-collapse{
     min-width: 200px;
@@ -16,8 +16,8 @@
     width: 40px;
   }
 .notification {
-    border: none;
-    border-bottom: 1px solid #e9ecef;
+    
+    border: 1px solid #e9ecef;
     padding: 1rem 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -32,4 +32,9 @@
     font-size: 1rem;
     padding: 0.5em;
   }
-  
+  .strong{
+    color: #201a37 !important;
+  }
+  .list-group-item.unread {
+  background-color: #f0f0f0; /* light grey */
+}

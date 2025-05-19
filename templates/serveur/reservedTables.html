@@ -2,14 +2,14 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'styles/waiter/reservedTables.css ' %}">
+<link rel="stylesheet" href="{% static 'styles/waiter/reservedTables.css' %}">
 {% endblock %}
 
 {%  block content%}
 <div id='main' class=" bg-white">
   
   <div class="d-flex flex-wrap justify-content-between  ">
-    <!-- Title + Filters + Search -->
+    
     <nav class="navbar navbar-expand px-3 py-1 bg-basic">
           <h3 class="mb-0">Reserved Tables</h3>
 
@@ -25,11 +25,12 @@
     </nav>
   </div>
  
-      <!-- === Filters bar === -->
+      <!-- Filters -->
       <div class="row g-2 align-items-center mb-3 mt-3">
         <form id="filterForm" method="get" class="row g-2 align-items-center mb-3 mt-3">
           <div class="col-12 col-md-1 d-grid">
-            <button id="clearFilters" type="submit" name="clear" value="1" class="btn  mt-4 shadow-sm filter">All</button>
+            
+            <a href="{% url 'reserved_tables' %}?clear=1" id="clearFilters" class="btn  mt-4 shadow-sm filter">All</a>
           </div>
           <div class="col-6 col-md-2">
             <label class="form-label small" for="filterDate">Date</label>
@@ -46,36 +47,47 @@
           <div class="col-6 col-md-2">
             <label class="form-label small" for="filterStatus">Status</label>
             <select id="filterStatus" name="filterStatus" class="form-select shadow-sm filter">
+                  <option value="" {% if not request.GET.filterStatus %}selected{% endif %}>All</option>
                   <option value="pending" {% if request.GET.filterStatus == 'pending' %}selected{% endif %}>Pending</option>
                   <option value="accepted" {% if request.GET.filterStatus  == 'accepted' %}selected{% endif %}>Accepted</option>
                   <option value="refused" {% if request.GET.filterStatus  == 'refused' %}selected{% endif %}>Refused</option>
-              <option value="Cancelled" {% if request.GET.filterStatus == "Cancelled" %}selected{% endif %}>Cancelled</option>
+              <option value="Canceled" {% if request.GET.filterStatus == "Canceled" %}selected{% endif %}>Cancelled</option>
             </select>
           </div>
           
-          <div class="search-container mt-4 col-12 col-md-3">
-            <i id="search-icon" class="bi bi-search"></i>
-            <input type="text" name="search" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search" value="{{ request.GET.search }}">
-          </div>
-        </form>
+          
+            <div class="col-12 col-md-4 mt-4">
+              <form method="get" action="{% url 'reserved_tables' %}">
+                <div class="search-container">
+                  <i id="search-icon" class="bi bi-search"></i>
+                  <input type="text" name="search" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search" value="{{ request.GET.search|default_if_none:''}}"onkeypress="if(event.key === 'Enter'){ this.form.submit(); }">
+                </div>
+              </form> 
+            </div>
+          
+        
         
       </div>
-  <!-- Cards grid -->
+  <!-- Cards -->
   <div  class="row g-4" >
     {% for reservation in reservations %}
       <div  class="col-sm-6 col-md-3">
         <div id="cardContainer" class="card shadow-sm">
           <div id="card" class="card-body position-relative">
             
-            <span id="tables-num" class="badge position-absolute top-0 start-0 m-2">
-              <input type="number"
-              name="table_number"
-              value="{{ reservation.table }}"
-              placeholder="N°"
-              class="form-control form-control-sm tables-num-input"
-              style="width:70px; display:inline-block; font-size:0.8em; padding:2px 6px;" {% if reservation.status != 'accepted' %}readonly{% endif %}>
-            </span>
-          
+            <form method="post" action="{% url 'update_reservation_table' reservation.pk %}">
+              {% csrf_token %}
+              <span id="tables-num" class="badge position-absolute top-0 start-0 m-2">
+                <input type="number"
+                name="table_number"
+                value="{{ reservation.table }}"
+                
+                placeholder="N°"
+                class="form-control form-control-sm tables-num-input"
+                style="width:70px; display:inline-block; font-size:0.8em; padding:2px 6px;" {% if reservation.status != 'accepted' %}readonly{% endif %}>
+                
+              </span>
+            </form>
             <span class="badge  position-absolute top-0 end-0 m-2 duration"><i class="bi bi-clock-fill"></i>{{ reservation.datetime|date:"H:i" }}</span>
             <p class="mt-4 mb-1"><i class="bi bi-clock"></i><strong>Reservation Time:</strong>{{ reservation.datetime }} </p>
             <p class="mb-1"><i class="bi bi-person"></i><strong>Customer:</strong> {{ reservation.client.user.username }}</p>
@@ -83,6 +95,7 @@
             <p class="mb-1"><i class="bi bi-people"></i><strong>Guests:</strong>{{ reservation.number_of_people }} </p>
             <div class="d-flex mb-3 position-relative">
               <label class="form-label mb-0" for="Status"><i class="mdi mdi-list-status mdi-24px" aria-hidden="true"></i><strong>Status:</strong></label>
+              {% if reservation.status != 'canceled' %}
               <form method="post" action="{% url 'update_reservation_status' reservation.pk %}" class="d-flex align-items-center gap-2 " style="position: absolute; top: 0; left: 0; width: 100%;">
                 {% csrf_token %}
                 
@@ -92,6 +105,12 @@
                   <option value="refused" {% if reservation.status == 'refused' %}selected{% endif %}>Refused</option>
                 </select>
               </form>
+              {% else %}
+                <span 
+                  class="badge bg-danger mt-3" style="position: absolute; left: 90px; font-size:0.8em; padding:2px 6px;">
+                  Canceled
+                </span>
+              {% endif %}
             </div>
             
             <div class="d-flex justify-content-end">
@@ -99,7 +118,7 @@
               
               <form method="post" action="{% url 'cancel_reservation' reservation.pk %}"  style="display:inline;">
                 {% csrf_token %}
-                <button class="btn btn-sm ms-2 btn-outline-danger items"  onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');"><i class="bi bi-trash"></i></button>
+                <button class="btn btn-sm ms-2 btn-outline-danger items"  onclick="return confirm('Are you sure to cancel this reservation?');"><i class="bi bi-trash"></i></button>
               </form>
             </div>
           </div>

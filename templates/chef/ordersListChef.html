@@ -24,7 +24,7 @@
        </nav>
     
         
-          <!-- Top Nav: Categories + Search -->
+          <!-- filters + Search -->
           <div class="container-fluid my-3">
             <div class="filter-bar">
               <ul class="nav nav-pills justify-content-between flex-wrap">
@@ -35,14 +35,14 @@
                   </a>
                 </li>
                 <li class="nav-item flex-fill text-center">
-                  <a href="{% url 'ordersListChef' %}?filter_type=dine-in{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
-                     class="nav-link filter-link {% if filter_type == 'dine-in' %}active{% endif %}">
+                  <a href="{% url 'ordersListChef' %}?filter_type=served{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                     class="nav-link filter-link {% if filter_type == 'served' %}active{% endif %}">
                     Dine In
                   </a>
                 </li>
                 <li class="nav-item flex-fill text-center">
-                  <a href="{% url 'ordersListChef' %}?filter_type=takeaway{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
-                     class="nav-link filter-link {% if filter_type == 'takeaway' %}active{% endif %}">
+                  <a href="{% url 'ordersListChef' %}?filter_type=take-away{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                     class="nav-link filter-link {% if filter_type == 'take-away' %}active{% endif %}">
                     Takeaway
                   </a>
                 </li>
@@ -60,19 +60,20 @@
           <!-- Search Bar -->
           
             
-          <div class="search-container">
-            <i id="search-icon" class="bi bi-search "></i>
-            <input type="text" class="form-control search-input" placeholder="Search..." aria-label="Search">
-            
-          </div>
+          <form method="get" action="{% url 'ordersListChef' %}">
+              <div class="search-container">
+                <i id="search-icon" class="bi bi-search"></i>
+                <input type="text" name="search" class="form-control search-input shadow-sm" placeholder="Search..." aria-label="Search" value="{{ request.GET.search|default_if_none:''}}" onkeypress="if(event.key === 'Enter'){ this.form.submit(); }">
+              </div>
+          </form> 
           
           
           <!-- Orders List -->
         
             {% for order in orders %}
               <div>
-                <!-- Order 1 -->
-                <div class="order-row d-flex justify-content-between align-items-left " >
+                <!-- Orde -->
+                <div class="order-row d-flex justify-content-between align-items-left {% if order.status == 'pending' %} order-pending {% endif %} " >
                   <div class=" align-items-center mb-2">
                     <small class="text-muted m">Order #{{ order.pk }}</small>
                     {% if order.server == NULL %}
@@ -80,6 +81,7 @@
                     {% else %}
                         <h5 class="mb-0 me-2">Table {{ order.table_number}}</h5>
                     {% endif %}
+                    <small class="text-muted mt-4">{{order.order_date|date:"H:i"}}</small>
                   </div>
                   <div class="mb-1 mt-2">
                     <small class="text-muted ">
@@ -90,29 +92,32 @@
 
                   <div class="text-end">
                     <div class="d-flex">
-                      {% if order.status in 'pending preparing' %}
-                        <form method="post" action="{% url 'update_order_status' order.pk %}" class="d-inline">
-                          {% csrf_token %}
-                          <select name="status" class="form-select  d-inline  bg-warning text-dark order-status" onchange="this.form.submit()">
-                            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
-                            <option value="preparing" {% if order.status == 'preparing' %}selected{% endif %}>Preparing</option>
-                            <option value="done" {% if order.status == 'done' %}selected{% endif %}>Done</option>
-                          </select>
-                        </form>
-                      {% else %}
-                        <span class="order-status bg-warning text-dark">
-                          {{ order.status }}
-                        </span>
-                      {% endif %}
+                       {% if order.status == 'pending' %}
+                          <form method="post" action="{% url 'update_order_status' order.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <select name="status" class="form-select d-inline bg-warning text-dark order-status" onchange="this.form.submit()">
+                              <option value="pending" selected>Pending</option>
+                              <option value="preparing">Preparing</option>
+                            </select>
+                          </form>
+                       {% elif order.status == 'preparing' %}
+                          <form method="post" action="{% url 'update_order_status' order.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <select name="status" class="form-select d-inline bg-warning text-dark order-status" onchange="this.form.submit()">
+                              <option value="preparing" selected>Preparing</option>
+                              <option value="done">Done</option>
+                            </select>
+                          </form>
+                        {% else %}
+                          <span class="order-status bg-warning text-dark">
+                            {{ order.status }}
+                          </span>
+                       {% endif %}
                       <button class="btn btn-link p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#items{{ order.pk }}" aria-expanded="false" aria-controls="items{{ order.pk }}">
                         <i id="chevron" class="bi bi-chevron-down"></i>
                       </button>
                     </div>
-                    <div class="d-flex">
-                      <i id="icons" class="mdi mdi-motorbike mdi-20px" aria-hidden="true"></i>
-                      <span class="icon-separator">  </span>
-                      <i id="icons" class="bi bi-person meal-icon"></i>
-                    </div>
+                    
                   </div>
                 </div>
                 <div class="collapse mt-2" id="items{{ order.pk }}">
@@ -141,7 +146,7 @@
               <p>No orders found.</p>
             {% endfor %}
         
-        <!-- End Main Content -->
+        
     
       </div>
  </div>
