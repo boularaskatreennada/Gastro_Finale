@@ -657,7 +657,7 @@ def placeOrder(request):
 @delivery_required
 def notifications_del(request):
     deliveries = Delivery.objects.filter(
-        notified=True).select_related('order__client__user')
+        notified=True).select_related('order__client__user').order_by('-delivery_date') 
     
     return render(request, 'livreur/notificationsDel.html', {
         'deliveries': deliveries,
@@ -668,7 +668,7 @@ def notifications_del(request):
 def notifications_serveur(request):
     my_server = request.user.server
     orders = Order.objects.filter(
-        notified=True,server=my_server).select_related('client__user', 'server', 'restaurant')
+        notified=True,server=my_server).select_related('client__user', 'server', 'restaurant').order_by('-order_date')
 
     return render(request, 'serveur/Notifications.html', {
         'orders':orders,

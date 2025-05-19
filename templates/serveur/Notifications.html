@@ -66,7 +66,6 @@
         <strong>Order #${d.order_id} Served!</strong><br>
         Table: ${d.table}<br>
         Items: ${d.items.join(', ')}<br>
-        <small>${new Date(d.timestamp).toLocaleTimeString()}</small>
         <button class="btn btn-success btn-sm mark-read-btn">Mark as Read</button>
       </div>`;
     document.getElementById('notifContainer').insertAdjacentHTML('afterbegin', html);
