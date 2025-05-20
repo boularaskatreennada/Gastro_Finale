@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-tum#+5vo#e506+a(k#_y@3xv)#o2e0ejts)e@46#1tmpktzfp)
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['192.168.41.179', 'localhost' , '192.168.0.156', '192.168.43.130', '192.168.41.179']
+ALLOWED_HOSTS = ['192.168.0.156', '192.168.41.179', 'localhost' , '192.168.0.156', '192.168.43.130', '192.168.41.179']
 
 AUTH_USER_MODEL = 'restaurant.User'
 

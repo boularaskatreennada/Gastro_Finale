@@ -1,7 +1,7 @@
 from django.db import models
 from restaurant.models import *
 from menu.models import Dish
-
+from offers.models import *
 
 class OrderStatus(models.TextChoices):
     PENDING = 'pending', 'Pending'
@@ -23,7 +23,18 @@ class Order(models.Model):
     server = models.ForeignKey(Server, on_delete=models.SET_NULL, null=True)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     table_number = models.PositiveIntegerField(null=True, blank=True)
-    notified=models.BooleanField(default=False)
+    promo_code = models.CharField(max_length=50, blank=True, null=True)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    
+    @property
+    def total_before_discount(self):
+        return self.total_amount + self.discount_amount
+    
+    @property 
+    def discount_applied(self):
+        return self.discount_amount > 0
+
     def __str__(self):
         return f"Order #{self.id} at {self.restaurant.name} - Table {self.table_number if self.table_number else 'N/A'}"
     @property

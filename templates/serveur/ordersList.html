@@ -100,7 +100,7 @@
           <div class="mb-1 mt-2">
             <small class="text-muted ">
               {{ order.items_count }} item{{ order.items_count|pluralize }} &bull; 
-              <span class="fw-bold text-danger">{{ order.total_price|default:0|floatformat:2 }} DA</span>
+              <span class="fw-bold text-danger">{{ order.final_price|default:0|floatformat:2 }} DA</span>
             </small>
           </div>
           

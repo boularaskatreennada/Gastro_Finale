@@ -16,6 +16,9 @@ from feedback.models import *
 from django.views.decorators.http import require_POST
 from django.db.models import F, Q ,Count ,Sum
 from django.http import Http404
+from django.db.models import Sum, F, Count, Q
+from django.db.models.functions import Coalesce
+from decimal import Decimal
 
 
 
@@ -203,21 +206,74 @@ def placeOrderClient(request):
 @client_required
 def confirm_order(request, order_id):
     order = get_object_or_404(Order, id=order_id, client=request.user.client)
+    
+    # Initialisation des variables
+    subtotal = order.total_amount
+    final_amount = subtotal
+    discount_amount = 0
+    discount_percentage = 0
+    discount_applied = False
+    promo_error = None
+    promo_success = None
+    promo_code = None
 
     if request.method == 'POST':
+        # Traitement du code promo
+        if 'apply_promo' in request.POST:
+            promo_code = request.POST.get('promo_code', '').strip()
+            if promo_code:
+                try:
+                    offer = Offer.objects.get(code=promo_code)
+                    today = timezone.now().date()
+                    
+                    # Vérification de la validité de l'offre
+                    if offer.start_date <= today <= offer.end_date:
+                        discount_percentage = Decimal(str(offer.discount))
+                        discount_amount = (subtotal * discount_percentage) / Decimal('100')
+                        final_amount = subtotal - discount_amount
+                        discount_applied = True
+                        promo_success = f"Promo code applied! {discount_percentage}% discount."
+                        
+                        # Sauvegarde des infos de réduction
+                        order.discount_amount = discount_amount
+                        order.discount_percentage = discount_percentage
+                        order.promo_code = promo_code
+                        order.save()
+                    else:
+                        promo_error = "This promo code is not currently active."
+                except Offer.DoesNotExist:
+                    promo_error = "Invalid promo code."
+
+            # Retourner la réponse
+            return render(request, 'client/confirmOrder.html', {
+                'order': order,
+                'subtotal': subtotal,
+                'final_amount': final_amount,
+                'discount_amount': discount_amount,
+                'discount_percentage': discount_percentage,
+                'discount_applied': discount_applied,
+                'promo_error': promo_error,
+                'promo_success': promo_success,
+                'promo_code': promo_code,
+                'address': request.POST.get('address', ''),
+                'table_number': request.POST.get('table_number', ''),
+            })
+
+        # Traitement de la confirmation de commande
         mode = request.POST.get('mode')
         address = request.POST.get('address', '').strip()
         table_number = request.POST.get('table_number')
+        promo_code = request.POST.get('promo_code', '').strip()
 
+        # Validation du mode de commande
         if mode not in ['served', 'delivered', 'take-away']:
             messages.error(request, "Invalid mode selected.")
             return redirect('confirm_order', order_id=order.id)
 
-
         order.mode = mode
 
+        # Gestion spécifique au mode 'served'
         if mode == 'served':
-            # Validate and save table_number
             if table_number:
                 try:
                     table_number_int = int(table_number)
@@ -231,33 +287,42 @@ def confirm_order(request, order_id):
                 messages.error(request, "Table number is required for served orders.")
                 return redirect('confirm_order', order_id=order.id)
         else:
-            order.table_number = None  # Clear table number for other modes
+            order.table_number = None
 
         order.save()
+
+        # Création d'une livraison si nécessaire
         if mode == 'delivered':
             Delivery.objects.create(
-                    order=order,
-                    delivery_person=None,
-                    delivery_date=timezone.now(),
-                    status=DeliveryStatus.PENDING,
-                    address=address
-                )
-            
+                order=order,
+                delivery_person=None,
+                delivery_date=timezone.now(),
+                status=DeliveryStatus.PENDING,
+                address=address
+            )
+
+        # Mise à jour des points de fidélité
         try:
             client = request.user.client
             client.loyality_points += 1
             client.save()
-            print(f"Updated loyalty points for {client.user.username}")
         except Exception as e:
             print(f"Error updating loyalty points: {e}")
-    
+
         return redirect('profile')
 
-    return render(request, 'client/confirmOrder.html', {'order': order})
-
-
-
-
+    # GET request - Affichage initial
+    return render(request, 'client/confirmOrder.html', {
+        'order': order,
+        'subtotal': subtotal,
+        'final_amount': final_amount,
+        'discount_amount': discount_amount,
+        'discount_percentage': discount_percentage,
+        'discount_applied': discount_applied,
+        'promo_error': promo_error,
+        'promo_success': promo_success,
+        'promo_code': promo_code,
+    })
 
 @waiter_required
 def orders_list(request):
@@ -266,6 +331,7 @@ def orders_list(request):
     restaurant = server.restaurant
     status = request.GET.get('filterStatus')
     order_type = request.GET.get('filterType')
+
     search = request.GET.get('search')
     date_str = request.GET.get('date')
 
@@ -299,24 +365,28 @@ def orders_list(request):
     
     if search:
         orders = orders.filter(
-            Q(client__user__username__icontains=search)).distinct()
+            Q(table__name__icontains=search) |
+            Q(server__user__username__icontains=search) |
+            Q(orderdish__dish__name__icontains=search)
+        ).distinct()
     
     return render(request, 'serveur/ordersList.html', {
         'orders': orders,
         'selected_date': selected_date,
-        'search': search,
+        
     })
 
 
-
-@chef_required
-def order_list_chef(request):
-       # get chefs restaurant
-    chef = get_object_or_404(Chef, user=request.user)
-    restaurant = chef.restaurant
-    filter_type = request.GET.get('filter_type','')
-    date_str = request.GET.get('date')
+@waiter_required
+def orders_list(request):
+    #  Find the restaurant 
+    server     = get_object_or_404(Server, user=request.user)
+    restaurant = server.restaurant
+    status = request.GET.get('filterStatus')
+    order_type = request.GET.get('filterType')
     search = request.GET.get('search')
+    date_str = request.GET.get('date')
+
     if date_str:
         try:
             selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -326,25 +396,112 @@ def order_list_chef(request):
     else:
         selected_date = timezone.localdate()
 
+
     orders = (
         Order.objects
-             .filter(
-                 restaurant=restaurant,
-                 order_date__date=selected_date  
-             ).exclude(status='cancelled').annotate(
-                items_count=Count('orderdish', distinct=True),
-                total_price=Sum(F('orderdish__quantity') * F('orderdish__dish__price')
-                )).order_by('-order_date')
-             .prefetch_related('orderdish_set__dish')
+        .filter(restaurant=restaurant, order_date__date=selected_date)
+        .exclude(status='cancelled')
+        .annotate(
+            items_count=Count('orderdish'),
+            raw_subtotal=Sum(F('orderdish__quantity') * F('orderdish__dish__price'))
+        )
+        .order_by('-order_date')
+        .prefetch_related('orderdish_set__dish')
     )
+    
+    if status:
+        orders = orders.filter(status=status)
+    if order_type:
+        orders = orders.filter(mode=order_type)
+    
+    if search:
+        orders = orders.filter(
+            Q(client__user__username__icontains=search)).distinct()
+    
+    # Calculate final price for each order
+    for order in orders:
+        # Ensure we have proper decimal values
+        order.subtotal = order.raw_subtotal if order.raw_subtotal else Decimal('0.00')
+        
+        # Calculate discounts
+        if order.discount_percentage > 0:
+            discount = (order.subtotal * order.discount_percentage) / Decimal('100')
+            order.final_price = order.subtotal - discount
+        elif order.discount_amount > 0:
+            order.final_price = order.subtotal - order.discount_amount
+        else:
+            order.final_price = order.subtotal
+        
+        # Format for display
+        order.display_subtotal = f"{order.subtotal:.2f}"
+        order.display_final = f"{order.final_price:.2f}"
+        
+    return render(request, 'serveur/ordersList.html', {
+        'orders': orders,
+        'selected_date': selected_date,
+        'search': search,
+    })
+
+
+
+
+
+@chef_required
+def order_list_chef(request):
+    # Get chef's restaurant
+    chef = get_object_or_404(Chef, user=request.user)
+    restaurant = chef.restaurant
+    filter_type = request.GET.get('filter_type', '')
+    date_str = request.GET.get('date')
+    search = request.GET.get('search')
+    
+    if date_str:
+        try:
+            selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            selected_date = None
+    else:
+        selected_date = timezone.localdate()
+
+    # Get base queryset
+    orders = (
+        Order.objects
+        .filter(restaurant=restaurant, order_date__date=selected_date)
+        .exclude(status='cancelled')
+        .annotate(
+            items_count=Count('orderdish'),
+            raw_subtotal=Sum(F('orderdish__quantity') * F('orderdish__dish__price'))
+        )
+        .order_by('-order_date')
+        .prefetch_related('orderdish_set__dish')
+    )
+
 
     if filter_type:
         orders = orders.filter(mode=filter_type)
 
     if search:
         orders = orders.filter(
-            Q(client__user__username__icontains=search)).distinct()
+            Q(client__user__username__icontains=search)
+        ).distinct()
     
+    # Calculate final price for each order
+    for order in orders:
+        # Ensure we have proper decimal values
+        order.subtotal = order.raw_subtotal if order.raw_subtotal else Decimal('0.00')
+        
+        # Calculate discounts
+        if order.discount_percentage > 0:
+            discount = (order.subtotal * order.discount_percentage) / Decimal('100')
+            order.final_price = order.subtotal - discount
+        elif order.discount_amount > 0:
+            order.final_price = order.subtotal - order.discount_amount
+        else:
+            order.final_price = order.subtotal
+        
+        # Format for display
+        order.display_subtotal = f"{order.subtotal:.2f}"
+        order.display_final = f"{order.final_price:.2f}"
     
     return render(request, 'chef/ordersListChef.html', {
         'orders': orders,
@@ -352,6 +509,7 @@ def order_list_chef(request):
         'filter_type': filter_type,
         'search': search,
     })
+
 
 @waiter_required
 def edit_order(request, pk):

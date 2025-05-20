@@ -30,6 +30,23 @@
             {% endfor %}
         </ul>
 
+        <div class="p-3 border-top">
+            <div class="d-flex justify-content-between">
+                <strong>Subtotal:</strong>
+                <span>DA{{ order.total_amount|floatformat:2 }}</span>
+            </div>
+            {% if discount_applied %}
+            <div class="d-flex justify-content-between text-success">
+                <strong>Discount ({{ discount_percentage }}%):</strong>
+                <span>-DA{{ discount_amount|floatformat:2 }}</span>
+            </div>
+            {% endif %}
+            <div class="d-flex justify-content-between mt-2">
+                <strong>Total:</strong>
+                <span class="fw-bold">DA{{ final_amount|floatformat:2 }}</span>
+            </div>
+        </div>
+
         <p class="info-label"><i class="bi bi-shop-window me-2 text-success"></i><strong>Restaurant:</strong> {{ order.restaurant.name }}</p>
         <p class="info-label"><i class="bi bi-calendar-check me-2 text-danger"></i><strong>Order Date:</strong> {{ order.order_date|date:"M d, Y H:i" }}</p>
 
@@ -42,23 +59,37 @@
             {% csrf_token %}
 
             <div class="mb-3">
+                <label for="promo_code" class="form-label"><i class="bi bi-tag me-2 text-warning"></i>Promo Code</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" name="promo_code" id="promo_code" placeholder="Enter promo code" value="{{ promo_code }}">
+                    <button class="btn btn-outline-secondary" type="button" id="apply_promo">Apply</button>
+                </div>
+                {% if promo_error %}
+                    <div class="text-danger mt-1">{{ promo_error }}</div>
+                {% endif %}
+                {% if promo_success %}
+                    <div class="text-success mt-1">{{ promo_success }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
                 <label for="mode" class="form-label"><i class="bi bi-truck me-2 text-primary"></i>Order Mode</label>
                 <select class="form-select" name="mode" id="mode" required>
                     <option value="">Select mode...</option>
-                    <option value="served">🍽️ Served (Dine-in)</option>
-                    <option value="delivered">🚚 Delivered (Home delivery)</option>
-                    <option value="take-away">🥡 Take-away (Pickup)</option>
+                    <option value="served" {% if order.mode == 'served' %}selected{% endif %}>🍽️ Served (Dine-in)</option>
+                    <option value="delivered" {% if order.mode == 'delivered' %}selected{% endif %}>🚚 Delivered (Home delivery)</option>
+                    <option value="take-away" {% if order.mode == 'take-away' %}selected{% endif %}>🥡 Take-away (Pickup)</option>
                 </select>
             </div>
 
             <div class="mb-3" id="delivery-address-group">
                 <label for="address" class="form-label"><i class="bi bi-geo-alt me-2 text-danger"></i>Delivery Address</label>
-                <textarea class="form-control" name="address" id="address" rows="3" placeholder="Enter delivery address..."></textarea>
+                <textarea class="form-control" name="address" id="address" rows="3" placeholder="Enter delivery address...">{{ address }}</textarea>
             </div>
 
             <div class="mb-3" id="table-number-group">
                 <label for="table_number" class="form-label"><i class="bi bi-grid-3x3-gap me-2 text-info"></i>Table Number</label>
-                <input type="number" class="form-control" name="table_number" id="table_number" min="1" placeholder="Enter your table number">
+                <input type="number" class="form-control" name="table_number" id="table_number" min="1" placeholder="Enter your table number" value="{{ table_number }}">
             </div>
 
             <button type="submit" class="btn btn-gradient w-100 mt-3"><i class="bi bi-check-circle me-2"></i>Confirm Order</button>
@@ -69,6 +100,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
+        // Handle order mode changes
         $('#mode').change(function () {
             const mode = $(this).val();
 
@@ -86,6 +118,23 @@
             } else {
                 $('#table-number-group').slideUp();
                 $('#table_number').prop('required', false);
+            }
+        });
+
+        // Trigger change event on page load to set initial state
+        $('#mode').trigger('change');
+
+        // Handle promo code application
+        $('#apply_promo').click(function() {
+            const promoCode = $('#promo_code').val();
+            if (promoCode) {
+                // Submit form with apply_promo flag
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'apply_promo',
+                    value: 'true'
+                }).appendTo('form');
+                $('form').submit();
             }
         });
     });

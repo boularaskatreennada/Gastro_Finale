@@ -126,11 +126,25 @@
                                 {% endfor %}
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <td colspan="3">Order Total:</td>
-                                    <td>{{ order.total }} DA</td>
-                                </tr>
-                            </tfoot>
+    <tr>
+        <td colspan="3">Subtotal:</td>
+        <td>{{ order.subtotal }} DA</td>
+    </tr>
+    {% if order.has_discount %}
+    <tr>
+        <td colspan="3">Discount:
+            {% if order.discount_percentage > 0 %}
+            ({{ order.discount_percentage }}%)
+            {% endif %}
+        </td>
+        <td>-{{ order.discount_amount }} DA</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td colspan="3"><strong>Final Total:</strong></td>
+        <td><strong>{{ order.final_amount }} DA</strong></td>
+    </tr>
+</tfoot>
                         </table>
                     </div>
                 </div>

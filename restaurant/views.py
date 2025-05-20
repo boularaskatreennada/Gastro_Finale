@@ -590,7 +590,6 @@ def landing_page(request):
 
 
 
-
 @client_required
 def profile(request):
     if request.method == 'POST':
@@ -610,15 +609,12 @@ def profile(request):
         u_form = UserUpdateForm(instance=request.user)
         p_form = CustomPasswordChangeForm(user=request.user)
     
-    # Récupérer l'historique des commandes et réservations
-    orders = Order.objects.filter(client=request.user.client).order_by('-order_date')[:5]
-    reservations = Reservation.objects.filter(client=request.user.client).order_by('-datetime')[:5]
-    
+    # Get orders with proper discount calculation
     orders_qs = Order.objects.filter(client=request.user.client).order_by('-order_date')[:5]
     order_details = []
     for order in orders_qs:
         items = []
-        total = 0
+        subtotal = 0
         for od in order.orderdish_set.select_related('dish'):
             item_total = od.quantity * od.dish.price
             items.append({
@@ -627,14 +623,31 @@ def profile(request):
                 'price': od.dish.price,
                 'total': item_total,
             })
-            total += item_total
+            subtotal += item_total
+        
+        # Calculate final amount after discount
+        if order.discount_percentage > 0:
+            # Percentage discount
+            discount_amount = (subtotal * order.discount_percentage) / 100
+            final_amount = subtotal - discount_amount
+        elif order.discount_amount > 0:
+            # Fixed amount discount
+            final_amount = subtotal - order.discount_amount
+        else:
+            # No discount
+            final_amount = subtotal
+        
         order_details.append({
             'id': order.id,
             'date': order.order_date,
             'restaurant': order.restaurant.name,
             'status': order.get_status_display(),
             'items': items,
-            'total': total,
+            'subtotal': subtotal,
+            'discount_amount': order.discount_amount,
+            'discount_percentage': order.discount_percentage,
+            'final_amount': final_amount,
+            'has_discount': order.discount_amount > 0 or order.discount_percentage > 0,
         })
 
     # Historique des réservations
@@ -648,9 +661,6 @@ def profile(request):
     }
     
     return render(request, 'client/profil.html', context)
-
-
-
 
 
 
